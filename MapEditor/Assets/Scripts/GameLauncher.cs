@@ -12,6 +12,7 @@ using UnityEngine;
 /// GameLauncher.cs
 /// ÓÎÏ·Æô¶¯Æ÷
 /// </summary>
-public class GameLauncher : MonoBehaviour {
+public class GameLauncher : MonoBehaviour
+{
 
-}
+} 
