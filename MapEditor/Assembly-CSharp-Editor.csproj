@@ -57,6 +57,9 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Assets\Scripts\Editor\AssetProcesserHook\ScriptAutoProcess\ScriptKeywordProcesser.cs" />
+    <Compile Include="Assets\Scripts\Editor\MapEditor\MapEditorWindow.cs" />
+    <Compile Include="Assets\Scripts\Editor\MapEditor\MapEditorConst.cs" />
+    <Compile Include="Assets\Scripts\Editor\MapEditor\MapStyles.cs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="UnityEngine">

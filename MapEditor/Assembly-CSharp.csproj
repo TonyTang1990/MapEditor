@@ -57,6 +57,18 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Assets\Scripts\GameLauncher.cs" />
+    <Compile Include="Assets\Scripts\MapEditor\Map.cs" />
+    <Compile Include="Assets\Scripts\MapEditor\MapConst.cs" />
+    <Compile Include="Assets\Scripts\MapEditor\MapUtilities.cs" />
+    <Compile Include="Assets\Scripts\MapEditor\MapData\MapDataType.cs" />
+    <Compile Include="Assets\Scripts\MapEditor\MapData\MapData.cs" />
+    <Compile Include="Assets\Scripts\MapEditor\MapObject\MapObjectType.cs" />
+    <Compile Include="Assets\Scripts\MapEditor\MapObject\MapObjectData.cs" />
+    <Compile Include="Assets\Scripts\MapEditor\MapObject\MapObjectConfig.cs" />
+    <Compile Include="Assets\Scripts\MapEditor\MapObject\MapObjectSetting.cs" />
+    <Compile Include="Assets\Scripts\MapEditor\MapData\MapDataSetting.cs" />
+    <Compile Include="Assets\Scripts\MapEditor\MapData\MapDataConfig.cs" />
+    <Compile Include="Assets\Scripts\MapEditor\MapSetting.cs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="UnityEngine">
