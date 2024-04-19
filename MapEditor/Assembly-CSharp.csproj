@@ -8,7 +8,8 @@
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProductVersion>10.0.20506</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
-    <RootNamespace></RootNamespace>
+    <RootNamespace>
+    </RootNamespace>
     <ProjectGuid>{8FDB5A40-4C78-576C-FBF9-6CA5ED291819}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
@@ -57,18 +58,29 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Assets\Scripts\GameLauncher.cs" />
-    <Compile Include="Assets\Scripts\MapEditor\Map.cs" />
-    <Compile Include="Assets\Scripts\MapEditor\MapConst.cs" />
-    <Compile Include="Assets\Scripts\MapEditor\MapUtilities.cs" />
-    <Compile Include="Assets\Scripts\MapEditor\MapData\MapDataType.cs" />
-    <Compile Include="Assets\Scripts\MapEditor\MapData\MapData.cs" />
-    <Compile Include="Assets\Scripts\MapEditor\MapObject\MapObjectType.cs" />
-    <Compile Include="Assets\Scripts\MapEditor\MapObject\MapObjectData.cs" />
-    <Compile Include="Assets\Scripts\MapEditor\MapObject\MapObjectConfig.cs" />
-    <Compile Include="Assets\Scripts\MapEditor\MapObject\MapObjectSetting.cs" />
-    <Compile Include="Assets\Scripts\MapEditor\MapData\MapDataSetting.cs" />
-    <Compile Include="Assets\Scripts\MapEditor\MapData\MapDataConfig.cs" />
-    <Compile Include="Assets\Scripts\MapEditor\MapSetting.cs" />
+    <Compile Include="Assets\Scripts\Map\Map.cs" />
+    <Compile Include="Assets\Scripts\Map\MapConst.cs" />
+    <Compile Include="Assets\Scripts\Map\MapData\MonsterGroupMapData.cs" />
+    <Compile Include="Assets\Scripts\Map\MapData\MonsterMapData.cs" />
+    <Compile Include="Assets\Scripts\Map\MapExport\BaseMapDataExport.cs" />
+    <Compile Include="Assets\Scripts\Map\MapExport\BaseMapDynamicExport.cs" />
+    <Compile Include="Assets\Scripts\Map\MapExport\ColliderMapDynamicExport.cs" />
+    <Compile Include="Assets\Scripts\Map\MapExport\ExportType.cs" />
+    <Compile Include="Assets\Scripts\Map\MapExport\MapDataExport.cs" />
+    <Compile Include="Assets\Scripts\Map\MapExport\MapExport.cs" />
+    <Compile Include="Assets\Scripts\Map\MapExport\MonsterGroupMapDataExport.cs" />
+    <Compile Include="Assets\Scripts\Map\MapExport\PositionExport.cs" />
+    <Compile Include="Assets\Scripts\Map\MapObject\MapObjectDataMono.cs" />
+    <Compile Include="Assets\Scripts\Map\MapUtilities.cs" />
+    <Compile Include="Assets\Scripts\Map\MapData\MapDataType.cs" />
+    <Compile Include="Assets\Scripts\Map\MapData\MapData.cs" />
+    <Compile Include="Assets\Scripts\Map\MapObject\MapObjectType.cs" />
+    <Compile Include="Assets\Scripts\Map\MapObject\MapObjectData.cs" />
+    <Compile Include="Assets\Scripts\Map\MapObject\MapObjectConfig.cs" />
+    <Compile Include="Assets\Scripts\Map\MapObject\MapObjectSetting.cs" />
+    <Compile Include="Assets\Scripts\Map\MapData\MapDataSetting.cs" />
+    <Compile Include="Assets\Scripts\Map\MapData\MapDataConfig.cs" />
+    <Compile Include="Assets\Scripts\Map\MapSetting.cs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="UnityEngine">
