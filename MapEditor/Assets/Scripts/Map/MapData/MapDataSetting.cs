@@ -85,5 +85,16 @@ namespace MapEditor
         {
             return mapDataConfig1.UID.CompareTo(mapDataConfig2.UID);
         }
+
+        /// <summary>
+        /// 获取指定数据埋点UID的配置
+        /// </summary>
+        /// <param name="uid"></param>
+        /// <returns></returns>
+        public MapDataConfig GetMapDataConfigByUID(int uid)
+        {
+            var mapDataConfig = AlllMapDataConfigs.Find(mapDataConfig => mapDataConfig.UID == uid);
+            return mapDataConfig;
+        }
     }
 }

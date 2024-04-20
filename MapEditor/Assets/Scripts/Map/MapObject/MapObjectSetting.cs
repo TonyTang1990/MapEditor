@@ -20,7 +20,6 @@ namespace MapEditor
         [SerializeReference]
         public List<MapObjectConfig> AllMapObjectConfigs = new List<MapObjectConfig>();
 
-
         /// <summary>
         /// 添加指定地图对象配置数据
         /// </summary>
@@ -50,7 +49,7 @@ namespace MapEditor
         /// <returns></returns>
         public bool RemoveMapObjectConfig(MapObjectConfig mapObjectConfig)
         {
-            var result = AlllMapObjectConfigs.Remove(mapObjectConfig);
+            var result = AllMapObjectConfigs.Remove(mapObjectConfig);
             if (result == false)
             {
                 Debug.LogError($"找不到地图对象类型:{mapObjectConfig.ObjectType},对象描述:{mapObjectConfig.Des}对应的地图对象配置数据，删除地图对象配置数据失败！");
@@ -65,7 +64,7 @@ namespace MapEditor
         /// <returns></returns>
         public bool ExistMapObjectConfigByUID(int uid)
         {
-            return AlllMapObjectConfigs.Find(mapDataConfig => mapDataConfig.UID == uid) != null;
+            return AllMapObjectConfigs.Find(mapDataConfig => mapDataConfig.UID == uid) != null;
         }
 
         /// <summary>
@@ -73,7 +72,7 @@ namespace MapEditor
         /// </summary>
         public void DoSortMapObjectConfigs()
         {
-            AlllMapObjectConfigs.Sort(SortMapDataConfigs);
+            AllMapObjectConfigs.Sort(SortMapObjectConfigs);
         }
 
         /// <summary>
@@ -85,6 +84,17 @@ namespace MapEditor
         private int SortMapObjectConfigs(MapObjectConfig mapObjectConfig1, MapObjectConfig mapObjectConfig2)
         {
             return mapObjectConfig1.UID.CompareTo(mapObjectConfig2.UID);
+        }
+
+        /// <summary>
+        /// 获取指定数据对象UID的地图对象配置
+        /// </summary>
+        /// <param name="uid"></param>
+        /// <returns></returns>
+        public MapObjectConfig GetMapObjectConfigByUID(int uid)
+        {
+            var mapObjectConfig = AllMapObjectConfigs.Find(mapObjectConfig => mapObjectConfig.UID == uid);
+            return mapObjectConfig;
         }
     }
 }

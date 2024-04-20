@@ -20,7 +20,7 @@ namespace MapEditor
         /// <summary>
         /// 地图横向默认大小
         /// </summary>
-        public const int DefaultMapSizeWidth = 6;
+        public const int DefaultMapWidth = 6;
 
         /// <summary>
         /// 地图纵向默认大小
@@ -46,5 +46,10 @@ namespace MapEditor
         /// 地图地块节点名
         /// </summary>
         public const string MapTerrianNodeName = "MapTerrian";
+
+        /// <summary>
+        /// 默认地图地形预制件路径
+        /// </summary>
+        public const string DetaulMapTerrianPrefabPath = "Assets/Resources/Terrian/Terrian.prefab";
     }
 }

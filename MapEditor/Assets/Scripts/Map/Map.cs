@@ -97,7 +97,81 @@ namespace MapEditor
         /// </summary>
         private void OnDrawGizmosSelected()
         {
+            if(SceneGUISwitch == false)
+            {
+                return;
+            }
+            if(Event.current.type == EventType.Repaint)
+            {
+                if(MapObjectSceneGUISwich)
+                {
+                    DrawMapObjectDataGizmosGUI();
+                }
+                if(MapDataSceneGUISwich)
+                {
+                    DrawMapDataGizmosGUI();
+                }
+            }
+        }
 
+        /// <summary>
+        /// 绘制地图对象数据Gizmos GUI
+        /// </summary>
+        private void DrawMapObjectDataGizmosGUI()
+        {
+
+        }
+
+        /// <summary>
+        /// 绘制地图埋点数据Gizmos GUI
+        /// </summary>
+        private void DrawMapDataGizmosGUI()
+        {
+            DrawMapCustomDataGizmos();
+        }
+
+        /// <summary>
+        /// 绘制地图埋点自定义数据显示
+        /// </summary>
+        private void DrawMapCustomDataGizmos()
+        {
+            for(int i = 0; i < MapDataList.Count; i++)
+            {
+                var mapData = MapDataList[i];
+                var mapDataConfig = MapSetting.GetEditorInstance().DataSetting.GetMapDataConfigByUID(mapData.UID);
+                if(mapDataConfig == null)
+                {
+                    continue;
+                }
+                var mapDataType = mapDataConfig.DataType;
+                if(mapDataType == MapDataType.MONSTER_GROUP)
+                {
+                    DrawMapMonsterGroupDataGizmos(mapData);
+                }
+            }
+        }
+
+        /// <summary>
+        /// 绘制指定地图怪物组埋点数据的自定义数据Gizmos
+        /// </summary>
+        /// <param name="mapData"></param>
+        private void DrawMapMonsterGroupDataGizmos(MapData mapData)
+        {
+            var monsterGroupMapData = mapData as MonsterGroupMapData;
+            if(monsterGroupMapData == null)
+            {
+                return;
+            }
+            var position = monsterGroupMapData.Position;
+            var preGizmosColor = Gizmos.color;
+            Gizmos.color = Color.Green;
+            Gizmos.DrawWireSphere(position, monsterGroupMapData.MonsterCreateRadius);
+            Gizmos.color = preGizmosColor;
+
+            preGizmosColor = Gizmos.color;
+            Gizmos.color = Color.red;
+            Gizmos.DrawWireSphere(position, monsterGroupMapData.MonsterActiveRadius);
+            Gizmos.color = preGizmosColor;
         }
     }
 }

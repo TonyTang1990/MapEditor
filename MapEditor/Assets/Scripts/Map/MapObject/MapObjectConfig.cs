@@ -74,6 +74,5 @@ namespace MapEditor
         {
             return $"{UID}({ObjectType.ToString()})({Des})";
         }
-
     }
 }
