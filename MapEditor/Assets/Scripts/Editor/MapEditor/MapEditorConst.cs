@@ -38,9 +38,14 @@ namespace MapEditor
         public const float MapObjectIsDynamicUIWidth = 60f;
 
         /// <summary>
+        /// 地图对象关联配置Id UI显示宽度
+        /// </summary>
+        public const float MapObjectConfIdUIWidth = 100f;
+
+        /// <summary>
         /// 地图对象Asset UI显示宽度
         /// </summary>
-        public const float MapObjectAssetUIWIdth = 150f;
+        public const float MapObjectAssetUIWidth = 150f;
 
         /// <summary>
         /// 地图对象描述UI显示宽度
@@ -53,6 +58,11 @@ namespace MapEditor
         public const float MapObjectPreviewUIWidth = 100f;
 
         /// <summary>
+        /// 地图对象预览UI显示高度
+        /// </summary>
+        public const float MapObjectPreviewUIHeight = 100f;
+
+        /// <summary>
         /// 地图埋点UID UI显示宽度
         /// </summary>
         public const float MapDataUIDUIWidth = 40f;
@@ -61,6 +71,11 @@ namespace MapEditor
         /// 地图埋点类型UI显示宽度
         /// </summary>
         public const float MapDataTypeUIWidth = 150f;
+
+        /// <summary>
+        /// 地图埋点关联配置Id UI显示宽度
+        /// </summary>
+        public const float MapDataConfIdUIWidth = 100f;
 
         /// <summary>
         /// 地图埋点颜色UI显示宽度
