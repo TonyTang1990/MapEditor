@@ -4,6 +4,8 @@
  * Create Date:             2024/04/08
  */
 
+using UnityEngine;
+
 namespace MapEditor
 {
     /// <summary>

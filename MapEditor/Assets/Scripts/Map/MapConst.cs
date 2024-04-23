@@ -4,6 +4,8 @@
  * Create Date:             2024/04/08
  */
 
+using System;
+
 namespace MapEditor
 {
     /// <summary>
@@ -35,7 +37,7 @@ namespace MapEditor
         /// <summary>
         /// MapObjectType类型信息
         /// </summary>
-        public static readonly Type MapObjectType = typeof(MapOjectType);
+        public static readonly Type MapObjectType = typeof(MapObjectType);
 
         /// <summary>
         /// 地图对象父节点挂点名

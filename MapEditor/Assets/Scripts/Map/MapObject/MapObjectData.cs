@@ -4,6 +4,9 @@
  * Create Date:             2024/04/08
  */
 
+using System;
+using UnityEngine;
+
 namespace MapEditor
 {
     /// <summary>
@@ -28,7 +31,7 @@ namespace MapEditor
         /// <summary>
         /// 埋点位置
         /// </summary>
-        [Heade("埋点位置")]
+        [Header("埋点位置")]
         public Vector3 Position;
 
         /// <summary>

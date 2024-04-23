@@ -4,6 +4,15 @@
  * Create Date:             2024/04/08
  */
 
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Text;
+using Unity.AI.Navigation;
+using UnityEditor;
+using UnityEngine;
+using UnityEngine.AI;
+
 namespace MapEditor
 {
     /// <summary>
@@ -152,7 +161,7 @@ namespace MapEditor
                 navMeshSurface = mapGO.AddComponent<NavMeshSurface>();
             }
             navMeshSurface.collectObjects = CollectObjects.Children;
-            navMeshSurface.userGeometry = NavMeshCollectGeometry.PhysicsColliders;
+            navMeshSurface.useGeometry = NavMeshCollectGeometry.PhysicsColliders;
             return navMeshSurface;
         }
 
@@ -191,7 +200,7 @@ namespace MapEditor
         /// </summary>
         /// <param name="asset"></param>
         /// <returns></returns>
-        public static Texture2D GetAssetPreview(Object asset)
+        public static Texture2D GetAssetPreview(UnityEngine.Object asset)
         {
             if(asset == null)
             {
@@ -221,9 +230,9 @@ namespace MapEditor
             Color color;
             if(MapDataTypeColorMap.TryGetValue(dataType, out color))
             {
-                retrurn color;
+                return color;
             }
-            return Color.Grey;
+            return Color.grey;
         }
 
         /// <summary>
@@ -290,7 +299,7 @@ namespace MapEditor
                 mapObjectConfig = MapSetting.GetEditorInstance().ObjectSetting.GetMapObjectConfigByUID(mapObjectData.UID);
                 if(mapObjectConfig == null)
                 {
-                    Debug.LogError($"地图对象数据有配置不支持的地图对象UID:{mapData.UID}");
+                    Debug.LogError($"地图对象数据有配置不支持的地图对象UID:{mapObjectData.UID}");
                     return true;
                 }
             }
@@ -384,7 +393,7 @@ namespace MapEditor
                 if(!mapObjectTypeDatasMap.TryGetValue(mapObjectConfig.ObjectType, out mapObjectDataList))
                 {
                     mapObjectDataList = new List<MapObjectData>();
-                    mapObjectTypeDatasMap.Add(mapObjectConfig.ObjectType, out mapObjectDataList);
+                    mapObjectTypeDatasMap.Add(mapObjectConfig.ObjectType, mapObjectDataList);
                 }
                 mapObjectDataList.Add(mapObjectData);
             }
@@ -415,7 +424,7 @@ namespace MapEditor
                 if (!mapDataTypeDatasMap.TryGetValue(mapDataConfig.DataType, out mapDataList))
                 {
                     mapDataList = new List<MapData>();
-                    mapDataTypeDatasMap.Add(mapDataConfig.ObjectType, out mapDataList);
+                    mapDataTypeDatasMap.Add(mapDataConfig.DataType, mapDataList);
                 }
                 mapDataList.Add(mapData);
             }
@@ -479,7 +488,7 @@ namespace MapEditor
         /// </summary>
         /// <param name="map"></param>
         /// <returns></returns>
-        private static MapDataExport GetMapExport(Map map)
+        private static MapExport GetMapExport(Map map)
         {
             MapExport mapExport = new MapExport();
             return mapExport;

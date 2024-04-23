@@ -4,6 +4,14 @@
  * Create Date:             2024/04/08
  */
 
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using Unity.AI.Navigation;
+using UnityEditor;
+using UnityEngine;
+
 namespace MapEditor
 {
     /// <summary>
@@ -176,8 +184,8 @@ namespace MapEditor
             InitTarget();
             InitProperties();
             InitGUIStyles();
-            mMapWidthProperty.intValue = mMapWidthProperty.intValue == 0 ? MapSetting.GetEditorInstance().DefaultMapWidth;
-            mMapHeightProperty.intValue = mMapHeightProperty.intValue == 0 ? MapSetting.GetEditorInstance().DefaultMapHeight;
+            mMapWidthProperty.intValue = mMapWidthProperty.intValue == 0 ? MapSetting.GetEditorInstance().DefaultMapWidth : mMapWidthProperty.intValue;
+            mMapHeightProperty.intValue = mMapHeightProperty.intValue == 0 ? MapSetting.GetEditorInstance().DefaultMapHeight : mMapHeightProperty.intValue;
             CreateAllNodes();
             UpdateMapObjectDataChoiceDatas();
             UpdateMapDataChoiceDatas();
@@ -227,7 +235,7 @@ namespace MapEditor
             {
                 mLabelGUIStyle = new GUIStyle();
                 mLabelGUIStyle.fontSize = 15;
-                mLabelGUIStyle.aligment = TextAnchor.MiddleCenter;
+                mLabelGUIStyle.alignment = TextAnchor.MiddleCenter;
                 mLabelGUIStyle.normal.textColor = Color.red;
             }
         }
@@ -235,7 +243,7 @@ namespace MapEditor
         /// <summary>
         /// 创建所有节点
         /// </summary>
-        private void CreateAllNode()
+        private void CreateAllNodes()
         {
             CreateAllMapObjectParentNodes();
             CreateMapTerrianNode();
@@ -257,7 +265,7 @@ namespace MapEditor
             foreach(var mapObjectTypeValue in mapObjectTypeValues)
             {
                 var mapObjectType = (MapObjectType)mapObjectTypeValue;
-                var mapObjectTypeParentNodeTransform = MapEditorUtilities.GetOrCreateMapObjectTypeParentNode(mapObjectType);
+                var mapObjectTypeParentNodeTransform = MapEditorUtilities.GetOrCreateMapObjectTypeParentNode(mTarget.gameObject, mapObjectType);
                 mapObjectTypeParentNodeTransform.localPosition = Vector3.zero;
             }
         }
@@ -268,7 +276,7 @@ namespace MapEditor
         private void CreateMapTerrianNode()
         {
             var customAsset = mMapTerrianAssetProperty.objectReferenceValue as GameObject;
-            var mapTerrianTransform = MapEditorUtilities.GetOrCreateMapterrianNode(mTarget.gameObject, customAsset);
+            var mapTerrianTransform = MapEditorUtilities.GetOrCreateMapTerrianNode(mTarget.gameObject, customAsset);
             if(mapTerrianTransform != null)
             {
                 mapTerrianTransform.localPosition = Vector3.zero;
@@ -315,7 +323,7 @@ namespace MapEditor
             var meshRenderer = mapTerrianTransform.GetComponent<MeshRenderer>();
             if(meshRenderer != null)
             {
-                meshRenderer.shareMaterial.SetTextureScale("_MainTex", new Vector2(mapWidth, mapHeight));
+                meshRenderer.sharedMaterial.SetTextureScale("_MainTex", new Vector2(mapWidth, mapHeight));
             }
         }
 
@@ -335,7 +343,7 @@ namespace MapEditor
                 {
                     continue;
                 }
-                var goProperty = MapObjectData.FindPropertyRelative("Go");
+                var goProperty = mapObjectDataProperty.FindPropertyRelative("Go");
                 if(goProperty.objectReferenceValue != null)
                 {
                     var positionProperty = mapObjectDataProperty.FindPropertyRelative("Position");
@@ -424,7 +432,7 @@ namespace MapEditor
         /// <summary>
         /// 更新添加选择的地图对象预览Asset
         /// </summary>
-        private void UpdateAddMapObjectDataPreviewAssset()
+        private void UpdateAddMapObjectDataPreviewAsset()
         {
             var addMapObjectValue = mAddMapObjectValueProperty.intValue;
             if(addMapObjectValue != 0)
@@ -539,9 +547,9 @@ namespace MapEditor
                 return false;
             }
             var mapDataIndex2Property = propertyList.GetArrayElementAtIndex(exchangeIndex2);
-            var mapData2 = mapDataIndex2Property.managerReferenceValue;
+            var mapData2 = mapDataIndex2Property.managedReferenceValue;
             var mapDataIndex1Property = propertyList.GetArrayElementAtIndex(exchangeIndex1);
-            var mapData1 = mapDataIndex1Property.managerReferenceValue;
+            var mapData1 = mapDataIndex1Property.managedReferenceValue;
             mapDataIndex1Property.managedReferenceValue = mapData2;
             mapDataIndex2Property.managedReferenceValue = mapData1;
             //Debug.Log($"交换属性数据索引1:{exchangeIndex1}和索引2:{exchangeIndex2}成功！");
@@ -626,7 +634,7 @@ namespace MapEditor
             {
                 var preInsertPos = Math.Clamp(insertPos - 1, 0, maxInsertIndex);
                 var preInsertMapObjectProperty = mMapObjectDataListProperty.GetArrayElementAtIndex(preInsertPos);
-                var preMapObjectData = preInsertMapObjectProperty.managerReferenceValue as MapObjectData;
+                var preMapObjectData = preInsertMapObjectProperty.managedReferenceValue as MapObjectData;
                 mapObjectPosition = preMapObjectData.Go != null ? preMapObjectData.Go.transform.position : preMapObjectData.Position;
             }
             var instanceGo = CreateGameObjectByUID(uid);
@@ -658,7 +666,7 @@ namespace MapEditor
             }
             var mapObjectDataProperty = mMapObjectDataListProperty.GetArrayElementAtIndex(index);
             var goProperty = mapObjectDataProperty.FindPropertyRelative("Go");
-            if(goProperty.objectRefrenceValue != null)
+            if(goProperty.objectReferenceValue != null)
             {
                 var positionProperty = mapObjectDataProperty.FindPropertyRelative("Position");
                 positionProperty.vector3Value = Vector3.zero;
@@ -705,7 +713,7 @@ namespace MapEditor
             }
             var newMapData = MapUtilities.CreateMapDataByType(mapDataType, uid, mapDataPosition);
             var newMapObjectDataProperty = mMapObjectDataListProperty.GetArrayElementAtIndex(insertPos);
-            newMapObjectDataProperty.managedReferenceValue = newMapObjectData;
+            newMapObjectDataProperty.managedReferenceValue = newMapData;
             serializedObject.ApplyModifiedProperties();
             return true;
         }
@@ -736,7 +744,7 @@ namespace MapEditor
             var isPrefabAssetInstance = PrefabUtility.IsPartOfPrefabInstance(mTarget.gameObject);
             if(isPrefabAssetInstance)
             {
-                var prefabStage = PrefabStageUtility.GetCurrentPrefabStage();
+                var prefabStage = UnityEditor.SceneManagement.PrefabStageUtility.GetCurrentPrefabStage();
                 if(prefabStage == null)
                 {
                     Debug.LogError($"此功能在预制件Asset下仅支持打开嵌套预制件模式下使用！");
@@ -757,7 +765,7 @@ namespace MapEditor
                 var goProperty = mapObjectDataProperty.FindPropertyRelative("Go");
                 if(mapObjectConfig.IsDynamic && goProperty.objectReferenceValue != null)
                 {
-                    var go = goProperty.objectReference as GameObject;
+                    var go = goProperty.objectReferenceValue as GameObject;
                     GameObject.DestroyImmediate(go);
                     goProperty.objectReferenceValue = null;
                 }
@@ -838,14 +846,14 @@ namespace MapEditor
         {
             for(int i = 0; i < mMapObjectDataListProperty.arraySize; i++)
             {
-                var mapObjectDataProperty = mMapObjectDataListProperty.GetArrayElementAt(i);
-                var goProperty = mapObjectDataProperty.FinPropertyRelative("Go");
-                if(goProperty.objectReference == null)
+                var mapObjectDataProperty = mMapObjectDataListProperty.GetArrayElementAtIndex(i);
+                var goProperty = mapObjectDataProperty.FindPropertyRelative("Go");
+                if(goProperty.objectReferenceValue == null)
                 {
                     continue;
                 }
                 var uidProperty = mapObjectDataProperty.FindPropertyRelative("UID");
-                var go = goProperty.objectReference as GameObject;
+                var go = goProperty.objectReferenceValue as GameObject;
                 MapEditorUtilities.AddOrUpdateMapObjectDataMono(go, uidProperty.intValue);
             }
         }
@@ -944,7 +952,7 @@ namespace MapEditor
             {
                 ExportMapData();
             }
-            EditorGUILayout.EndHorinztal();
+            EditorGUILayout.EndHorizontal();
             EditorGUILayout.EndVertical();
         }
 
@@ -955,7 +963,7 @@ namespace MapEditor
         {
             EditorGUILayout.BeginVertical("box");
             EditorGUILayout.BeginHorizontal();
-            mPanelToolBarSelectIndex = GUILayout.Toolbar(mPanelToolBarSelectIndex, mPanelToolBarStrings, EditorStyles.toobarButton, GUILayout.ExpandWidth(true));
+            mPanelToolBarSelectIndex = GUILayout.Toolbar(mPanelToolBarSelectIndex, mPanelToolBarStrings, EditorStyles.toolbarButton, GUILayout.ExpandWidth(true));
             mSelectedTabType = (MapTabType)mPanelToolBarSelectIndex;
             EditorGUILayout.EndHorizontal();
             if(mSelectedTabType == MapTabType.MapBuild)
@@ -990,10 +998,10 @@ namespace MapEditor
                 EditorGUILayout.BeginHorizontal();
                 EditorGUILayout.LabelField("地图对象选择:", GUILayout.Width(100f));
                 EditorGUI.BeginChangeCheck();
-                mAddMapObjectValueProperty.intValue = EditorGUILayout.InitPopup(mAddMapObjectValueProperty.inValue, mMapObjectDataChoiceOptions, mMapObjectDataChoiceValues, GUILayout.ExpandWidth(true));
+                mAddMapObjectValueProperty.intValue = EditorGUILayout.IntPopup(mAddMapObjectValueProperty.intValue, mMapObjectDataChoiceOptions, mMapObjectDataChoiceValues, GUILayout.ExpandWidth(true));
                 if(EditorGUI.EndChangeCheck())
                 {
-                    UpdateAddMapObjectDataPreviewAssset();
+                    UpdateAddMapObjectDataPreviewAsset();
                 }
                 if(GUILayout.Button("+", GUILayout.Width(40f)))
                 {
@@ -1016,7 +1024,7 @@ namespace MapEditor
         /// </summary>
         private void DrawMapObjectDataListArea()
         {
-            mMapObjectDataAreaUnfold = EditorGUILayout.FoldOut(mMapObjectDataAreaUnfold, "地图对象数据列表");
+            mMapObjectDataAreaUnfold = EditorGUILayout.Foldout(mMapObjectDataAreaUnfold, "地图对象数据列表");
             if(mMapObjectDataAreaUnfold)
             {
                 DrawMapObjectTitleArea();
@@ -1064,7 +1072,7 @@ namespace MapEditor
             if(mapObjectConfig != null)
             {
                 EditorGUILayout.LabelField(mapObjectConfig.ObjectType.ToString(), MapStyles.TabMiddleStyle, GUILayout.Width(150f));
-                EditorGUILayout.space(20f, false);
+                EditorGUILayout.Space(20f, false);
                 EditorGUILayout.Toggle(mapObjectConfig.IsDynamic, GUILayout.Width(40f));
                 EditorGUILayout.IntField(mapObjectConfig.ConfId, MapStyles.TabMiddleStyle, GUILayout.Width(100f));
             }
@@ -1105,7 +1113,7 @@ namespace MapEditor
             EditorGUILayout.BeginVertical("box");
             DrawMapDataOperationArea();
             DrawMapDataArea();
-            EditrGUILayout.EndVertical();
+            EditorGUILayout.EndVertical();
         }
 
         /// <summary>
@@ -1138,7 +1146,7 @@ namespace MapEditor
         /// </summary>
         private void DrawMapCommonDataArea()
         {
-            mMapDataAreaUnfold = EditorGUILaout.Foldout(mMapDataAreaUnfold, "地图埋点数据列表");
+            mMapDataAreaUnfold = EditorGUILayout.Foldout(mMapDataAreaUnfold, "地图埋点数据列表");
             if(mMapDataAreaUnfold)
             {
                 DrawMapDataTitleArea();
@@ -1382,7 +1390,7 @@ namespace MapEditor
                     }
                     if(mMapDataSceneGUISwitchProperty != null && mMapDataSceneGUISwitchProperty.boolValue)
                     {
-                        DrawMapDataLabels();
+                        //DrawMapDataLabels();
                         DrawMapDataSpheres();
                     }
                 }
@@ -1424,7 +1432,7 @@ namespace MapEditor
                 }
                 var uidProperty = mapObjectDataProperty.FindPropertyRelative("UID");
                 var mapObjectUID = uidProperty.intValue;
-                var mapObjectConfig = MapSetting.GetEditorInstance().ObjectSetting.GetMapObjectConfigByUID(uid);
+                var mapObjectConfig = MapSetting.GetEditorInstance().ObjectSetting.GetMapObjectConfigByUID(mapObjectUID);
                 var mapObjectDes = mapObjectConfig != null ? mapObjectConfig.Des : "";
                 var mapObjectLabelName = $"[{i}]{mapObjectDes}";
                 var labelPos = go.transform.position + MapEditorConst.MapObjectDataLabelPosOffset;
@@ -1444,9 +1452,9 @@ namespace MapEditor
                 var mapDataUID = uidProperty.intValue;
                 var mapDataPositionProperty = mapDataProperty.FindPropertyRelative("Position");
                 var mapDataConfig = MapSetting.GetEditorInstance().DataSetting.GetMapDataConfigByUID(mapDataUID);
-                var preHandlesColor = Handles.Color;
+                var preHandlesColor = Handles.color;
                 Handles.color = mapDataConfig != null ? mapDataConfig.SceneSphereColor : Color.gray;
-                preHandlesColor.SphereHandleCap(i, mapDataPositionProperty.vector3Value, Quaternion.identity, MapEditorConst.MapDataSphereSize, EventType.Repaint);
+                Handles.SphereHandleCap(i, mapDataPositionProperty.vector3Value, Quaternion.identity, MapEditorConst.MapDataSphereSize, EventType.Repaint);
                 Handles.color = preHandlesColor;
             }
         }
@@ -1461,7 +1469,7 @@ namespace MapEditor
                 EditorGUI.BeginChangeCheck();
                 var mapDataProperty = mMapDataListProperty.GetArrayElementAtIndex(i);
                 var mapDataPositionProperty = mapDataProperty.FindPropertyRelative("Position");
-                var newTargetPosition = Handles.PositionHandle(mapDataPositionProperty.vector3Value, Quaternion.identy);
+                var newTargetPosition = Handles.PositionHandle(mapDataPositionProperty.vector3Value, Quaternion.identity);
                 if(EditorGUI.EndChangeCheck())
                 {
                     mapDataPositionProperty.vector3Value = newTargetPosition;

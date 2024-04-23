@@ -4,6 +4,11 @@
  * Create Date:             2024/04/08
  */
 
+using System;
+using UnityEditor;
+using UnityEditor.SceneManagement;
+using UnityEngine;
+
 namespace MapEditor
 {
     /// <summary>
@@ -56,7 +61,7 @@ namespace MapEditor
         /// <summary>
         /// 计时器
         /// </summary>
-        private Stopwatch mTimeWatcher = new Stopwatch();
+        private System.Diagnostics.Stopwatch mTimeWatcher = new System.Diagnostics.Stopwatch();
 
         /// <summary>
         /// 地图编辑器设置数据
@@ -199,7 +204,7 @@ namespace MapEditor
         /// </summary>
         private void DoQuickSelectGameMapInScene()
         {
-            var map = GameObject.FindFirstObjectType<Map>();
+            var map = GameObject.FindObjectOfType<Map>();
             if (map != null)
             {
                 Selection.SetActiveObjectWithContext(map.gameObject, map.gameObject);
@@ -307,9 +312,9 @@ namespace MapEditor
             EditorGUILayout.BeginHorizontal();
             EditorGUILayout.LabelField("地图对象UID:", GUILayout.Width(80f));
             mAddMapObjectUID = EditorGUILayout.IntField(mAddMapObjectUID, GUILayout.Width(100f));
-            EditorGUILayout.Labelfield("地图对象类型:", GUILayout.Width(80f));
+            EditorGUILayout.LabelField("地图对象类型:", GUILayout.Width(80f));
             mAddMapObjectType = (MapObjectType)EditorGUILayout.EnumPopup(mAddMapObjectType, GUILayout.Width(150f));
-            EditorGUILayout.Labelfield("是否动态对象:", GUILayout.Width(80f));
+            EditorGUILayout.LabelField("是否动态对象:", GUILayout.Width(80f));
             mAddIsDynamic = EditorGUILayout.Toggle(mAddIsDynamic, GUILayout.ExpandWidth(true));
             if (GUILayout.Button("+", GUILayout.ExpandWidth(true)))
             {
@@ -353,14 +358,14 @@ namespace MapEditor
                 EditorGUILayout.Space(MapEditorConst.MapObjectIsDynamicUIWidth / 3, false);
                 mapObjectConfig.IsDynamic = EditorGUILayout.Toggle(mapObjectConfig.IsDynamic, GUILayout.Width(MapEditorConst.MapObjectIsDynamicUIWidth * 2 / 3));
                 EditorGUI.BeginChangeCheck();
-                mapObjectConfig.ConfId = EditorGUILayout.IntField(mapObjectConfig.ConfId, GUILayout.Width(MapEditorConst.MapObjectConfIdUIWIdth));
+                mapObjectConfig.ConfId = EditorGUILayout.IntField(mapObjectConfig.ConfId, GUILayout.Width(MapEditorConst.MapObjectConfIdUIWidth));
                 if (EditorGUI.EndChangeCheck())
                 {
                     OnMapObjectConfigIdChange();
                 }
-                mapObjectConfig.Asset = EditorGUILayout.ObjectField(mapObjectConfig.Asset, MapConst.GameObjectType, false, GUILayout.Width(MapEditorConst.MapObjectAssetUIWIdth));
-                mapObjectConfig.Des = EditorGUILayout.LabelField(mapObjectConfig.Des, GUILayout.Width(MapEditorConst.MapObjectDesUIWidth));
-                var assetPreview = mapObjectConfig != null ? MapEditorUtilities.GetAssetPreview(mapObjectConfig.Asset) ; null;
+                mapObjectConfig.Asset = (GameObject)EditorGUILayout.ObjectField(mapObjectConfig.Asset, MapConst.GameObjectType, false, GUILayout.Width(MapEditorConst.MapObjectAssetUIWidth));
+                mapObjectConfig.Des = EditorGUILayout.TextField(mapObjectConfig.Des, GUILayout.Width(MapEditorConst.MapObjectDesUIWidth));
+                var assetPreview = mapObjectConfig != null ? MapEditorUtilities.GetAssetPreview(mapObjectConfig.Asset) : null;
                 GUILayout.Box(assetPreview, GUILayout.Width(MapEditorConst.MapObjectPreviewUIWidth), GUILayout.Height(MapEditorConst.MapObjectPreviewUIHeight));
                 if (GUILayout.Button("-", GUILayout.ExpandWidth(true)))
                 {
@@ -386,11 +391,11 @@ namespace MapEditor
             DrawMapDataConfigAddView();
             DrawMapDataConfigTitleView();
             mMapDataPanelScrollPos = EditorGUILayout.BeginScrollView(mMapDataPanelScrollPos);
-            if (mMapSettingAsset.DataSetting.AddMapDataConfig.Count > 0)
+            if (mMapSettingAsset.DataSetting.AlllMapDataConfigs.Count > 0)
             {
-                for (int i = 0; i < mMapSettingAsset.DataSetting.AddMapDataConfig.Count; i++)
+                for (int i = 0; i < mMapSettingAsset.DataSetting.AlllMapDataConfigs.Count; i++)
                 {
-                    DrawOneMapDataConfigView(mMapSettingAsset.DataSetting.AddMapDataConfig[i]);
+                    DrawOneMapDataConfigView(mMapSettingAsset.DataSetting.AlllMapDataConfigs[i]);
                 }
             }
             else
@@ -409,7 +414,7 @@ namespace MapEditor
             EditorGUILayout.BeginHorizontal();
             EditorGUILayout.LabelField("地图埋点UID:", GUILayout.Width(80f));
             mAddMapDataUID = EditorGUILayout.IntField(mAddMapDataUID, GUILayout.Width(100f));
-            EditorGUILayout.Labelfield("地图埋点类型:", GUILayout.Width(80f));
+            EditorGUILayout.LabelField("地图埋点类型:", GUILayout.Width(80f));
             mSelectedMapDataType = (MapDataType)EditorGUILayout.EnumPopup(mSelectedMapDataType, GUILayout.Width(150f));
             if (GUILayout.Button("+", GUILayout.ExpandWidth(true)))
             {
@@ -444,7 +449,7 @@ namespace MapEditor
             {
                 EditorGUILayout.BeginHorizontal();
                 EditorGUILayout.IntField(mapDataConfig.UID, MapStyles.ButtonMidStyle, GUILayout.Width(MapEditorConst.MapDataUIDUIWidth));
-                EditorGUILayout.LabelField(mapDataConfig.ObjectType.ToString(), MapStyles.ButtonMidStyle, GUILayout.Width(MapEditorConst.MapDataTypeUIWidth));
+                EditorGUILayout.LabelField(mapDataConfig.DataType.ToString(), MapStyles.ButtonMidStyle, GUILayout.Width(MapEditorConst.MapDataTypeUIWidth));
                 EditorGUI.BeginChangeCheck();
                 mapDataConfig.ConfId = EditorGUILayout.IntField(mapDataConfig.ConfId, GUILayout.Width(MapEditorConst.MapDataConfIdUIWidth));
                 if (EditorGUI.EndChangeCheck())
@@ -452,7 +457,7 @@ namespace MapEditor
                     OnMapDataConfigIdChange();
                 }
                 mapDataConfig.SceneSphereColor = EditorGUILayout.ColorField(mapDataConfig.SceneSphereColor, GUILayout.Width(MapEditorConst.MapDataColorUIWidth));
-                mapDataConfig.Des = EditorGUILayout.LabelField(mapDataConfig.Des, GUILayout.Width(MapEditorConst.MapDataDesUIWidth));
+                mapDataConfig.Des = EditorGUILayout.TextField(mapDataConfig.Des, GUILayout.Width(MapEditorConst.MapDataDesUIWidth));
                 if (GUILayout.Button("-", GUILayout.ExpandWidth(true)))
                 {
                     DoRemoveMapDataConfig(mapDataConfig);

@@ -4,6 +4,9 @@
  * Create Date:             2024/04/19
  */
 
+using System.Collections.Generic;
+using UnityEngine;
+
 namespace MapEditor
 {
     /// <summary>
@@ -30,6 +33,6 @@ namespace MapEditor
         /// <summary>
         /// 出生点位置列表
         /// </summary>
-        public List<PositionExport> BirthPos = new List<PositionExport>;
+        public List<PositionExport> BirthPos = new List<PositionExport>();
     }
 }

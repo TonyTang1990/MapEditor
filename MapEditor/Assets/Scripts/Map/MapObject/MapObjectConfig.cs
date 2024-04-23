@@ -4,13 +4,16 @@
  * Create Date:             2024/04/08
  */
 
+using System;
+using UnityEngine;
+
 namespace MapEditor
 {
     /// <summary>
     /// MapObjectConfig.cs
     /// 地图对象数据配置
     /// </summary>
-    [Serilizable]
+    [Serializable]
     public class MapObjectConfig
     {
         /// <summary>

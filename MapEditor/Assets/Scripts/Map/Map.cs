@@ -164,7 +164,7 @@ namespace MapEditor
             }
             var position = monsterGroupMapData.Position;
             var preGizmosColor = Gizmos.color;
-            Gizmos.color = Color.Green;
+            Gizmos.color = Color.green;
             Gizmos.DrawWireSphere(position, monsterGroupMapData.MonsterCreateRadius);
             Gizmos.color = preGizmosColor;
 

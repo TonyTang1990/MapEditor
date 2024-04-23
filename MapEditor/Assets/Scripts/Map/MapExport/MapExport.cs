@@ -1,12 +1,19 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿/*
+ * Description:             MapExport.cs
+ * Author:                  TONYTANG
+ * Create Date:             2024/04/23
+ */
 
-namespace Assets.Scripts.Map.MapExport
+using UnityEngine;
+
+namespace MapEditor
 {
-    class MapExport
+    /// <summary>
+    /// MapExport.cs
+    /// 地图导出数据结构定义
+    /// </summary>
+    public class MapExport
     {
+
     }
 }
