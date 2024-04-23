@@ -1390,7 +1390,7 @@ namespace MapEditor
                     }
                     if(mMapDataSceneGUISwitchProperty != null && mMapDataSceneGUISwitchProperty.boolValue)
                     {
-                        //DrawMapDataLabels();
+                        DrawMapDataLabels();
                         DrawMapDataSpheres();
                     }
                 }
@@ -1437,6 +1437,21 @@ namespace MapEditor
                 var mapObjectLabelName = $"[{i}]{mapObjectDes}";
                 var labelPos = go.transform.position + MapEditorConst.MapObjectDataLabelPosOffset;
                 Handles.Label(labelPos, mapObjectLabelName, mLabelGUIStyle);
+            }
+        }
+
+        /// <summary>
+        /// 绘制地图埋点标签
+        /// </summary>
+        private void DrawMapDataLabels()
+        {
+            for (int i = 0; i < mMapDataListProperty.arraySize; i++)
+            {
+                var mapDataProperty = mMapDataListProperty.GetArrayElementAtIndex(i);
+                string mapDataLabelName = MapEditorUtilities.GetMapDataPropertyLabelName(mMapDataListProperty, i);
+                var mapDataPositionProperty = mapDataProperty.FindPropertyRelative("Position");
+                var labelPos = mapDataPositionProperty.vector3Value + MapEditorConst.MapDAtaLabelPosOffset;
+                Handles.Label(labelPos, mapDataLabelName, mLabelGUIStyle);
             }
         }
 
