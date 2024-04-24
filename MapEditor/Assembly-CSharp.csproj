@@ -8,7 +8,8 @@
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProductVersion>10.0.20506</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
-    <RootNamespace></RootNamespace>
+    <RootNamespace>
+    </RootNamespace>
     <ProjectGuid>{8FDB5A40-4C78-576C-FBF9-6CA5ED291819}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
@@ -58,6 +59,7 @@
   <ItemGroup>
     <Compile Include="Assets\Scripts\Map\MapData\MapDataConfig.cs" />
     <Compile Include="Assets\Scripts\Map\MapData\MonsterMapData.cs" />
+    <Compile Include="Assets\Scripts\Map\MapExport\MonsterMapDataExport.cs" />
     <Compile Include="Assets\Scripts\Map\MapObject\MapObjectType.cs" />
     <Compile Include="Assets\Scripts\Map\MapData\MonsterGroupMapData.cs" />
     <Compile Include="Assets\Scripts\Map\MapObject\MapObjectDataMono.cs" />
@@ -78,7 +80,6 @@
     <Compile Include="Assets\Scripts\Map\MapObject\MapObjectSetting.cs" />
     <Compile Include="Assets\Scripts\Map\MapConst.cs" />
     <Compile Include="Assets\Scripts\Map\MapExport\BaseMapDataExport.cs" />
-    <Compile Include="Assets\Scripts\Map\MapExport\PositionExport.cs" />
     <Compile Include="Assets\Scripts\Map\MapObject\MapObjectData.cs" />
   </ItemGroup>
   <ItemGroup>

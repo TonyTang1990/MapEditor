@@ -4,6 +4,7 @@
  * Create Date:             2024/04/19
  */
 
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -13,6 +14,7 @@ namespace MapEditor
     /// MapDataExport.cs
     /// 导出地图相关数据结构定义
     /// </summary>
+    [Serializable]
     public class MapDataExport
     {
         /// <summary>
@@ -33,6 +35,14 @@ namespace MapEditor
         /// <summary>
         /// 出生点位置列表
         /// </summary>
-        public List<PositionExport> BirthPos = new List<PositionExport>();
+        public List<Vector3> BirthPos = new List<Vector3>();
+
+        public MapDataExport(int width, int height, Vector3 startPos, List<Vector3> birthPos)
+        {
+            Width = width;
+            Height = height;
+            StartPos = startPos;
+            BirthPos = birthPos;
+        }
     }
 }

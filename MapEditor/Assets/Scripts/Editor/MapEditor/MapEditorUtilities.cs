@@ -491,6 +491,106 @@ namespace MapEditor
         private static MapExport GetMapExport(Map map)
         {
             MapExport mapExport = new MapExport();
+            var mapDataTypeDatasMap = GetMapDataTypeDatas(map);
+            mapExport.MapData.Width = map.MapWidth;
+            mapExport.MapData.Height = map.MapHeight;
+            mapExport.MapData.StartPos = map.MapStartPos;
+            List<MapData> playerSpawnDatas;
+            if(mapDataTypeDatasMap.TryGetValue(MapDataType.PLAYER_SPAWN, out playerSpawnDatas))
+            {
+                foreach(var playerSpawnData in playerSpawnDatas)
+                {
+                    mapExport.MapData.BirthPos.Add(playerSpawnData.Position);
+                }
+            }
+
+            foreach(var mapObjectData in map.MapObjectDataList)
+            {
+                var mapObjectUID = mapObjectData.UID;
+                var mapObjectConfig = MapSetting.GetEditorInstance().ObjectSetting.GetMapObjectConfigByUID(mapObjectUID);
+                if(mapObjectConfig.IsDynamic)
+                {
+                    var mapDataExport = GetMapDataExport(mapData);
+                    mapExport.AllDynamicMapObjectDatas.Add(mapDataExport);
+                }
+            }
+
+            foreach(var mapData in map.MapDataList)
+            {
+                var mapDataExport = GetMapDataExport(mapData);
+                mapExport.AllMapDatas.Add(mapDataExport);
+            }
+            return mapExport;
+        }
+
+        /// <summary>
+        /// 获取制定地图对象数据的地图对象导出数据
+        /// </summary>
+        /// <param name="mapObjectData"></param>
+        /// <returns></returns>
+        private static BaseMapDynamicExport GetMapDataExport(MapObjectData mapObjectData)
+        {
+            if(mapObjectData == null)
+            {
+                Debug.LogError($"不允许获取空地图对象数据的地图对象导出数据，获取地图对象数据导出数据失败！");
+                return null;
+            }
+            var mapObjectUID = mapObjectData.UID;
+            var mapObjectConfig = MapSetting.GetEditorInstance().ObjectSetting.GetMapObjectConfigByUID(mapObjectUID);
+            if(mapObjectConfig == null)
+            {
+                Debug.LogError($"找不到地图对象UID:{mapObjectUID}的配置，获取地图对象数据导出数据失败！");
+                return null;
+            }
+            BaseMapDynamicExport mapExport;
+            var mapObjectType = mapObjectConfig.ObjectType;
+            if(mapObjectType == MapObjectType.TREASURE_BOX)
+            {
+                mapExport = new ColliderMapDynamicExport(mapObjectConfig.ConfId, mapObjectData.Position, mapObjectData.ColliderCenter, mapObjectData.ColliderSize);
+            }
+            else
+            {
+                mapExport = new BaseMapDynamicExport(mapObjectConfig.ConfId, mapObjectData.Position);
+            }
+            return mapExport;
+        }
+
+        /// <summary>
+        /// 获取指定地图埋点数据的地图埋点导出数据
+        /// </summary>
+        /// <param name="mapData"></param>
+        /// <returns></returns>
+        private static BaseMapDataExport GetMapDataExport(MapData mapData)
+        {
+            if (mapData == null)
+            {
+                Debug.LogError($"不允许获取空地图埋点数据的地图埋点导出数据，获取地图埋点数据导出数据失败！");
+                return null;
+            }
+            var mapDataUID = mapData.UID;
+            var mapDataConfig = MapSetting.GetEditorInstance().DataSetting.GetMapDataConfigByUID(mapDataUID);
+            if (mapDataConfig == null)
+            {
+                Debug.LogError($"找不到地图埋点UID:{mapDataUID}的配置，获取地图埋点数据导出数据失败！");
+                return null;
+            }
+            BaseMapDataExport mapExport;
+            var mapDataType = mapDataConfig.DataType;
+            if (mapDataType == MapDataType.MONSTER_GROUP)
+            {
+                var monsterGroupMapData = mapData as MonsterGroupMapData;
+                mapExport = new MonsterGroupMapDataExport(mapDataConfig.ConfId, monsterGroupMapData.Position, monsterGroupMapData.GroupId,
+                                                            monsterGroupMapData.MonsterCreateRadius, monsterGroupMapData.MonsterActiveRadius);
+            }
+            else if(mapDataType == MapDataType.MONSTER)
+            {
+                var monsterMapData = mapData as MonsterMapData;
+                mapExport = new MonsterMapDataExport(mapDataConfig.ConfId, monsterMapData.Position, monsterMapData.GroupId);
+            }
+            else
+            {
+                mapExport = new BaseMapDataExport(mapDataConfig.ConfId, mapObjectData.Position);
+            }
             return mapExport;
         }
     }
