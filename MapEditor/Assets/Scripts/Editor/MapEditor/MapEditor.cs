@@ -632,10 +632,10 @@ namespace MapEditor
             var mapObjectPosition = mMapStartPosProperty.vector3Value;
             if(mapObjectDataTotalNum != 0)
             {
-                var preInsertPos = Math.Clamp(insertPos - 1, 0, maxInsertIndex);
-                var preInsertMapObjectProperty = mMapObjectDataListProperty.GetArrayElementAtIndex(preInsertPos);
-                var preMapObjectData = preInsertMapObjectProperty.managedReferenceValue as MapObjectData;
-                mapObjectPosition = preMapObjectData.Go != null ? preMapObjectData.Go.transform.position : preMapObjectData.Position;
+                var insertMapObjectPos = Math.Clamp(insertPos, 0, maxInsertIndex - 1);
+                var insertMapObjectProperty = mMapObjectDataListProperty.GetArrayElementAtIndex(insertMapObjectPos);
+                var insertMapObjectData = insertMapObjectProperty.managedReferenceValue as MapObjectData;
+                mapObjectPosition = insertMapObjectData.Go != null ? insertMapObjectData.Go.transform.position : insertMapObjectData.Position;
             }
             var instanceGo = CreateGameObjectByUID(uid);
             if(instanceGo != null)
@@ -706,10 +706,10 @@ namespace MapEditor
             var mapDataPosition = mMapStartPosProperty.vector3Value;
             if(mapDataTotalNum != 0)
             {
-                var preInsertPos = Math.Clamp(insertPos - 1, 0, maxInsertIndex);
-                var preInsertMapDataProperty = mMapDataListProperty.GetArrayElementAtIndex(preInsertPos);
-                var preMapData = preInsertMapDataProperty.managedReferenceValue as MapData;
-                mapDataPosition = preMapData != null ? preMapData.Position : mapDataPosition;
+                var insertMapDataPos = Math.Clamp(insertPos, 0, maxInsertIndex - 1);
+                var insertMapDataProperty = mMapDataListProperty.GetArrayElementAtIndex(insertMapDataPos);
+                var insertMapData = insertMapDataProperty.managedReferenceValue as MapData;
+                mapDataPosition = insertMapData != null ? insertMapData.Position : mapDataPosition;
             }
             var newMapData = MapUtilities.CreateMapDataByType(mapDataType, uid, mapDataPosition);
             var newMapObjectDataProperty = mMapObjectDataListProperty.GetArrayElementAtIndex(insertPos);
