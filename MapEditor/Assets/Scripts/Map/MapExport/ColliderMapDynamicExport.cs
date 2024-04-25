@@ -26,7 +26,7 @@ namespace MapEditor
         /// </summary>
         public Vector3 ColliderSize;
 
-        public ColliderMapDynamicExport(int confId, Vector3 postion, Vector3 colliderCenter, Vector3 colliderSize) : base(confId, position)
+        public ColliderMapDynamicExport(int confId, Vector3 position, Vector3 colliderCenter, Vector3 colliderSize) : base(confId, position)
         {
             ColliderCenter = colliderCenter;
             ColliderSize = ColliderSize;

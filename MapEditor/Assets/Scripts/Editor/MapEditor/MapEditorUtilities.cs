@@ -512,7 +512,7 @@ namespace MapEditor
                 var mapObjectConfig = MapSetting.GetEditorInstance().ObjectSetting.GetMapObjectConfigByUID(mapObjectUID);
                 if(mapObjectConfig.IsDynamic)
                 {
-                    var mapDataExport = GetMapDataExport(mapData);
+                    var mapDataExport = GetMapDataExport(mapObjectData);
                     mapExport.AllDynamicMapObjectDatas.Add(mapDataExport);
                 }
             }
@@ -591,7 +591,7 @@ namespace MapEditor
             }
             else
             {
-                mapExport = new BaseMapDataExport(mapDataConfig.ConfId, mapObjectData.Position);
+                mapExport = new BaseMapDataExport(mapDataConfig.ConfId, mapData.Position);
             }
             return mapExport;
         }

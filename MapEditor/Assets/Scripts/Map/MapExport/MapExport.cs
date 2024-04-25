@@ -4,6 +4,8 @@
  * Create Date:             2024/04/23
  */
 
+using System;
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace MapEditor
@@ -18,7 +20,7 @@ namespace MapEditor
         /// <summary>
         /// 地图导出数据成员
         /// </summary>
-        public MapDataExport MapData = new MapDataExport();
+        public MapDataExport MapData;
 
         /// <summary>
         /// 所有动态物体导出数据成员
