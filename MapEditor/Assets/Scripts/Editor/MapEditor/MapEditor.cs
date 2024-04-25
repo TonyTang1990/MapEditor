@@ -83,12 +83,12 @@ namespace MapEditor
         /// <summary>
         /// AddMapObjectValue属性
         /// </summary>
-        private SerializedProperty mAddMapObjectValueProperty;
+        private SerializedProperty mAddMapObjectIndexProperty;
 
         /// <summary>
         /// AddMapDataValue属性
         /// </summary>
-        private SerializedProperty mAddMapDataValueProperty;
+        private SerializedProperty mAddMapDataIndexProperty;
 
         /// <summary>
         /// ExportType属性
@@ -221,8 +221,8 @@ namespace MapEditor
             mMapTerrianAssetProperty ??= serializedObject.FindProperty("MapTerrianAsset");
             mMapObjectDataListProperty ??= serializedObject.FindProperty("MapObjectDataList");
             mMapDataListProperty ??= serializedObject.FindProperty("MapDataList");
-            mAddMapObjectValueProperty ??= serializedObject.FindProperty("AddMapObjectValue");
-            mAddMapDataValueProperty ??= serializedObject.FindProperty("AddMapDataValue");
+            mAddMapObjectIndexProperty ??= serializedObject.FindProperty("AddMapObjectIndex");
+            mAddMapDataIndexProperty ??= serializedObject.FindProperty("AddMapDataIndex");
             mExportTypeProperty ??= serializedObject.FindProperty("ExportType");
         }
 
@@ -351,11 +351,11 @@ namespace MapEditor
                     positionProperty.vector3Value = mapObjectGO.transform.position;
                     if(mapObjectConfig.IsDynamic)
                     {
-                        var collider = mapObjectGO.GetComponent<BoxCollider>();
                         var colliderCenterProperty = mapObjectDataProperty.FindPropertyRelative("ColliderCenter");
                         var colliderSizeProperty = mapObjectDataProperty.FindPropertyRelative("ColliderSize");
-                        colliderCenterProperty.vector3Value = collider.center;
-                        colliderSizeProperty.vector3Value = collider.size;
+                        var colliderRadiusProperty = mapObjectDataProperty.FindPropertyRelative("ColliderRadius");
+                        MapUtilities.UpdateColliderByColliderData(mapObjectGO, colliderCenterProperty.vector3Value,
+                                                                    colliderSizeProperty.vector3Value, colliderRadiusProperty.floatValue);
                     }
                 }
             }
@@ -367,9 +367,9 @@ namespace MapEditor
         private void CorrectAddMapObjectIndexValue()
         {
             var totalOptionNum = mMapObjectDataChoiceOptions.Length;
-            if(mAddMapObjectValueProperty.intValue > totalOptionNum)
+            if(mAddMapObjectIndexProperty.intValue > totalOptionNum)
             {
-                mAddMapObjectValueProperty.intValue = Math.Clamp(mAddMapObjectValueProperty.intValue, 0, totalOptionNum);
+                mAddMapObjectIndexProperty.intValue = Math.Clamp(mAddMapObjectIndexProperty.intValue, 0, totalOptionNum);
             }
         }
 
@@ -379,9 +379,9 @@ namespace MapEditor
         private void CorrectAddMapDataIndexValue()
         {
             var totalOptionNum = mMapDataChoiceOptions.Length;
-            if (mAddMapDataValueProperty.intValue > totalOptionNum)
+            if (mAddMapDataIndexProperty.intValue > totalOptionNum)
             {
-                mAddMapDataValueProperty.intValue = Math.Clamp(mAddMapDataValueProperty.intValue, 0, totalOptionNum);
+                mAddMapDataIndexProperty.intValue = Math.Clamp(mAddMapDataIndexProperty.intValue, 0, totalOptionNum);
             }
         }
 
@@ -434,7 +434,7 @@ namespace MapEditor
         /// </summary>
         private void UpdateAddMapObjectDataPreviewAsset()
         {
-            var addMapObjectValue = mAddMapObjectValueProperty.intValue;
+            var addMapObjectValue = mAddMapObjectIndexProperty.intValue;
             if(addMapObjectValue != 0)
             {
                 var addMapObjectUID = addMapObjectValue;
@@ -514,7 +514,7 @@ namespace MapEditor
                 var parentNodeTransform = MapEditorUtilities.GetOrCreateMapObjectTypeParentNode(mTarget.gameObject, mapObjectType);
                 instanceGo.transform.SetParent(parentNodeTransform);
                 instanceGo.transform.position = mMapStartPosProperty.vector3Value;
-                var instanceGoName = instanceGo.name.RemoveSubStr("Clone()");
+                var instanceGoName = instanceGo.name.RemoveSubStr("(Clone)");
                 instanceGoName = $"{instanceGoName}_{uid}";
                 instanceGo.name = instanceGoName;
                 MapEditorUtilities.AddOrUpdateMapObjectDataMono(instanceGo, uid);
@@ -531,7 +531,7 @@ namespace MapEditor
         /// <returns></returns>
         private bool ExchangeMapDataByIndex(SerializedProperty propertyList, int exchangeIndex1, int exchangeIndex2)
         {
-            if(propertyList == null || propertyList.isArray)
+            if(propertyList == null || !propertyList.isArray)
             {
                 Debug.LogError($"传递的属性对象为空或不是数组属性，交换属性数据位置失败！");
                 return false;
@@ -643,6 +643,7 @@ namespace MapEditor
                 Selection.SetActiveObjectWithContext(instanceGo, instanceGo);
             }
             instanceGo.transform.position = mapObjectPosition;
+            MapUtilities.UpdateColliderByColliderDataMono(instanceGo);
             var newMapObjectData = new MapObjectData(uid, instanceGo);
             mMapObjectDataListProperty.InsertArrayElementAtIndex(insertPos);
             var newMapObjectDataProperty = mMapObjectDataListProperty.GetArrayElementAtIndex(insertPos);
@@ -741,16 +742,6 @@ namespace MapEditor
         /// </summary>
         private void CleanDynamicMaoObjectGos()
         {
-            var isPrefabAssetInstance = PrefabUtility.IsPartOfPrefabInstance(mTarget.gameObject);
-            if(isPrefabAssetInstance)
-            {
-                var prefabStage = UnityEditor.SceneManagement.PrefabStageUtility.GetCurrentPrefabStage();
-                if(prefabStage == null)
-                {
-                    Debug.LogError($"此功能在预制件Asset下仅支持打开嵌套预制件模式下使用！");
-                    return;
-                }
-            }
             UpdateMapObjectDataPositionDatas();
             for(int i = 0; i < mMapObjectDataListProperty.arraySize; i++)
             {
@@ -798,11 +789,10 @@ namespace MapEditor
                         var positionProperty = mapObjectDataProperty.FindPropertyRelative("Position");
                         var colliderCenterProperty = mapObjectDataProperty.FindPropertyRelative("ColliderCenter");
                         var colliderSizeProperty = mapObjectDataProperty.FindPropertyRelative("ColliderSize");
+                        var colliderRadiusProperty = mapObjectDataProperty.FindPropertyRelative("ColliderRadius");
                         instanceGo.transform.position = positionProperty.vector3Value;
                         goProperty.objectReferenceValue = instanceGo;
-                        var collider = instanceGo.GetComponent<BoxCollider>();
-                        collider.center = colliderCenterProperty.vector3Value;
-                        collider.size = colliderSizeProperty.vector3Value;
+                        MapUtilities.UpdateColliderByColliderData(instanceGo, colliderCenterProperty.vector3Value, colliderSizeProperty.vector3Value, colliderRadiusProperty.floatValue);
                     }
                 }
             }
@@ -998,14 +988,14 @@ namespace MapEditor
                 EditorGUILayout.BeginHorizontal();
                 EditorGUILayout.LabelField("地图对象选择:", GUILayout.Width(100f));
                 EditorGUI.BeginChangeCheck();
-                mAddMapObjectValueProperty.intValue = EditorGUILayout.IntPopup(mAddMapObjectValueProperty.intValue, mMapObjectDataChoiceOptions, mMapObjectDataChoiceValues, GUILayout.ExpandWidth(true));
+                mAddMapObjectIndexProperty.intValue = EditorGUILayout.IntPopup(mAddMapObjectIndexProperty.intValue, mMapObjectDataChoiceOptions, mMapObjectDataChoiceValues, GUILayout.ExpandWidth(true));
                 if(EditorGUI.EndChangeCheck())
                 {
                     UpdateAddMapObjectDataPreviewAsset();
                 }
                 if(GUILayout.Button("+", GUILayout.Width(40f)))
                 {
-                    var addMapObjectValue = mAddMapObjectValueProperty.intValue;
+                    var addMapObjectValue = mAddMapObjectIndexProperty.intValue;
                     AddMapObjectData(addMapObjectValue);
                 }
                 GUILayout.Box(mAddMapObjectPreviewAsset, MapStyles.CenterLabelStyle, GUILayout.Width(50f), GUILayout.Height(50f));
@@ -1095,7 +1085,7 @@ namespace MapEditor
             }
             if (GUILayout.Button("+", GUILayout.Width(40f)))
             {
-                var addMapObjectValue = mAddMapObjectValueProperty.intValue;
+                var addMapObjectValue = mAddMapObjectIndexProperty.intValue;
                 AddMapObjectData(addMapObjectValue, mapObjectDataIndex);
             }
             if (GUILayout.Button("-", GUILayout.Width(40f)))
@@ -1121,15 +1111,24 @@ namespace MapEditor
         /// </summary>
         private void DrawMapDataOperationArea()
         {
-            EditorGUILayout.BeginHorizontal();
-            EditorGUILayout.LabelField("地图埋点选择:", GUILayout.Width(100f));
-            mAddMapDataValueProperty.intValue = EditorGUILayout.IntPopup(mAddMapDataValueProperty.intValue, mMapDataChoiceOptions, mMapDataChoiceValues, GUILayout.ExpandWidth(true));
-            if(GUILayout.Button("+", GUILayout.Width(40f)))
+            if (mMapDataChoiceOptions.Length > 0)
             {
-                var addMapDataValue = mAddMapDataValueProperty.intValue;
-                AddMapData(addMapDataValue);
+                EditorGUILayout.BeginHorizontal();
+                EditorGUILayout.LabelField("地图埋点选择:", GUILayout.Width(100f));
+                mAddMapDataIndexProperty.intValue = EditorGUILayout.IntPopup(mAddMapDataIndexProperty.intValue, mMapDataChoiceOptions, mMapDataChoiceValues, GUILayout.ExpandWidth(true));
+                if (GUILayout.Button("+", GUILayout.Width(40f)))
+                {
+                    var addMapDataValue = mAddMapDataIndexProperty.intValue;
+                    AddMapData(addMapDataValue);
+                }
+                EditorGUILayout.EndHorizontal();
             }
-            EditorGUILayout.EndHorizontal();
+            else
+            {
+                EditorGUILayout.BeginHorizontal();
+                EditorGUILayout.LabelField("没有有效地图埋点配置，不支持地图埋点选择！", GUILayout.ExpandWidth(true));
+                EditorGUILayout.EndHorizontal();
+            }
         }
 
         /// <summary>
@@ -1224,7 +1223,7 @@ namespace MapEditor
             }
             if (GUILayout.Button("+", GUILayout.Width(40f)))
             {
-                var addMapDataValue = mAddMapDataValueProperty.intValue;
+                var addMapDataValue = mAddMapDataIndexProperty.intValue;
                 AddMapData(addMapDataValue, mapDataIndex);
             }
             if (GUILayout.Button("-", GUILayout.Width(40f)))

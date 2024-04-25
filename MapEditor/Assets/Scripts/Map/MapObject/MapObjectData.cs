@@ -47,6 +47,12 @@ namespace MapEditor
         public Vector3 ColliderSize;
 
         /// <summary>
+        /// 碰撞体半径
+        /// </summary>
+        [Header("碰撞体半径")]
+        public float ColliderRadius;
+
+        /// <summary>
         /// 带参构造函数
         /// </summary>
         /// <param name="uid"></param>

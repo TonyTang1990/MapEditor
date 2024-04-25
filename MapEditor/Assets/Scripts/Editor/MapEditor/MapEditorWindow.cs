@@ -353,8 +353,8 @@ namespace MapEditor
                 var preColor = GUI.color;
                 GUI.color = mapObjectConfig.IsDynamic ? Color.yellow : preColor;
                 EditorGUILayout.BeginHorizontal();
-                EditorGUILayout.IntField(mapObjectConfig.UID, MapStyles.ButtonMidStyle, GUILayout.Width(MapEditorConst.MapObjectUIDUIWidth));
-                EditorGUILayout.LabelField(mapObjectConfig.ObjectType.ToString(), MapStyles.ButtonMidStyle, GUILayout.Width(MapEditorConst.MapObjectTypeUIWidth));
+                EditorGUILayout.IntField(mapObjectConfig.UID, MapStyles.TabMiddleStyle, GUILayout.Width(MapEditorConst.MapObjectUIDUIWidth));
+                EditorGUILayout.LabelField(mapObjectConfig.ObjectType.ToString(), MapStyles.TabMiddleStyle, GUILayout.Width(MapEditorConst.MapObjectTypeUIWidth));
                 EditorGUILayout.Space(MapEditorConst.MapObjectIsDynamicUIWidth / 3, false);
                 mapObjectConfig.IsDynamic = EditorGUILayout.Toggle(mapObjectConfig.IsDynamic, GUILayout.Width(MapEditorConst.MapObjectIsDynamicUIWidth * 2 / 3));
                 EditorGUI.BeginChangeCheck();
@@ -448,8 +448,8 @@ namespace MapEditor
             if (mapDataConfig != null)
             {
                 EditorGUILayout.BeginHorizontal();
-                EditorGUILayout.IntField(mapDataConfig.UID, MapStyles.ButtonMidStyle, GUILayout.Width(MapEditorConst.MapDataUIDUIWidth));
-                EditorGUILayout.LabelField(mapDataConfig.DataType.ToString(), MapStyles.ButtonMidStyle, GUILayout.Width(MapEditorConst.MapDataTypeUIWidth));
+                EditorGUILayout.IntField(mapDataConfig.UID, MapStyles.TabMiddleStyle, GUILayout.Width(MapEditorConst.MapDataUIDUIWidth));
+                EditorGUILayout.LabelField(mapDataConfig.DataType.ToString(), MapStyles.TabMiddleStyle, GUILayout.Width(MapEditorConst.MapDataTypeUIWidth));
                 EditorGUI.BeginChangeCheck();
                 mapDataConfig.ConfId = EditorGUILayout.IntField(mapDataConfig.ConfId, GUILayout.Width(MapEditorConst.MapDataConfIdUIWidth));
                 if (EditorGUI.EndChangeCheck())

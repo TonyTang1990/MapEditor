@@ -73,14 +73,17 @@
     <Compile Include="Assets\Scripts\Map\MapExport\ExportType.cs" />
     <Compile Include="Assets\Scripts\Map\MapExport\MonsterGroupMapDataExport.cs" />
     <Compile Include="Assets\Scripts\Map\MapExport\MapExport.cs" />
-    <Compile Include="Assets\Scripts\GameLauncher.cs" />
     <Compile Include="Assets\Scripts\Map\MapExport\BaseMapDynamicExport.cs" />
     <Compile Include="Assets\Scripts\Map\Map.cs" />
     <Compile Include="Assets\Scripts\Map\MapData\MapDataSetting.cs" />
     <Compile Include="Assets\Scripts\Map\MapObject\MapObjectSetting.cs" />
+    <Compile Include="Assets\Scripts\Utilities\PathUtilities.cs" />
     <Compile Include="Assets\Scripts\Map\MapConst.cs" />
     <Compile Include="Assets\Scripts\Map\MapExport\BaseMapDataExport.cs" />
     <Compile Include="Assets\Scripts\Map\MapObject\MapObjectData.cs" />
+    <Compile Include="Assets\Scripts\Map\MapObject\ColliderDataMono.cs" />
+    <Compile Include="Assets\Scripts\Map\MapObject\ColliderType.cs" />
+    <Compile Include="Assets\Scripts\Core\Extension\GameObjectExtension.cs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="UnityEngine">
@@ -779,17 +782,17 @@
     <Reference Include="Unity.Timeline.Editor">
       <HintPath>Library\ScriptAssemblies\Unity.Timeline.Editor.dll</HintPath>
     </Reference>
+    <Reference Include="Unity.AI.Navigation.Editor">
+      <HintPath>Library\ScriptAssemblies\Unity.AI.Navigation.Editor.dll</HintPath>
+    </Reference>
+    <Reference Include="Unity.AI.Navigation">
+      <HintPath>Library\ScriptAssemblies\Unity.AI.Navigation.dll</HintPath>
+    </Reference>
     <Reference Include="Unity.TestTools.CodeCoverage.Editor">
       <HintPath>Library\ScriptAssemblies\Unity.TestTools.CodeCoverage.Editor.dll</HintPath>
     </Reference>
     <Reference Include="Unity.VisualScripting.State">
       <HintPath>Library\ScriptAssemblies\Unity.VisualScripting.State.dll</HintPath>
-    </Reference>
-    <Reference Include="Unity.AI.Navigation">
-      <HintPath>Library\ScriptAssemblies\Unity.AI.Navigation.dll</HintPath>
-    </Reference>
-    <Reference Include="Unity.AI.Navigation.Editor">
-      <HintPath>Library\ScriptAssemblies\Unity.AI.Navigation.Editor.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>

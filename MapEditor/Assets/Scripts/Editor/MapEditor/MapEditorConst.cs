@@ -22,12 +22,12 @@ namespace MapEditor
         /// <summary>
         /// 地图导出目录相对路径(相对Asset目录)
         /// </summary>
-        public const string MapExportRelativePath = "../Product/Lua/MapData";
+        public const string MapExportRelativePath = "/Resources/MapExport";
 
         /// <summary>
         /// 地图对象UID UI显示宽度
         /// </summary>
-        public const float MapObjectUIDUIWidth = 40f;
+        public const float MapObjectUIDUIWidth = 50f;
 
         /// <summary>
         /// 地图对象类型UI显示宽度
@@ -67,7 +67,7 @@ namespace MapEditor
         /// <summary>
         /// 地图埋点UID UI显示宽度
         /// </summary>
-        public const float MapDataUIDUIWidth = 40f;
+        public const float MapDataUIDUIWidth = 50f;
 
         /// <summary>
         /// 地图埋点类型UI显示宽度

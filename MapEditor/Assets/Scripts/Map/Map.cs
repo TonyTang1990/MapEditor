@@ -26,13 +26,13 @@ namespace MapEditor
         /// 地图对象场景GUI开关
         /// </summary>
         [Header("地图对象场景GUI开关")]
-        public bool MapObjectSceneGUISwich = true;
+        public bool MapObjectSceneGUISwitch = true;
 
         /// <summary>
         /// 地图埋点场景GUI开关
         /// </summary>
         [Header("地图埋点场景GUI开关")]
-        public bool MapDataSceneGUISwich = true;
+        public bool MapDataSceneGUISwitch = true;
 
         /// <summary>
         /// 地图横向大小
@@ -65,7 +65,7 @@ namespace MapEditor
         /// </summary>
         [Header("地图对象数据列表")]
         [SerializeReference]
-        public List<MapObjectData> MapObjetDataList = new List<MapObjectData>();
+        public List<MapObjectData> MapObjectDataList = new List<MapObjectData>();
 
         /// <summary>
         /// 地图埋点数据列表
@@ -103,11 +103,11 @@ namespace MapEditor
             }
             if(Event.current.type == EventType.Repaint)
             {
-                if(MapObjectSceneGUISwich)
+                if(MapObjectSceneGUISwitch)
                 {
                     DrawMapObjectDataGizmosGUI();
                 }
-                if(MapDataSceneGUISwich)
+                if(MapDataSceneGUISwitch)
                 {
                     DrawMapDataGizmosGUI();
                 }

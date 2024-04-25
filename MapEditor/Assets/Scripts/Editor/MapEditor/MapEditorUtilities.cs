@@ -204,7 +204,6 @@ namespace MapEditor
         {
             if(asset == null)
             {
-                Debug.LogError($"不允许获取空Asset的Asset预览，获取Asset预览失败！");
                 return null;
             }
             return AssetPreview.GetAssetPreview(asset);
@@ -294,7 +293,7 @@ namespace MapEditor
                 return false;
             }
             MapObjectConfig mapObjectConfig;
-            foreach(var mapObjectData in map.MapObjetDataList)
+            foreach(var mapObjectData in map.MapObjectDataList)
             {
                 mapObjectConfig = MapSetting.GetEditorInstance().ObjectSetting.GetMapObjectConfigByUID(mapObjectData.UID);
                 if(mapObjectConfig == null)
@@ -310,9 +309,11 @@ namespace MapEditor
         /// 获取地图导出目录全路径
         /// </summary>
         /// <returns></returns>
-        public static string GetGameMapExportFolderFullPath()
+        public static string GetGameMapExportFolderFullPath(ExportType exportType)
         {
-            var gameMapExportFolderFullPath = Path.Combine(Application.dataPath, MapEditorConst.MapExportRelativePath);
+            var gameMapExportFolderFullPath = PathUtilities.GetAssetFullPath(MapEditorConst.MapExportRelativePath);
+            var folderName = exportType.ToString();
+            gameMapExportFolderFullPath = Path.Combine(gameMapExportFolderFullPath, folderName);
             return gameMapExportFolderFullPath;
         }
 
@@ -324,7 +325,7 @@ namespace MapEditor
         /// <returns></returns>
         public static string GetGameMapExportFileFullPath(ExportType exportType, string fileName)
         {
-            var gameMapExportFolderFullPath = GetGameMapExportFolderFullPath();
+            var gameMapExportFolderFullPath = GetGameMapExportFolderFullPath(exportType);
             var filePostFix = GetExportFilePostFix(exportType);
             var fileFullName = $"{fileName}{filePostFix}";
             var gameMapExportFileFullPath = Path.Combine(gameMapExportFolderFullPath, fileFullName);
@@ -358,9 +359,9 @@ namespace MapEditor
         /// <summary>
         /// 检查或创建地图导出目录
         /// </summary>
-        public static void CheckOrCreateGameMapExportFolder()
+        public static void CheckOrCreateGameMapExportFolder(ExportType exportType)
         {
-            var gameMapExportFolderFullPath = GetGameMapExportFolderFullPath();
+            var gameMapExportFolderFullPath = GetGameMapExportFolderFullPath(exportType);
             FolderUtilities.CheckAndCreateSpecificFolder(gameMapExportFolderFullPath);
         }
 
@@ -382,7 +383,7 @@ namespace MapEditor
             }
             Dictionary<MapObjectType, List<MapObjectData>> mapObjectTypeDatasMap = new Dictionary<MapObjectType, List<MapObjectData>>();
             MapObjectConfig mapObjectConfig;
-            foreach(var mapObjectData in map.MapObjetDataList)
+            foreach(var mapObjectData in map.MapObjectDataList)
             {
                 mapObjectConfig = MapSetting.GetEditorInstance().ObjectSetting.GetMapObjectConfigByUID(mapObjectData.UID);
                 if(mapObjectConfig == null)
@@ -435,6 +436,7 @@ namespace MapEditor
         /// 导出指定地图数据
         /// </summary>
         /// <param name="map"></param>
+        /// <param name="exportType"></param>
         public static void ExportGameMapData(Map map)
         {
             if(map == null)
@@ -442,7 +444,7 @@ namespace MapEditor
                 Debug.LogError($"不允许导出空的Map脚本地图数据，导出地图数据失败！");
                 return;
             }
-            CheckOrCreateGameMapExportFolder();
+            CheckOrCreateGameMapExportFolder(map.ExportType);
             if(map.ExportType == ExportType.LUA)
             {
                 DoExportGameMapLuaData(map);
