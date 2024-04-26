@@ -21,7 +21,7 @@ namespace MapEditor
         /// </summary>
         public int GroupId;
 
-        public MonsterMapDataExport(int confId, Vector3 position, int groupId) : base(confId, position)
+        public MonsterMapDataExport(MapDataType mapDataType, int confId, Vector3 position, int groupId) : base(mapDataType, confId, position)
         {
             GroupId = groupId;
         }

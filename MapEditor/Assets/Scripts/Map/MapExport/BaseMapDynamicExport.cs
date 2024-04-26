@@ -17,6 +17,11 @@ namespace MapEditor
     public class BaseMapDynamicExport
     {
         /// <summary>
+        /// 地图对象类型
+        /// </summary>
+        public MapObjectType MapObjectType;
+
+        /// <summary>
         /// 关联配置Id
         /// </summary>
         public int ConfId;
@@ -26,8 +31,9 @@ namespace MapEditor
         /// </summary>
         public Vector3 Position;
 
-        public BaseMapDynamicExport(int confId, Vector3 position)
+        public BaseMapDynamicExport(MapObjectType mapObjectType, int confId, Vector3 position)
         {
+            MapObjectType = mapObjectType;
             ConfId = confId;
             Position = position;
         }
