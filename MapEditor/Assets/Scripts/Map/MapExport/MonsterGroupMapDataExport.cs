@@ -31,11 +31,16 @@ namespace MapEditor
         /// </summary>
         public float MonsterActiveRadius;
 
+        /// <summary>
+        /// 所有归属当前怪物组的怪物导出数据列表
+        /// </summary>
+        public List<MonsterMapDataExport> AllMonsterMapExportDatas = new List<MonsterMapDataExport>();
+
         public MonsterGroupMapDataExport(MapDataType mapDataType, int confId, Vector3 position, int groupId, float monsterCreateRadius, float monsterActiveRadius) : base(mapDataType, confId, position)
         {
             GroupId = groupId;
             MonsterCreateRadius = monsterCreateRadius;
-            MonsterActiveRadius = MonsterActiveRadius;
+            MonsterActiveRadius = monsterActiveRadius;
         }
     }
 }

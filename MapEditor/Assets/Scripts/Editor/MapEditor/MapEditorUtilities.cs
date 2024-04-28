@@ -475,22 +475,16 @@ namespace MapEditor
         /// <param name="map"></param>
         private static void DoExportGameMapLuaData(Map map)
         {
-            var mapExport = GetMapExport(map);
-            var fileName = map.gameObject.name;
-            var exportFileFullPath = GetGameMapExportFileFullPath(map.ExportType, fileName);
-            var tableName = map.gameObject.name;
-            using(var sw = File.CreateText(exportFileFullPath))
-            {
-                sw.WriteLine($"local {tableName} = {{}}");
-                var mapDataContent = GetMapDataTableContent(tableName, mapExport);
-                sw.WriteLine(mapDataContent);
-                var dynamicMapObjectsContent = GetDynamicMapObjectsContent(tableName, mapExport);
-                sw.WriteLine(dynamicMapObjectsContent);
-                var mapDatasContent = GetMapDataContent(tableName, mapExport);
-                sw.WriteLine(mapDatasContent);
-                sw.WriteLine($"return {tableName}");
-            }
-            Debug.Log($"导出地图数据:{exportFileFullPath}成功！");
+            Debug.Log("待支持Lua序列化");
+            //var mapExport = GetMapExport(map);
+            //var fileName = map.gameObject.name;
+            //var exportFileFullPath = GetGameMapExportFileFullPath(map.ExportType, fileName);
+            //var tableName = map.gameObject.name;
+            //using(var sw = File.CreateText(exportFileFullPath))
+            //{
+            //    // 待支持Lua序列化
+            //}
+            //Debug.Log($"导出地图数据:{exportFileFullPath}成功！");
         }
 
         /// <summary>
@@ -742,39 +736,6 @@ namespace MapEditor
                 return null;
             }
             return new BaseMapDataExport(mapDataConfig.DataType, mapDataConfig.ConfId, mapData.Position);
-        }
-
-        /// <summary>
-        /// 获取场景基础数据字符串内容
-        /// </summary>
-        /// <param name="tableName"></param>
-        /// <param name="mapExport"></param>
-        /// <returns></returns>
-        private static string GetMapDataTableContent(string tableName, MapExport mapExport)
-        {
-            return "";
-        }
-
-        /// <summary>
-        /// 获取场景动态物体数据字符串内容
-        /// </summary>
-        /// <param name="tableName"></param>
-        /// <param name="mapExport"></param>
-        /// <returns></returns>
-        private static string GetDynamicMapObjectsContent(string tableName, MapExport mapExport)
-        {
-            return "";
-        }
-
-        /// <summary>
-        /// 获取埋点数据字符串内容
-        /// </summary>
-        /// <param name="tableName"></param>
-        /// <param name="mapExport"></param>
-        /// <returns></returns>
-        private static string GetMapDatasContent(string tableName, MapExport mapExport)
-        {
-            return "";
         }
     }
 }

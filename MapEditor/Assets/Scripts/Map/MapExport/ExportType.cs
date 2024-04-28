@@ -12,7 +12,7 @@ namespace MapEditor
     /// </summary>
     public enum ExportType
     {
-        LUA = 0,
-        JSON = 1,
+        JSON = 0,
+        LUA = 1,
     }
 }
