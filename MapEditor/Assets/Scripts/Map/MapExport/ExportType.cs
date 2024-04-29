@@ -13,6 +13,5 @@ namespace MapEditor
     public enum ExportType
     {
         JSON = 0,
-        LUA = 1,
     }
 }

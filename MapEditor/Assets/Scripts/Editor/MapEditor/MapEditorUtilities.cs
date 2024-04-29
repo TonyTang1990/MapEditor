@@ -455,11 +455,7 @@ namespace MapEditor
                 return;
             }
             CheckOrCreateGameMapExportFolder(map.ExportType);
-            if(map.ExportType == ExportType.LUA)
-            {
-                DoExportGameMapLuaData(map);
-            }
-            else if(map.ExportType == ExportType.JSON)
+            if(map.ExportType == ExportType.JSON)
             {
                 DoExportGameMapJsonData(map);
             }
@@ -467,24 +463,6 @@ namespace MapEditor
             {
                 Debug.LogError($"不支持的导出类型:{map.ExportType.ToString()}，导出地图数据失败！");
             }
-        }
-
-        /// <summary>
-        /// 导出指定地图组件的Lua格式数据
-        /// </summary>
-        /// <param name="map"></param>
-        private static void DoExportGameMapLuaData(Map map)
-        {
-            Debug.Log("待支持Lua序列化");
-            //var mapExport = GetMapExport(map);
-            //var fileName = map.gameObject.name;
-            //var exportFileFullPath = GetGameMapExportFileFullPath(map.ExportType, fileName);
-            //var tableName = map.gameObject.name;
-            //using(var sw = File.CreateText(exportFileFullPath))
-            //{
-            //    // 待支持Lua序列化
-            //}
-            //Debug.Log($"导出地图数据:{exportFileFullPath}成功！");
         }
 
         /// <summary>
