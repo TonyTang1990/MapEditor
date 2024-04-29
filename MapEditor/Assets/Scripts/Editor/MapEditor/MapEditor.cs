@@ -825,6 +825,10 @@ namespace MapEditor
             var targetAssetFolderPath = Path.GetDirectoryName(targetAssetPath);
             var navMeshAssetName = Path.GetFileName(navMeshAssetPath);
             var newNavMeshAssetPath = Path.Combine(targetAssetFolderPath, navMeshAssetName);
+            if(!string.Equals(navMeshAssetPath, newNavMeshAssetPath))
+            {
+                AssetDatabase.DeleteAsset(newNavMeshAssetPath);
+            }
             AssetDatabase.MoveAsset(navMeshAssetPath, newNavMeshAssetPath);
             Debug.Log($"移动寻路数据Asset:{navMeshAssetPath}到{newNavMeshAssetPath}成功！");
         }
