@@ -75,10 +75,22 @@ namespace MapEditor
         public List<MapData> MapDataList = new List<MapData>();
 
         /// <summary>
+        /// 当前选中需要新增的地图对象类型
+        /// </summary>
+        [HideInInspector]
+        public int AddMapObjectType = (int)MapObjectType.TREASURE_BOX;
+
+        /// <summary>
         /// 当前选中需要新增的地图对象索引
         /// </summary>
         [HideInInspector]
         public int AddMapObjectIndex = 1;
+
+        /// <summary>
+        /// 当前选中需要新增的地图埋点类型
+        /// </summary>
+        [HideInInspector]
+        public int AddMapDataType = (int)MapDataType.PLAYER_SPAWN;
 
         /// <summary>
         /// 当前选中需要新增的地图埋点索引

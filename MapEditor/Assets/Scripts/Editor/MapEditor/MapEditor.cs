@@ -81,9 +81,19 @@ namespace MapEditor
         private SerializedProperty mMapDataListProperty;
 
         /// <summary>
+        /// mAddMapObjectType属性
+        /// </summary>
+        private SerializedProperty mAddMapObjectTypeProperty;
+
+        /// <summary>
         /// AddMapObjectValue属性
         /// </summary>
         private SerializedProperty mAddMapObjectIndexProperty;
+
+        /// <summary>
+        /// mAddMapDataType属性
+        /// </summary>
+        private SerializedProperty mAddMapDataTypeProperty;
 
         /// <summary>
         /// AddMapDataValue属性
@@ -141,14 +151,14 @@ namespace MapEditor
         private Texture2D mAddMapObjectPreviewAsset;
 
         /// <summary>
-        /// 地图对象选项数组(显示名字数组)
+        /// 地图对象类型和选项数组(显示名字数组)Map<地图对象类型, 选项数组>
         /// </summary>
-        private string[] mMapObjectDataChoiceOptions;
+        private Dictionary<MapObjectType, string[]> mMapObjectDataChoiceOptionsMap;
 
         /// <summary>
-        /// 地图对象选项值数组(UID数组)
+        /// 地图对象类型和选项值数组(UID数组)Map<地图对象类型， 选项值数组>
         /// </summary>
-        private int[] mMapObjectDataChoiceValues;
+        private Dictionary<MapObjectType, int[]> mMapObjectDataChoiceValuesMap;
 
         /// <summary>
         /// 地图埋点数据区域是否展开显示
@@ -170,14 +180,14 @@ namespace MapEditor
         private List<MapDataType> mMapCustomDataTypeList;
 
         /// <summary>
-        /// 地图埋点选项数组(显示名字数组)
+        /// 地图埋点类型和选项数组(显示名字数组)Map<地图埋点类型, 选项数组>
         /// </summary>
-        private string[] mMapDataChoiceOptions;
+        private Dictionary<MapDataType, string[]> mMapDataChoiceOptionsMap;
 
         /// <summary>
-        /// 地图埋点选项值数组(UID数组)
+        /// 地图埋点类型和选项值数组(UID数组)Map<地图埋点类型， 选项值数组>
         /// </summary>
-        private int[] mMapDataChoiceValues;
+        private Dictionary<MapDataType, int[]> mMapDataChoiceValuesMap;
 
         private void Awake()
         {
@@ -221,7 +231,9 @@ namespace MapEditor
             mMapTerrianAssetProperty ??= serializedObject.FindProperty("MapTerrianAsset");
             mMapObjectDataListProperty ??= serializedObject.FindProperty("MapObjectDataList");
             mMapDataListProperty ??= serializedObject.FindProperty("MapDataList");
+            mAddMapObjectTypeProperty ??= serializedObject.FindProperty("AddMapObjectType");
             mAddMapObjectIndexProperty ??= serializedObject.FindProperty("AddMapObjectIndex");
+            mAddMapDataTypeProperty ??= serializedObject.FindProperty("AddMapDataType");
             mAddMapDataIndexProperty ??= serializedObject.FindProperty("AddMapDataIndex");
             mExportTypeProperty ??= serializedObject.FindProperty("ExportType");
         }
@@ -366,10 +378,20 @@ namespace MapEditor
         /// </summary>
         private void CorrectAddMapObjectIndexValue()
         {
-            var totalOptionNum = mMapObjectDataChoiceOptions.Length;
-            if(mAddMapObjectIndexProperty.intValue > totalOptionNum)
+            if(mMapObjectDataChoiceOptionsMap == null)
             {
-                mAddMapObjectIndexProperty.intValue = Math.Clamp(mAddMapObjectIndexProperty.intValue, 0, totalOptionNum);
+                return;
+            }
+            var addMapObjectType = (MapObjectType)mAddMapObjectTypeProperty.intValue;
+            var mapObjectDataValueOptions = mMapObjectDataChoiceValuesMap[addMapObjectType];
+            var addMapObjectIndexValue = mAddMapObjectIndexProperty.intValue;
+            if(!MapEditorUtilities.IsIntValueInArrays(addMapObjectIndexValue, mapObjectDataValueOptions))
+            {
+                mAddMapObjectIndexProperty.intValue = mapObjectDataValueOptions[0];
+            }
+            else
+            {
+                mAddMapObjectIndexProperty.intValue = 0;
             }
         }
 
@@ -378,10 +400,20 @@ namespace MapEditor
         /// </summary>
         private void CorrectAddMapDataIndexValue()
         {
-            var totalOptionNum = mMapDataChoiceOptions.Length;
-            if (mAddMapDataIndexProperty.intValue > totalOptionNum)
+            if (mMapDataChoiceOptionsMap == null)
             {
-                mAddMapDataIndexProperty.intValue = Math.Clamp(mAddMapDataIndexProperty.intValue, 0, totalOptionNum);
+                return;
+            }
+            var addMapDataType = (MapDataType)mAddMapDataTypeProperty.intValue;
+            var mapDataValueOptions = mMapDataChoiceValuesMap[addMapDataType];
+            var addMapDataIndexValue = mAddMapDataIndexProperty.intValue;
+            if (!MapEditorUtilities.IsIntValueInArrays(addMapDataIndexValue, mapDataValueOptions))
+            {
+                mAddMapDataIndexProperty.intValue = mapDataValueOptions[0];
+            }
+            else
+            {
+                mAddMapDataIndexProperty.intValue = 0;
             }
         }
 
@@ -390,20 +422,25 @@ namespace MapEditor
         /// </summary>
         private void UpdateMapObjectDataChoiceDatas()
         {
-            var allMapObjectConfigs = MapSetting.GetEditorInstance().ObjectSetting.AllMapObjectConfigs;
-            var totalMapObjectConfigNum = allMapObjectConfigs.Count;
-            if (mMapObjectDataChoiceOptions == null || mMapObjectDataChoiceOptions.Length != totalMapObjectConfigNum)
+            var objectSetting = MapSetting.GetEditorInstance().ObjectSetting;
+            var mapObjectTypeValues = Enum.GetValues(MapConst.MapObjectType);
+            mMapObjectDataChoiceOptionsMap = new Dictionary<MapObjectType, string[]>();
+            mMapObjectDataChoiceValuesMap = new Dictionary<MapObjectType, int[]>();
+            foreach(var mapObjectTypeValue in mapObjectTypeValues)
             {
-                mMapObjectDataChoiceOptions = new string[totalMapObjectConfigNum];
-            }
-            if (mMapObjectDataChoiceValues == null || mMapObjectDataChoiceValues.Length != totalMapObjectConfigNum)
-            {
-                mMapObjectDataChoiceValues = new int[totalMapObjectConfigNum];
-            }
-            for(int i = 0, length = totalMapObjectConfigNum; i < length; i++)
-            {
-                mMapObjectDataChoiceOptions[i] = allMapObjectConfigs[i].GetOptionName();
-                mMapObjectDataChoiceValues[i] = allMapObjectConfigs[i].UID;
+                var mapObjectType = (MapObjectType)mapObjectTypeValue;
+                var mapObjectTypeAllConfigs = objectSetting.GetAllMapObjectConfigByType(mapObjectType);
+                var mapObjectTypeConfigNum = mapObjectTypeAllConfigs.Count;
+                string[] allChoiceOptions = new string[mapObjectTypeConfigNum];
+                int[] allValueOptions = new int[mapObjectTypeConfigNum];
+                for(int i = 0; i < mapObjectTypeConfigNum; i++)
+                {
+                    var mapObjectTypeAllConfig = mapObjectTypeAllConfigs[i];
+                    allChoiceOptions[i] = mapObjectTypeAllConfig.GetOptionName();
+                    allValueOptions[i] = mapObjectTypeAllConfig.UID;
+                }
+                mMapObjectDataChoiceOptionsMap.Add(mapObjectType, allChoiceOptions);
+                mMapObjectDataChoiceValuesMap.Add(mapObjectType, allValueOptions);
             }
         }
 
@@ -412,20 +449,25 @@ namespace MapEditor
         /// </summary>
         private void UpdateMapDataChoiceDatas()
         {
-            var allMapDataConfigs = MapSetting.GetEditorInstance().DataSetting.AlllMapDataConfigs;
-            var totalMapDataConfigNum = allMapDataConfigs.Count;
-            if (mMapDataChoiceOptions == null || mMapDataChoiceOptions.Length != totalMapDataConfigNum)
+            var dataSetting = MapSetting.GetEditorInstance().DataSetting;
+            var mapDataTypeValues = Enum.GetValues(MapConst.MapDataType);
+            mMapDataChoiceOptionsMap = new Dictionary<MapDataType, string[]>();
+            mMapDataChoiceValuesMap = new Dictionary<MapDataType, int[]>();
+            foreach (var mapDataTypeValue in mapDataTypeValues)
             {
-                mMapDataChoiceOptions = new string[totalMapDataConfigNum];
-            }
-            if (mMapDataChoiceValues == null || mMapDataChoiceValues.Length != totalMapDataConfigNum)
-            {
-                mMapDataChoiceValues = new int[totalMapDataConfigNum];
-            }
-            for (int i = 0, length = totalMapDataConfigNum; i < length; i++)
-            {
-                mMapDataChoiceOptions[i] = allMapDataConfigs[i].GetOptionName();
-                mMapDataChoiceValues[i] = allMapDataConfigs[i].UID;
+                var mapDataType = (MapDataType)mapDataTypeValue;
+                var mapDataTypeAllConfigs = dataSetting.GetAllMapObjectConfigByType(mapDataType);
+                var mapDataTypeConfigNum = mapDataTypeAllConfigs.Count;
+                string[] allChoiceOptions = new string[mapDataTypeConfigNum];
+                int[] allValueOptions = new int[mapDataTypeConfigNum];
+                for (int i = 0; i < mapDataTypeConfigNum; i++)
+                {
+                    var mapObjectTypeAllConfig = mapDataTypeAllConfigs[i];
+                    allChoiceOptions[i] = mapObjectTypeAllConfig.GetOptionName();
+                    allValueOptions[i] = mapObjectTypeAllConfig.UID;
+                }
+                mMapDataChoiceOptionsMap.Add(mapDataType, allChoiceOptions);
+                mMapDataChoiceValuesMap.Add(mapDataType, allValueOptions);
             }
         }
 
@@ -878,6 +920,60 @@ namespace MapEditor
         }
 
         /// <summary>
+        /// 响应添加地图对象类型选择变化
+        /// </summary>
+        private void OnAddMapObjectTypeChange()
+        {
+            var addMapObjectType = (MapObjectType)mAddMapObjectTypeProperty.intValue;
+            var mapObjectDataChoiceValues = mMapObjectDataChoiceValuesMap[addMapObjectType];
+            if(mapObjectDataChoiceValues != null && mapObjectDataChoiceValues.Length > 0)
+            {
+                mAddMapObjectIndexProperty.intValue = mapObjectDataChoiceValues[0];
+            }
+            else
+            {
+                mAddMapObjectIndexProperty.intValue = 0;
+            }
+            serializedObject.ApplyModifiedProperties();
+            OnAddMapObjectIndexChange();
+        }
+
+        /// <summary>
+        /// 响应添加地图对象索引选择变化
+        /// </summary>
+        private void OnAddMapObjectIndexChange()
+        {
+            UpdateAddMapObjectDataPreviewAsset();
+        }
+
+        /// <summary>
+        /// 响应添加地图埋点类型选择变化
+        /// </summary>
+        private void OnAddMapDataTypeChange()
+        {
+            var addMapDataType = (MapDataType)mAddMapDataTypeProperty.intValue;
+            var mapDataChoiceValues = mMapDataChoiceValuesMap[addMapDataType];
+            if (mapDataChoiceValues != null && mapDataChoiceValues.Length > 0)
+            {
+                mAddMapIndexProperty.intValue = mapDataChoiceValues[0];
+            }
+            else
+            {
+                mAddMapIndexProperty.intValue = 0;
+            }
+            serializedObject.ApplyModifiedProperties();
+            OnAddMapDataIndexChange();
+        }
+
+        /// <summary>
+        /// 响应添加地图埋点索引选择变化
+        /// </summary>
+        private void OnAddMapDataIndexChange()
+        {
+
+        }
+
+        /// <summary>
         /// Inspector自定义显示
         /// </summary>
         public override void OnInspectorGUI()
@@ -987,17 +1083,27 @@ namespace MapEditor
         /// </summary>
         private void DrawMapObjectDataOperationArea()
         {
-            if(mMapObjectDataChoiceOptions.Length > 0)
+            if(mMapObjectDataChoiceOptionsMap != null && mMapObjectDataChoiceOptionsMap.Length > 0)
             {
                 EditorGUILayout.BeginHorizontal();
-                EditorGUILayout.LabelField("地图对象选择:", GUILayout.Width(100f));
+                EditorGUILayout.LabelField("地图对象类型:", GUILayout.Width(90f));
                 EditorGUI.BeginChangeCheck();
-                mAddMapObjectIndexProperty.intValue = EditorGUILayout.IntPopup(mAddMapObjectIndexProperty.intValue, mMapObjectDataChoiceOptions, mMapObjectDataChoiceValues, GUILayout.ExpandWidth(true));
+                mAddMapObjectTypeProperty.intValue = (int)(MapObjectType)EditorGUILayout.EnumPopup((MapObjectType)mAddMapObjectTypeProperty.intValue, GUILayout.Width(150f));
+                if (EditorGUI.EndChangeCheck())
+                {
+                    OnAddMapObjectTypeChange();
+                }
+                EditorGUILayout.LabelField("地图对象选择:", GUILayout.Width(90f));
+                EditorGUI.BeginChangeCheck();
+                var addMapObjectType = (MapObjectType)mAddMapObjectTypeProperty.intValue;
+                var mapObjectDataChoiceOptions = mMapObjectDataChoiceOptionsMap[addMapObjectType];
+                var mapObjectDataChoiceValues = mMapObjectDataChoiceValuesMap[addMapObjectType];
+                mAddMapObjectIndexProperty.intValue = EditorGUILayout.IntPopup(mAddMapObjectIndexProperty.intValue, mapObjectDataChoiceOptions, mapObjectDataChoiceValues, GUILayout.Width(250f));
                 if(EditorGUI.EndChangeCheck())
                 {
-                    UpdateAddMapObjectDataPreviewAsset();
+                    OnAddMapObjectIndexChange();
                 }
-                if(GUILayout.Button("+", GUILayout.Width(40f)))
+                if(GUILayout.Button("+", GUILayout.ExpandWidth(true)))
                 {
                     var addMapObjectValue = mAddMapObjectIndexProperty.intValue;
                     AddMapObjectData(addMapObjectValue);
@@ -1115,12 +1221,27 @@ namespace MapEditor
         /// </summary>
         private void DrawMapDataOperationArea()
         {
-            if (mMapDataChoiceOptions.Length > 0)
+            if (mMapDataChoiceOptionsMap.Length > 0)
             {
                 EditorGUILayout.BeginHorizontal();
-                EditorGUILayout.LabelField("地图埋点选择:", GUILayout.Width(100f));
-                mAddMapDataIndexProperty.intValue = EditorGUILayout.IntPopup(mAddMapDataIndexProperty.intValue, mMapDataChoiceOptions, mMapDataChoiceValues, GUILayout.ExpandWidth(true));
-                if (GUILayout.Button("+", GUILayout.Width(40f)))
+                EditorGUILayout.LabelField("地图埋点类型:", GUILayout.Width(90f));
+                EditorGUI.BeginChangeCheck();
+                mAddMapDataTypeProperty.intValue = (int)(MapDataType)EditorGUILayout.EnumPopup((MapDataType)mAddMapDataTypeProperty.intValue, GUILayout.Width(150f));
+                if (EditorGUI.EndChangeCheck())
+                {
+                    OnAddMapDataTypeChange();
+                }
+                EditorGUILayout.LabelField("地图埋点选择:", GUILayout.Width(90f));
+                EditorGUI.BeginChangeCheck();
+                var addMapDataType = (MapDataType)mAddMapDataTypeProperty.intValue;
+                var mapDataChoiceOptions = mMapDataChoiceOptionsMap[addMapDataType];
+                var mapDataChoiceValues = mMapDataChoiceValuesMap[addMapDataType];
+                mAddMapDataIndexProperty.intValue = EditorGUILayout.IntPopup(mAddMapDataIndexProperty.intValue, mapDataChoiceOptions, mapDataChoiceValues, GUILayout.Width(250f));
+                if (EditorGUI.EndChangeCheck())
+                {
+                    OnAddMapDataIndexChange();
+                }
+                if (GUILayout.Button("+", GUILayout.ExpandWidth(true)))
                 {
                     var addMapDataValue = mAddMapDataIndexProperty.intValue;
                     AddMapData(addMapDataValue);

@@ -715,5 +715,27 @@ namespace MapEditor
             }
             return new BaseMapDataExport(mapDataConfig.DataType, mapDataConfig.ConfId, mapData.Position);
         }
+
+        /// <summary>
+        /// 指定目标int值是否在指定值数组范围内
+        /// </summary>
+        /// <param name="targetValue"></param>
+        /// <param name="values"></param>
+        /// <returns></returns>
+        public static bool IsIntValueInArrays(int targetValue, int[] values)
+        {
+            if(values == null || values.Length == 0)
+            {
+                return false;
+            }
+            foreach(var value in values)
+            {
+                if(targetValue == value)
+                {
+                    return true;
+                }
+            }
+            return false;
+        }
     }
 }

@@ -100,5 +100,23 @@ namespace MapEditor
             var mapDataConfig = AlllMapDataConfigs.Find(mapDataConfig => mapDataConfig.UID == uid);
             return mapDataConfig;
         }
+
+        /// <summary>
+        /// 获取指定地图埋点类型的配置列表
+        /// </summary>
+        /// <param name="mapDataType"></param>
+        /// <returns></returns>
+        public List<MapDataConfig> GetAllMapObjectConfigByType(MapDataType mapDataType)
+        {
+            List<MapDataConfig> targetMapDataConfigs = new List<MapDataConfig>();
+            foreach (var mapObjectConfig in AlllMapDataConfigs)
+            {
+                if (mapObjectConfig.DataType == mapDataType)
+                {
+                    targetMapDataConfigs.Add(mapObjectConfig);
+                }
+            }
+            return targetMapDataConfigs;
+        }
     }
 }

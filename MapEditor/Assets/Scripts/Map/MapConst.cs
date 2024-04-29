@@ -40,6 +40,11 @@ namespace MapEditor
         public static readonly Type MapObjectType = typeof(MapObjectType);
 
         /// <summary>
+        /// MapDataType类型信息
+        /// </summary>
+        public static readonly Type MapDataType = typeof(MapDataType);
+
+        /// <summary>
         /// 地图对象父节点挂点名
         /// </summary>
         public const string MapObjectParentNodeName = "MapObjectParent";

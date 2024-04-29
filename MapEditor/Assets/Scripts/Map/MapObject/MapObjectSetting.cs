@@ -100,5 +100,23 @@ namespace MapEditor
             var mapObjectConfig = AllMapObjectConfigs.Find(mapObjectConfig => mapObjectConfig.UID == uid);
             return mapObjectConfig;
         }
+
+        /// <summary>
+        /// 获取指定地图对象类型的配置列表
+        /// </summary>
+        /// <param name="mapObjectType"></param>
+        /// <returns></returns>
+        public List<MapObjectConfig> GetAllMapObjectConfigByType(MapObjectType mapObjectType)
+        {
+            List<MapObjectConfig> targetMapObjectConfigs = new List<MapObjectConfig>();
+            foreach(var mapObjectConfig in AllMapObjectConfigs)
+            {
+                if(mapObjectConfig.ObjectType == mapObjectType)
+                {
+                    targetMapObjectConfigs.Add(mapObjectConfig);
+                }
+            }
+            return targetMapObjectConfigs;
+        }
     }
 }

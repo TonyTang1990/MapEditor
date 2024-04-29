@@ -75,7 +75,7 @@ namespace MapEditor
         /// <returns></returns>
         public string GetOptionName()
         {
-            return $"{UID}({ObjectType.ToString()})({Des})";
+            return $"{UID}({Des})";
         }
     }
 }
