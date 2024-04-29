@@ -315,7 +315,7 @@ namespace MapEditor
             EditorGUILayout.LabelField("地图对象类型:", GUILayout.Width(80f));
             mAddMapObjectType = (MapObjectType)EditorGUILayout.EnumPopup(mAddMapObjectType, GUILayout.Width(150f));
             EditorGUILayout.LabelField("是否动态对象:", GUILayout.Width(80f));
-            mAddIsDynamic = EditorGUILayout.Toggle(mAddIsDynamic, GUILayout.ExpandWidth(true));
+            mAddIsDynamic = EditorGUILayout.Toggle(mAddIsDynamic, GUILayout.Width(30f));
             if (GUILayout.Button("+", GUILayout.ExpandWidth(true)))
             {
                 DoAddMapObjectConfig(mAddMapObjectUID, mAddMapObjectType, mAddIsDynamic);
