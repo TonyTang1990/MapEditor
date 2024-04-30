@@ -66,12 +66,16 @@
     <Compile Include="Assets\Scripts\Map\MapObject\MapObjectConfig.cs" />
     <Compile Include="Assets\Scripts\Map\MapSetting.cs" />
     <Compile Include="Assets\Scripts\Map\MapUtilities.cs" />
+    <Compile Include="Assets\Scripts\Map\MapObject\ColliderDataMono.cs" />
+    <Compile Include="Assets\Scripts\Map\MapExport\MonsterMapDataExport.cs" />
     <Compile Include="Assets\Scripts\Map\MapExport\MapDataExport.cs" />
     <Compile Include="Assets\Scripts\Map\MapData\MapData.cs" />
+    <Compile Include="Assets\Scripts\Core\Extension\GameObjectExtension.cs" />
     <Compile Include="Assets\Scripts\Map\MapExport\ExportType.cs" />
     <Compile Include="Assets\Scripts\Map\MapExport\MonsterGroupMapDataExport.cs" />
     <Compile Include="Assets\Scripts\Map\MapExport\MapExport.cs" />
     <Compile Include="Assets\Scripts\Map\MapExport\BaseMapDynamicExport.cs" />
+    <Compile Include="Assets\Scripts\Map\MapObject\ColliderType.cs" />
     <Compile Include="Assets\Scripts\Map\Map.cs" />
     <Compile Include="Assets\Scripts\Map\MapData\MapDataSetting.cs" />
     <Compile Include="Assets\Scripts\Map\MapObject\MapObjectSetting.cs" />
@@ -79,10 +83,6 @@
     <Compile Include="Assets\Scripts\Map\MapConst.cs" />
     <Compile Include="Assets\Scripts\Map\MapExport\BaseMapDataExport.cs" />
     <Compile Include="Assets\Scripts\Map\MapObject\MapObjectData.cs" />
-    <Compile Include="Assets\Scripts\Map\MapObject\ColliderDataMono.cs" />
-    <Compile Include="Assets\Scripts\Map\MapObject\ColliderType.cs" />
-    <Compile Include="Assets\Scripts\Core\Extension\GameObjectExtension.cs" />
-    <Compile Include="Assets\Scripts\Map\MapExport\MonsterMapDataExport.cs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="UnityEngine">

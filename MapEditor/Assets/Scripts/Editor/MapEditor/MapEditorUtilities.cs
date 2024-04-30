@@ -337,7 +337,6 @@ namespace MapEditor
         /// </summary>
         private static Dictionary<ExportType, string> ExportTypePostFixMap = new Dictionary<ExportType, string>()
         {
-            { ExportType.LUA, ".lua" },
             { ExportType.JSON, ".json" },
         };
 
@@ -565,14 +564,14 @@ namespace MapEditor
             {
                 var monsterGroupMapData = monsterGroup.Value as MonsterGroupMapData;
                 var groupId = monsterGroupMapData.GroupId;
-                var monsterGroupMapDataExport = GetMonsterGroupMapDataExport(MonsterGroupMapData);
+                var monsterGroupMapDataExport = GetMonsterGroupMapDataExport(monsterGroupMapData);
                 List<MapData> groupMonsterMapDatas;
                 if(monsterMap.TryGetValue(groupId, out groupMonsterMapDatas))
                 {
                     foreach(var mapData in groupMonsterMapDatas)
                     {
                         var monsterMapDataExport = GetMonsterMapDataExport(mapData);
-                        monsterMapDataExport.AllMonsterMapExportDatas.Add(monsterMapDataExport);
+                        monsterGroupMapDataExport.AllMonsterMapExportDatas.Add(monsterMapDataExport);
                     }
                 }
                 mapExport.AllMonsterGroupMapDatas.Add(monsterGroupMapDataExport);
@@ -582,8 +581,8 @@ namespace MapEditor
             {
                 foreach(var noGroupMonsterData in noGroupMonsterDatas)
                 {
-                    var monsterMapDataExport = GetMonsterDataExport(noGroupMonsterData);
-                    mapExport.ALlNoGroupMonsterMapDatas.Add(MonsterMapDataExport);
+                    var monsterMapDataExport = GetMonsterMapDataExport(noGroupMonsterData);
+                    mapExport.ALlNoGroupMonsterMapDatas.Add(monsterMapDataExport);
                 }
             }
 
@@ -676,7 +675,7 @@ namespace MapEditor
         /// </summary>
         /// <param name="mapData"></param>
         /// <returns></returns>
-        private static MonsterGroupMapDataExport GetMonsterMapDataExport(MapData mapData)
+        private static MonsterMapDataExport GetMonsterMapDataExport(MapData mapData)
         {
             if (mapData == null)
             {
