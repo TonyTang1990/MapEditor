@@ -28,6 +28,11 @@ namespace MapEditor
         [Header("埋点位置")]
         public Vector3 Position;
 
+        /// <summary>
+        /// 旋转
+        /// </summary>
+        public Vector3 Rotation;
+
         public MapData(int uid)
         {
             UID = uid;
@@ -37,6 +42,7 @@ namespace MapEditor
         {
             UID = uid;
             Position = position;
+            Rotation = Vector3.zero;
         }
     }
 }

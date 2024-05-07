@@ -31,11 +31,17 @@ namespace MapEditor
         /// </summary>
         public Vector3 Position;
 
-        public BaseMapDynamicExport(MapObjectType mapObjectType, int confId, Vector3 position)
+        /// <summary>
+        /// 旋转信息
+        /// </summary>
+        public Vector3 Rotation;
+
+        public BaseMapDynamicExport(MapObjectType mapObjectType, int confId, Vector3 position, Vector3 rotation)
         {
             MapObjectType = mapObjectType;
             ConfId = confId;
             Position = position;
+            Rotation = rotation;
         }
     }
 }

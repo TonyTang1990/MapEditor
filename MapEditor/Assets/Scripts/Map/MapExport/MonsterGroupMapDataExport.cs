@@ -37,7 +37,8 @@ namespace MapEditor
         /// </summary>
         public List<MonsterMapDataExport> AllMonsterMapExportDatas = new List<MonsterMapDataExport>();
 
-        public MonsterGroupMapDataExport(MapDataType mapDataType, int confId, Vector3 position, int groupId, float monsterCreateRadius, float monsterActiveRadius) : base(mapDataType, confId, position)
+        public MonsterGroupMapDataExport(MapDataType mapDataType, int confId, Vector3 position, Vector3 rotation, int groupId, float monsterCreateRadius, float monsterActiveRadius)
+                                            : base(mapDataType, confId, position, rotation)
         {
             GroupId = groupId;
             MonsterCreateRadius = monsterCreateRadius;

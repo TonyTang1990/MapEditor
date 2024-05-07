@@ -620,7 +620,7 @@ namespace MapEditor
                 Debug.LogError($"找不到地图对象UID:{mapObjectUID}的配置，获取地图动态对象数据碰撞体导出数据失败！");
                 return null;
             }
-            return new ColliderMapDynamicExport(mapObjectConfig.ObjectType, mapObjectConfig.ConfId, mapObjectData.Position,
+            return new ColliderMapDynamicExport(mapObjectConfig.ObjectType, mapObjectConfig.ConfId, mapObjectData.Position, mapObjectData.Rotation,
                                                     mapObjectData.ColliderCenter, mapObjectData.ColliderSize, mapObjectData.ColliderRadius);
         }
 
@@ -643,7 +643,7 @@ namespace MapEditor
                 Debug.LogError($"找不到地图对象UID:{mapObjectUID}的配置，获取地图动态对象数据基础导出数据失败！");
                 return null;
             }
-            return new BaseMapDynamicExport(mapObjectConfig.ObjectType, mapObjectConfig.ConfId, mapObjectData.Position);
+            return new BaseMapDynamicExport(mapObjectConfig.ObjectType, mapObjectConfig.ConfId, mapObjectData.Position, mapObjectData.Rotation);
         }
 
         /// <summary>
@@ -666,8 +666,8 @@ namespace MapEditor
                 return null;
             }
             var monsterGroupMapData = mapData as MonsterGroupMapData;
-            return new MonsterGroupMapDataExport(mapDataConfig.DataType, mapDataConfig.ConfId, monsterGroupMapData.Position, monsterGroupMapData.GroupId,
-                                                    monsterGroupMapData.MonsterCreateRadius, monsterGroupMapData.MonsterActiveRadius);
+            return new MonsterGroupMapDataExport(mapDataConfig.DataType, mapDataConfig.ConfId, monsterGroupMapData.Position, monsterGroupMapData.Rotation,
+                                                    monsterGroupMapData.GroupId, monsterGroupMapData.MonsterCreateRadius, monsterGroupMapData.MonsterActiveRadius);
         }
 
         /// <summary>
@@ -690,7 +690,7 @@ namespace MapEditor
                 return null;
             }
             var monsterMapData = mapData as MonsterMapData;
-            return new MonsterMapDataExport(mapDataConfig.DataType, mapDataConfig.ConfId, monsterMapData.Position, monsterMapData.GroupId);
+            return new MonsterMapDataExport(mapDataConfig.DataType, mapDataConfig.ConfId, monsterMapData.Position, monsterMapData.Rotation, monsterMapData.GroupId);
         }
 
         /// <summary>
@@ -712,7 +712,7 @@ namespace MapEditor
                 Debug.LogError($"找不到地图埋点UID:{mapDataUID}的配置，获取地图埋点基础导出数据失败！");
                 return null;
             }
-            return new BaseMapDataExport(mapDataConfig.DataType, mapDataConfig.ConfId, mapData.Position);
+            return new BaseMapDataExport(mapDataConfig.DataType, mapDataConfig.ConfId, mapData.Position, mapData.Rotation);
         }
 
         /// <summary>

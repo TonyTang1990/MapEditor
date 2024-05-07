@@ -29,28 +29,40 @@ namespace MapEditor
         public GameObject Go;
 
         /// <summary>
-        /// 埋点位置
+        /// 埋点位置(地图对象可能删除还原，所以需要逻辑层面记录位置)
         /// </summary>
         [Header("埋点位置")]
         public Vector3 Position;
 
         /// <summary>
+        /// 旋转(地图对象可能删除还原，所以需要逻辑层面记录旋转)
+        /// </summary>
+        [Header("旋转")]
+        public Vector3 Rotation = Vector3.zero;
+
+        /// <summary>
+        /// 本地缩放(地图对象可能删除还原，所以需要逻辑层面记录缩放)
+        /// </summary>
+        [Header("缩放")]
+        public Vector3 LocalScale = Vector3.one;
+
+        /// <summary>
         /// 碰撞器中心点
         /// </summary>
         [Header("碰撞器中心点")]
-        public Vector3 ColliderCenter;
+        public Vector3 ColliderCenter = new Vector3(0, 0, 0);
 
         /// <summary>
         /// 碰撞器大小
         /// </summary>
         [Header("碰撞器大小")]
-        public Vector3 ColliderSize;
+        public Vector3 ColliderSize = new Vector3(1, 1, 1);
 
         /// <summary>
         /// 碰撞体半径
         /// </summary>
         [Header("碰撞体半径")]
-        public float ColliderRadius;
+        public float ColliderRadius = 1;
 
         /// <summary>
         /// 带参构造函数

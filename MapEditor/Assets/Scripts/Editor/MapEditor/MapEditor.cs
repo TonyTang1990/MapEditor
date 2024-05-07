@@ -189,6 +189,11 @@ namespace MapEditor
         /// </summary>
         private Dictionary<MapDataType, int[]> mMapDataChoiceValuesMap;
 
+        /// <summary>
+        /// 按键按下Map<按键值， 是否按下>
+        /// </summary>
+        private Dictionary<KeyCode, bool> mKeyCodeDownMap = new Dictionary<KeyCode, bool>();
+
         private void Awake()
         {
             InitTarget();
@@ -203,7 +208,7 @@ namespace MapEditor
             UpdateMapSizeDrawDatas();
             UpdateMapGOPosition();
             UpdateTerrianSizeAndPos();
-            UpdateMapObjectDataPositionDatas();
+            UpdateMapObjectDataLogicDatas();
             CorrectAddMapObjectIndexValue();
             CorrectAddMapDataIndexValue();
             serializedObject.ApplyModifiedProperties();
@@ -340,11 +345,11 @@ namespace MapEditor
         }
 
         /// <summary>
-        /// 更新地图对象数据的位置数据(对象存在时才更新记录位置)
+        /// 更新地图对象数据的逻辑数据(对象存在时才更新记录逻辑数据)
         /// </summary>
-        private void UpdateMapObjectDataPositionDatas()
+        private void UpdateMapObjectDataLogicDatas()
         {
-            // 动态地图对象可能删除还原，所以需要逻辑层面记录数据
+            // 地图对象可能删除还原，所以需要逻辑层面记录数据
             for(int i = 0; i < mMapObjectDataListProperty.arraySize; i++)
             {
                 var mapObjectDataProperty = mMapObjectDataListProperty.GetArrayElementAtIndex(i);
@@ -359,15 +364,26 @@ namespace MapEditor
                 if(goProperty.objectReferenceValue != null)
                 {
                     var positionProperty = mapObjectDataProperty.FindPropertyRelative("Position");
+                    var rotationProperty = mapObjectDataProperty.FindPropertyRelative("Rotation");
+                    var localScaleProperty = mapObjectDataProperty.FindPropertyRelative("LocalScale");
+                    var colliderCenterProperty = mapObjectDataProperty.FindPropertyRelative("ColliderCenter");
+                    var colliderSizeProperty = mapObjectDataProperty.FindPropertyRelative("ColliderSize");
+                    var colliderRadiusProperty = mapObjectDataProperty.FindPropertyRelative("ColliderRadius");
                     var mapObjectGO = goProperty.objectReferenceValue as GameObject;
                     positionProperty.vector3Value = mapObjectGO.transform.position;
-                    if(mapObjectConfig.IsDynamic)
+                    rotationProperty.vector3Value = mapObjectGO.transform.rotation.eulerAngles;
+                    localScaleProperty.vector3Value = mapObjectGO.transform.localScale;
+                    var boxCollider = mapObjectGO.GetComponent<BoxCollider>();
+                    var sphereCollider = mapObjectGO.GetComponent<SphereCollider>();
+                    if (boxCollider != null)
                     {
-                        var colliderCenterProperty = mapObjectDataProperty.FindPropertyRelative("ColliderCenter");
-                        var colliderSizeProperty = mapObjectDataProperty.FindPropertyRelative("ColliderSize");
-                        var colliderRadiusProperty = mapObjectDataProperty.FindPropertyRelative("ColliderRadius");
-                        MapUtilities.UpdateColliderByColliderData(mapObjectGO, colliderCenterProperty.vector3Value,
-                                                                    colliderSizeProperty.vector3Value, colliderRadiusProperty.floatValue);
+                        colliderCenterProperty.vector3Value = boxCollider.center;
+                        colliderSizeProperty.vector3Value = boxCollider.size;
+                    }
+                    else if(sphereCollider != null)
+                    {
+                        colliderCenterProperty.vector3Value = sphereCollider.center;
+                        colliderRadiusProperty.floatValue = sphereCollider.radius;
                     }
                 }
             }
@@ -780,11 +796,70 @@ namespace MapEditor
         }
 
         /// <summary>
+        /// 标记指定按键按下
+        /// </summary>
+        /// <param name="keyCode"></param>
+        private void MarkKeyDown(KeyCode keyCode)
+        {
+            if(!mKeyCodeDownMap.ContainsKey(keyCode))
+            {
+                mKeyCodeDownMap.Add(keyCode, true);
+            }
+            else
+            {
+                mKeyCodeDownMap[keyCode] = true;
+            }
+        }
+
+        /// <summary>
+        /// 标记指定按键释放
+        /// </summary>
+        /// <param name="keyCode"></param>
+        private void MarkKeyUp(KeyCode keyCode)
+        {
+            if(!mKeyCodeDownMap.ContainsKey(keyCode))
+            {
+                mKeyCodeDownMap.Add(keyCode, false);
+            }
+            else
+            {
+                mKeyCodeDownMap[keyCode] = false;
+            }
+        }
+
+        /// <summary>
+        /// 标记所有按键释放
+        /// </summary>
+        private void UnmarkAllKeyUp()
+        {
+            if(mKeyCodeDownMap.Count == 0)
+            {
+                return;
+            }
+            mKeyCodeDownMap.Clear();
+        }
+
+        /// <summary>
+        /// 指定按键是否按下
+        /// </summary>
+        /// <param name="keyCode"></param>
+        /// <returns></returns>
+        private bool IsKeyCodeDown(KeyCode keyCode)
+        {
+            bool result = false;
+            if(mKeyCodeDownMap.TryGetValue(keyCode, out result))
+            {
+                return result;
+            }
+            return false;
+        }
+
+        /// <summary>
         /// 清除动态地图对象GameObjects
         /// </summary>
         private void CleanDynamicMaoObjectGos()
         {
-            UpdateMapObjectDataPositionDatas();
+            UpdateMapObjectDataLogicDatas();
             for(int i = 0; i < mMapObjectDataListProperty.arraySize; i++)
             {
                 var mapObjectDataProperty = mMapObjectDataListProperty.GetArrayElementAtIndex(i);
@@ -807,11 +882,57 @@ namespace MapEditor
         }
 
         /// <summary>
+        /// 恢复指定MapObject属性地图对象
+        /// </summary>
+        /// <param name="mapObjectDataProperty"></param>
+        private void RecreateMapObjectGo(SerializedProperty mapObjectDataProperty)
+        {
+            if(mapObjectDataProperty == null)
+            {
+                Debug.LogError($"不支持传空地图对象属性，重创地图对象失败！");
+                return;
+            }
+            var uidProperty = mapObjectDataProperty.FindPropertyRelative("UID");
+            var mapObjectUID = uidProperty.intValue;
+            var mapObjectConfig = MapSetting.GetEditorInstance().ObjectSetting.GetMapObjectConfigByUID(mapObjectUID);
+            if(mapObjectConfig == null)
+            {
+                Debug.LogError($"找不到地图对象UID:{mapObjectUID}的配置，重创地图对象失败！");
+                return;
+            }
+            var goProperty = mapObjectDataProperty.FindPropertyRelative("Go");
+            var gameObject = goProperty.objectReference as GameObject;
+            if(gameObject != null)
+            {
+                GameObject.DestroyImmediate(gameObject);
+            }
+            var instanceGo = CreateGameObjectByUID(mapObjectUID);
+            if(instanceGo != null)
+            {
+                var positionProperty = mapObjectDataProperty.FindPropertyRelative("Position");
+                var rotationProperty = mapObjectDataProperty.FindPropertyRelative("Roation");
+                var localScaleProperty = mapObjectDataProperty.FIndPropertyRelative("LocalScale");
+                instanceGo.transform.position = positionProperty.vector3Value;
+                instanceGo.transform.rotation = rotationProperty.vector3Value;
+                instanceGo.transform.localScale = localScaleProperty.vector3Value;
+                goProperty.objectReference = instanceGo;
+                if(mapObjectConfig.IsDynamic)
+                {
+                    var colliderCenterProperty = mapObjectDataProperty.FindPropertyRelative("ColliderCenter");
+                    var colliderSizeProperty = mapObjectDataProperty.FindPropertyRelative("ColliderSize");
+                    var collider = instanceGo.GetComponnet<BoxCollider>();
+                    collider.center = colliderCenterProperty.vector3Value;
+                    collider.size = colliderSizeProperty.vector3Value;
+                }
+            }
+        }
+
+        /// <summary>
         /// 回复动态地图对象GameObjects
         /// </summary>
         private void RecoverDynamicMapObjectGos()
         {
-            UpdateMapObjectDataPositionDatas();
+            UpdateMapObjectDataLogicDatas();
             for (int i = 0; i < mMapObjectDataListProperty.arraySize; i++)
             {
                 var mapObjectDataProperty = mMapObjectDataListProperty.GetArrayElementAtIndex(i);
@@ -873,6 +994,20 @@ namespace MapEditor
             }
             AssetDatabase.MoveAsset(navMeshAssetPath, newNavMeshAssetPath);
             Debug.Log($"移动寻路数据Asset:{navMeshAssetPath}到{newNavMeshAssetPath}成功！");
+        }
+
+        /// <summary>
+        /// 一键重创地图对象
+        /// </summary>
+        private void OneKeyRecreateMapObjectGos()
+        {
+            for(int i = 0; i < mMapObjectDataListProperty.arraySize; i++)
+            {
+                var mapObjectDataProperty = mMapObjectDataListProperty.GetArrayElementAtIndex(i);
+                RecreateMapObjectGo(mapObjectDataProperty);
+            }
+            serializedObject.ApplyModifiedProperties();
+            AssetDatabase.SaveAssets();
         }
 
         /// <summary>
@@ -1033,6 +1168,10 @@ namespace MapEditor
             if(GUILayout.Button("拷贝NavMesh Asset", GUILayout.ExpandWidth(true)))
             {
                 CopyNavMeshAsset();
+            }
+            if(GUILayout.Button("一键重创地图对象", GUILayout.ExpandWidth(true)))
+            {
+                OneKeyRecreateMapObjectGos();
             }
             EditorGUILayout.EndHorizontal();
             EditorGUILayout.BeginHorizontal();
@@ -1291,7 +1430,8 @@ namespace MapEditor
             EditorGUILayout.LabelField("UID", MapStyles.TabMiddleStyle, GUILayout.Width(60f));
             EditorGUILayout.LabelField("埋点类型", MapStyles.TabMiddleStyle, GUILayout.Width(150f));
             EditorGUILayout.LabelField("配置Id", MapStyles.TabMiddleStyle, GUILayout.Width(100f));
-            EditorGUILayout.LabelField("位置", MapStyles.TabMiddleStyle, GUILayout.Width(100f));
+            EditorGUILayout.LabelField("位置", MapStyles.TabMiddleStyle, GUILayout.Width(160f));
+            EditorGUILayout.LabelField("旋转", MapStyles.TabMiddleStyle, GUILayout.Width(160f));
             EditorGUILayout.LabelField("描述", MapStyles.TabMiddleStyle, GUILayout.Width(100f));
             EditorGUILayout.LabelField("上移", MapStyles.TabMiddleStyle, GUILayout.Width(40f));
             EditorGUILayout.LabelField("下移", MapStyles.TabMiddleStyle, GUILayout.Width(40f));
@@ -1335,6 +1475,19 @@ namespace MapEditor
             if(EditorGUI.EndChangeCheck())
             {
                 positionProperty.vector3Value = newVector3Value;
+            }
+            var rotationProperty = mapDataProperty.FindPropertyRelative("Rotation");
+            var newRotationVector3Value = rotationProperty.vector3Value;
+            EditorGUI.BeginChangeCheck();
+            EditorGUILayout.LabelField("X", GUILayout.Width(10f));
+            newRotationVector3Value.x = EditorGUILayout.FloatField(newRotationVector3Value.x, GUILayout.Width(40f));
+            EditorGUILayout.LabelField("Y", GUILayout.Width(10f));
+            newRotationVector3Value.y = EditorGUILayout.FloatField(newRotationVector3Value.y, GUILayout.Width(40f));
+            EditorGUILayout.LabelField("Z", GUILayout.Width(10f));
+            newRotationVector3Value.z = EditorGUILayout.FloatField(newRotationVector3Value.z, GUILayout.Width(40f));
+            if (EditorGUI.EndChangeCheck())
+            {
+                rotationProperty.vector3Value = newRotationVector3Value;
             }
             var des = mapDataConfig != null ? mapDataConfig.Des : "";
             EditorGUILayout.LabelField(des, MapStyles.TabMiddleStyle, GUILayout.Width(100f));
@@ -1505,7 +1658,8 @@ namespace MapEditor
         {
             if(mSceneGUISwitchProperty != null && mSceneGUISwitchProperty.boolValue)
             {
-                if(Event.current.type == EventType.Repaint)
+                var currentEvent = Event.current;
+                if (currentEvent.type == EventType.Repaint)
                 {
                     DrawMapLines();
                     if(mMapObjectSceneGUISwitchProperty != null && mMapObjectSceneGUISwitchProperty.boolValue)
@@ -1518,10 +1672,59 @@ namespace MapEditor
                         DrawMapDataSpheres();
                     }
                 }
-                if(mMapDataSceneGUISwitchProperty != null && mMapDataSceneGUISwitchProperty.boolValue)
+
+                if(currentEvent.type == EventType.KeyDown)
                 {
-                    DrawMapDataPositionHandles();
+                    if(currentEvent.keyCode == KeyCode.W)
+                    {
+                        MarkKeyDown(KeyCode.W);
+                    }
+                    if(currentEvent.keyCode == KeyCode.E)
+                    {
+                        MarkKeyDown(KeyCode.E);
+                    }
                 }
+                if(currentEvent.type == EventType.KeyUp)
+                {
+                    if (currentEvent.keyCode == KeyCode.W)
+                    {
+                        MarkKeyUp(KeyCode.W);
+                    }
+                    if (currentEvent.keyCode == KeyCode.E)
+                    {
+                        MarkKeyUp(KeyCode.E);
+                    }
+                }
+                if(IsKeyCodeDown(KeyCode.W))
+                {
+                    OnWKeyboardClick();
+                }
+                if(IsKeyCodeDown(keyCode.E))
+                {
+                    OnEKeyboardClick();
+                }
+            }
+        }
+
+        /// <summary>
+        /// 响应W按键按下
+        /// </summary>
+        private void OnWKeyboardClick()
+        {
+            if (mMapDataSceneGUISwitchProperty != null && mMapDataSceneGUISwitchProperty.boolValue)
+            {
+                DrawMapDataPositionHandles();
+            }
+        }
+
+        /// <summary>
+        /// 响应E按键按下
+        /// </summary>
+        private void OnEKeyboardClick()
+        {
+            if (mMapDataSceneGUISwitchProperty != null && mMapDataSceneGUISwitchProperty.boolValue)
+            {
+                DrawMapDataRotationHandles();
             }
         }
 
@@ -1590,10 +1793,12 @@ namespace MapEditor
                 var uidProperty = mapDataProperty.FindPropertyRelative("UID");
                 var mapDataUID = uidProperty.intValue;
                 var mapDataPositionProperty = mapDataProperty.FindPropertyRelative("Position");
+                var mapDataRotationProperty = mapDataProperty.FindPropertyRelative("Rotation");
+                var rotationQuaternion = Quaternion.Euler(mapDataRotationProperty.vector3Value);
                 var mapDataConfig = MapSetting.GetEditorInstance().DataSetting.GetMapDataConfigByUID(mapDataUID);
                 var preHandlesColor = Handles.color;
                 Handles.color = mapDataConfig != null ? mapDataConfig.SceneSphereColor : Color.gray;
-                Handles.SphereHandleCap(i, mapDataPositionProperty.vector3Value, Quaternion.identity, MapEditorConst.MapDataSphereSize, EventType.Repaint);
+                Handles.SphereHandleCap(i, mapDataPositionProperty.vector3Value, rotationQuaternion, MapEditorConst.MapDataSphereSize, EventType.Repaint);
                 Handles.color = preHandlesColor;
             }
         }
@@ -1608,10 +1813,33 @@ namespace MapEditor
                 EditorGUI.BeginChangeCheck();
                 var mapDataProperty = mMapDataListProperty.GetArrayElementAtIndex(i);
                 var mapDataPositionProperty = mapDataProperty.FindPropertyRelative("Position");
-                var newTargetPosition = Handles.PositionHandle(mapDataPositionProperty.vector3Value, Quaternion.identity);
+                var mapDataRotationProperty = mapDataProperty.FindPropertyRelative("Rotation");
+                var rotationQuaternion = Quaternion.Euler(mapDataRotationProperty.vector3Value);
+                var newTargetPosition = Handles.PositionHandle(mapDataPositionProperty.vector3Value, rotationQuaternion);
                 if(EditorGUI.EndChangeCheck())
                 {
                     mapDataPositionProperty.vector3Value = newTargetPosition;
+                    serializedObject.ApplyModifiedProperties();
+                }
+            }
+        }
+
+        /// <summary>
+        /// 绘制所有地图埋点数据坐标操作RoationHandle
+        /// </summary>
+        private void DrawMapDataRotationHandles()
+        {
+            for (int i = 0; i < mMapDataListProperty.arraySize; i++)
+            {
+                EditorGUI.BeginChangeCheck();
+                var mapDataProperty = mMapDataListProperty.GetArrayElementAtIndex(i);
+                var mapDataPositionProperty = mapDataProperty.FindPropertyRelative("Position");
+                var mapDataRotationProperty = mapDataProperty.FindPropertyRelative("Rotation");
+                var rotationQuaternion = Quaternion.Euler(mapDataRotationProperty.vector3Value);
+                var newTargetRotation = Handles.RotationHandle(rotationQuaternion, mapDataPositionProperty.vector3Value);
+                if (EditorGUI.EndChangeCheck())
+                {
+                    mapDataRotationProperty.vector3Value = newTargetRotation.eulerAngles;
                     serializedObject.ApplyModifiedProperties();
                 }
             }
