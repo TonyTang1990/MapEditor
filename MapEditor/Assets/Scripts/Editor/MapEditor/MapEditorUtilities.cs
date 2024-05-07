@@ -136,7 +136,8 @@ namespace MapEditor
                 {
                     return null;
                 }
-                mapTerrianNodeTransform = GameObject.Instantiate(mapTerrianPrefab).transform;
+                var mapTerrianNodeGo = PrefabUtility.InstantiatePrefab(mapTerrianPrefab) as GameObject;
+                mapTerrianNodeTransform = mapTerrianNodeGo.transform;
                 mapTerrianNodeTransform.name = mapTerrianNodeName;
                 mapTerrianNodeTransform.SetParent(mapGO.transform);
             }

@@ -565,7 +565,7 @@ namespace MapEditor
                 Debug.LogError($"未配置地图对象UID:{uid}配置数据，不支持创建地图实体对象！");
                 return null;
             }
-            var instanceGo = mapObjectConfig.Asset != null ? GameObject.Instantiate(mapObjectConfig.Asset) : null;
+            var instanceGo = mapObjectConfig.Asset != null ? PrefabUtility.InstantiatePrefab(mapObjectConfig.Asset) as GameObject : null;
             if(instanceGo != null)
             {
                 var mapObjectType = mapObjectConfig.ObjectType;
