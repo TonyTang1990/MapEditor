@@ -22,6 +22,17 @@ namespace MapEditor
     public class MapEditor : Editor
     {
         /// <summary>
+        /// 实体对象状态
+        /// </summary>
+        private enum GameObjectStatus
+        {
+            Normal = 0,             // 普通GameObject
+            Asset = 1,              // Asset
+            PrefabInstance = 2,     // 预制件实例对象
+            PrefabContent = 3,      // 预制件编辑模式对象
+        }
+
+        /// <summary>
         /// 地图编辑器页签类型
         /// </summary>
         private enum MapTabType
@@ -615,6 +626,21 @@ namespace MapEditor
         }
 
         /// <summary>
+        /// 执行将指定属性对象和指定索引的数据向上移动
+        /// </summary>
+        /// <param name="propertyList"></param>
+        /// <param name="index"></param>
+        /// <returns></returns>
+        private bool DoMovePropertyDataUpByIndex(SerializedProperty propertyList, int index)
+        {
+            if(!CheckOperationAvalible())
+            {
+                return false;
+            }
+            return MovePropertyDataUpByIndex(propertyList, index);
+        }
+
+        /// <summary>
         /// 将指定属性对象和指定索引的数据向上移动
         /// </summary>
         /// <param name="propertyList"></param>
@@ -639,6 +665,21 @@ namespace MapEditor
         }
 
         /// <summary>
+        /// 执行将指定属性对象和指定索引的数据向下移动
+        /// </summary>
+        /// <param name="propertyList"></param>
+        /// <param name="index"></param>
+        /// <returns></returns>
+        private bool DoMovePropertyDataDownByIndex(SerializedProperty propertyList, int index)
+        {
+            if (!CheckOperationAvalible())
+            {
+                return false;
+            }
+            return MovePropertyDataDownByIndex(propertyList, index);
+        }
+
+        /// <summary>
         /// 将指定属性对象和指定索引的数据向下移动
         /// </summary>
         /// <param name="propertyList"></param>
@@ -660,6 +701,21 @@ namespace MapEditor
             var newIndex = Math.Clamp(index + 1, 0, mapDataNum - 1);
             ExchangeMapDataByIndex(propertyList, index, newIndex);
             return true;
+        }
+
+        /// <summary>
+        /// 执行添加指定地图对象UID数据
+        /// </summary>
+        /// <param name="uid"></param>
+        /// <param name="insertIndex"></param>
+        /// <returns></returns>
+        private bool DoAddMapObjectData(int uid, int insertIndex = -1)
+        {
+            if(!CheckOperationAvalible())
+            {
+                return false;
+            }
+            return AddMapObjectData(uid, insertIndex);
         }
 
         /// <summary>
@@ -710,6 +766,21 @@ namespace MapEditor
             return true;
         }
 
+
+        /// <summary>
+        /// 执行移除指定索引的地图对象数据
+        /// </summary>
+        /// <param name="index"></param>
+        /// <returns></returns>
+        private bool DoRemoveMapObjectDataByIndex(int index)
+        {
+            if (!CheckOperationAvalible())
+            {
+                return false;
+            }
+            return RemoveMapObjectDataByIndex(index);
+        }
+
         /// <summary>
         /// 移除指定索引的地图对象数据
         /// </summary>
@@ -734,6 +805,21 @@ namespace MapEditor
             mMapObjectDataListProperty.DeleteArrayElementAtIndex(index);
             serializedObject.ApplyModifiedProperties();
             return true;
+        }
+
+        /// <summary>
+        /// 执行添加指定地图埋点UID数据
+        /// </summary>
+        /// <param name="uid"></param>
+        /// <param name="insertIndex"></param>
+        /// <returns></returns>
+        private bool DoAddMapData(int uid, int insertIndex = -1)
+        {
+            if(!CheckOperationAvalible())
+            {
+                return false;
+            }
+            return AddMapData(uid, insertIndex);
         }
 
         /// <summary>
@@ -778,6 +864,20 @@ namespace MapEditor
         }
 
         /// <summary>
+        /// 执行移除指定索引的地图埋点数据
+        /// </summary>
+        /// <param name="index"></param>
+        /// <returns></returns>
+        private bool DoRemoveMapDataByIndex(int index)
+        {
+            if(!CheckOperationAvalible())
+            {
+                return false;
+            }
+            return RemoveMapDataByIndex(index);
+        }
+
+        /// <summary>
         /// 移除指定索引的地图埋点数据
         /// </summary>
         /// <param name="index"></param>
@@ -792,6 +892,122 @@ namespace MapEditor
             }
             mMapDataListProperty.DeleteArrayElementAtIndex(index);
             serializedObject.ApplyModifiedProperties();
+            return true;
+        }
+
+        /// <summary>
+        /// 获取当前脚本GameObject状态
+        /// </summary>
+        /// <returns></returns>
+        private GameObjectStatus GetGameObjectStatus()
+        {
+            // 未做成预制件的所有操作可用
+            // 做成预制件的必须进入预制件编辑模式才可行
+            var go = mTarget.gameObject;
+            var assetPath = AssetDatabase.GetAssetPath(go);
+            if(!string.IsNullOrEmpty(assetPath))
+            {
+                return GameObjectStatus.Asset;
+            }
+            if(PrefabStageUtility.GetPrefabStage(go) != null)
+            {
+                return GameObjectStatus.PrefabContent;
+            }
+            else
+            {
+                if(PrefabUtility.IsPartOfPrefabInstance(go))
+                {
+                    return GameObjectStatus.PrefabInstance;
+                }
+            }
+            return GameObjectStatus.Normal;
+        }
+
+        /// <summary>
+        /// 获取当前脚本GameObject对应Asset
+        /// Note:
+        /// 未存储到本地Asset返回null
+        /// </summary>
+        /// <returns></returns>
+        private string GetMapAssetPath()
+        {
+            string assetPath = null;
+            var gameObjectStatus = GetGameObjectStatus();
+            if (gameObjectStatus == GameObjectStatus.Normal)
+            {
+                return null;
+            }
+            else if (gameObjectStatus == GameObjectStatus.PrefabInstance)
+            {
+                var asset = PrefabUtility.GetCorrespondingObjectFromSource(mTarget.gameObject);
+                assetPath = AssetDatabase.GetAssetPath(asset);
+            }
+            else if (gameObjectStatus == GameObjectStatus.Asset)
+            {
+                assetPath = AssetDatabase.GetAssetPath(mTarget.gameObject);
+            }
+            else if(gameObjectStatus == GameObjectStatus.PrefabContent)
+            {
+                var prefabStage = PrefabStageUtility.GetPrefabStage(mTarget.gameObject);
+                assetPath = prefabStage != null ? prefabStage.assetPath : null;
+            }
+            return assetPath;
+        }
+
+        /// <summary>
+        /// 尝试打开预制件编辑模式
+        /// </summary>
+        private void TryOpenPrefabContent()
+        {
+            var gameObjectStatus = GetGameObjectStatus();
+            if(gameObjectStatus == GameObjectStatus.Normal || gameObjectStatus == GameObjectStatus.PrefabContent)
+            {
+                return;
+            }
+            var prefabAssetPath = string.Empty;
+            if(gameObjectStatus == GameObjectStatus.Asset)
+            {
+                prefabAssetPath = AssetDatabase.GetAssetPath(mTarget.gameObject);
+            }
+            else if(gameObjectStatus == GameObjectStatus.PrefabInstance)
+            {
+                var prefabAsset = PrefabUtility.GetCorrespondingObjectFromSource(mTarget.gameObject);
+                prefabAssetPath = AssetDatabase.GetAssetPath(prefabAsset);
+            }
+            if(string.IsNullOrEmpty(prefabAssetPath))
+            {
+                return;
+            }
+            PrefabStageUtility.OpenPrefab(prefabAssetPath);
+        }
+
+        /// <summary>
+        /// 操作是否可用
+        /// </summary>
+        /// <returns></returns>
+        private bool IsOperationAvalible()
+        {
+            var gameObjectStatus = GetGameObjectStatus();
+            if(gameObjectStatus == GameObjectStatus.Normal || gameObjectStatus == GameObjectStatus.PrefabContent)
+            {
+                return true;
+            }
+            return false;
+        }
+
+        /// <summary>
+        /// 检查操作是否可用
+        /// </summary>
+        /// <returns></returns>
+        private bool CheckOperationAvalible()
+        {
+            if(!IsOperationAvalible())
+            {
+                var gameObjectStatus = GetGameObjectStatus();
+                Debug.Log($"当前操作对象处于:{gameObjectStatus.ToString()}状态下不允许操作！");
+                TryOpenPrefabContent();
+                return false;
+            }
             return true;
         }
 
@@ -859,6 +1075,10 @@ namespace MapEditor
         /// </summary>
         private void CleanDynamicMaoObjectGos()
         {
+            if(!CheckOperationAvalible())
+            {
+                return;
+            }
             UpdateMapObjectDataLogicDatas();
             for(int i = 0; i < mMapObjectDataListProperty.arraySize; i++)
             {
@@ -932,6 +1152,10 @@ namespace MapEditor
         /// </summary>
         private void RecoverDynamicMapObjectGos()
         {
+            if (!CheckOperationAvalible())
+            {
+                return;
+            }
             UpdateMapObjectDataLogicDatas();
             for (int i = 0; i < mMapObjectDataListProperty.arraySize; i++)
             {
@@ -973,8 +1197,8 @@ namespace MapEditor
                 Debug.LogError($"找不到寻路NavMeshSurface组件，烘焙和拷贝寻路数据Asset失败！");
                 return;
             }
-            var targetAssetPath = PrefabUtility.GetPrefabAssetPathOfNearestInstanceRoot(mTarget);
-            if(string.IsNullOrEmpty(targetAssetPath))
+            var mapAssetPath = GetMapAssetPath();
+            if(string.IsNullOrEmpty(mapAssetPath))
             {
                 Debug.LogError($"当前对象:{mTarget.name}未保存成任何本地Asset，复制寻路数据Asset失败！");
                 return;
@@ -985,15 +1209,20 @@ namespace MapEditor
                 Debug.LogError($"未烘焙任何有效寻路数据Asset，复制寻路数据Asset失败！");
                 return;
             }
-            var targetAssetFolderPath = Path.GetDirectoryName(targetAssetPath);
+            navMeshAssetPath = PathUtilities.GetRegularPath(navMeshAssetPath);
+            var targetAssetFolderPath = Path.GetDirectoryName(mapAssetPath);
             var navMeshAssetName = Path.GetFileName(navMeshAssetPath);
             var newNavMeshAssetPath = Path.Combine(targetAssetFolderPath, navMeshAssetName);
-            if(!string.Equals(navMeshAssetPath, newNavMeshAssetPath))
+            newNavMeshAssetPath = PathUtilities.GetRegularPath(newNavMeshAssetPath);
+            if (!string.Equals(navMeshAssetPath, newNavMeshAssetPath))
             {
-                AssetDatabase.DeleteAsset(newNavMeshAssetPath);
+                AssetDatabase.MoveAsset(navMeshAssetPath, newNavMeshAssetPath);
+                Debug.Log($"移动寻路数据Asset:{navMeshAssetPath}到{newNavMeshAssetPath}成功！");
             }
-            AssetDatabase.MoveAsset(navMeshAssetPath, newNavMeshAssetPath);
-            Debug.Log($"移动寻路数据Asset:{navMeshAssetPath}到{newNavMeshAssetPath}成功！");
+            else
+            {
+                Debug.Log($"移动寻路数据Asset:{navMeshAssetPath}已经在目标位置，不需要移动！");
+            }
         }
 
         /// <summary>
@@ -1001,7 +1230,11 @@ namespace MapEditor
         /// </summary>
         private void OneKeyRecreateMapObjectGos()
         {
-            for(int i = 0; i < mMapObjectDataListProperty.arraySize; i++)
+            if (!CheckOperationAvalible())
+            {
+                return;
+            }
+            for (int i = 0; i < mMapObjectDataListProperty.arraySize; i++)
             {
                 var mapObjectDataProperty = mMapObjectDataListProperty.GetArrayElementAtIndex(i);
                 RecreateMapObjectGo(mapObjectDataProperty);
@@ -1052,6 +1285,48 @@ namespace MapEditor
                 PrefabUtility.ApplyPrefabInstance(mTarget.gameObject, InteractionMode.AutomatedAction);
             }
             MapEditorUtilities.ExportGameMapData(mTarget);
+        }
+
+        /// <summary>
+        /// 一键烘焙拷贝和导出地图数据
+        /// </summary>
+        private async void OneKeyBakeAndExport()
+        {
+            if(!CheckOperationAvalible())
+            {
+                return;
+            }
+            RecoverDynamicMapObjectGos();
+            var navMeshSurface = MapEditorUtilities.GetOrCreateNavMeshSurface(mTarget.gameObject);
+            var bakePathTask = BakePathTask(navMeshSurface);
+            var bakePathResult = await bakePathTask;
+            CopyNavMeshAsset();
+            CleanDynamicMaoObjectGos();
+            ExportMapData();
+            AssetDatabase.SaveAssets();
+            Debug.Log($"一键烘焙拷贝导出地图数据完成！");
+        }
+
+        /// <summary>
+        /// 烘焙寻路任务
+        /// </summary>
+        /// <param name="navMeshSurface"></param>
+        /// <returns></returns>
+        private async Task<bool> BakePathTask(NavMeshSurface navMeshSurface)
+        {
+            var navMeshSurfaces = new UnityEngine.Object[] { navMeshSurface };
+            var navMeshDataAssetPath = navMeshSurface.navMeshData != null ? AssetDatabase.GetAssetPath(navMeshSurface.navMeshData) : null;
+            if(!string.IsNullOrEmpty(navMeshDataAssetPath))
+            {
+                NavMeshAssetManager.instance.ClearSurfaces(navMeshSurfaces);
+                AssetDatabase.DeleteAsset(navMeshDataAssetPath);
+            }
+            NavMeshAssetManager.instance.StartBakingSurfaces(navMeshSurfaces);
+            while(NavMeshAssetManager.instance.IsSurfaceBaking(navMeshSurfaces))
+            {
+                await Task.Delay(1);
+            }
+            return true;
         }
 
         /// <summary>
@@ -1182,6 +1457,12 @@ namespace MapEditor
                 ExportMapData();
             }
             EditorGUILayout.EndHorizontal();
+            EditorGUILayout.BeginHorizontal();
+            if (GUILayout.Button("一键烘焙拷贝导出", GUILayout.ExpandWidth(true)))
+            {
+                OneKeyBakeAndExport();
+            }
+            EditorGUILayout.EndHorizontal();
             EditorGUILayout.EndVertical();
         }
 
@@ -1245,7 +1526,7 @@ namespace MapEditor
                 if(GUILayout.Button("+", GUILayout.ExpandWidth(true)))
                 {
                     var addMapObjectValue = mAddMapObjectIndexProperty.intValue;
-                    AddMapObjectData(addMapObjectValue);
+                    DoAddMapObjectData(addMapObjectValue);
                 }
                 GUILayout.Box(mAddMapObjectPreviewAsset, MapStyles.CenterLabelStyle, GUILayout.Width(50f), GUILayout.Height(50f));
                 EditorGUILayout.EndHorizontal();
@@ -1326,20 +1607,20 @@ namespace MapEditor
             EditorGUILayout.LabelField(des, MapStyles.TabMiddleStyle, GUILayout.Width(100f));
             if (GUILayout.Button("↑", GUILayout.Width(40f)))
             {
-                MovePropertyDataUpByIndex(mMapObjectDataListProperty, mapObjectDataIndex);
+                DoMovePropertyDataUpByIndex(mMapObjectDataListProperty, mapObjectDataIndex);
             }
             if (GUILayout.Button("↓", GUILayout.Width(40f)))
             {
-                MovePropertyDataDownByIndex(mMapObjectDataListProperty, mapObjectDataIndex);
+                DoMovePropertyDataDownByIndex(mMapObjectDataListProperty, mapObjectDataIndex);
             }
             if (GUILayout.Button("+", GUILayout.Width(40f)))
             {
                 var addMapObjectValue = mAddMapObjectIndexProperty.intValue;
-                AddMapObjectData(addMapObjectValue, mapObjectDataIndex);
+                DoAddMapObjectData(addMapObjectValue, mapObjectDataIndex);
             }
             if (GUILayout.Button("-", GUILayout.Width(40f)))
             {
-                RemoveMapObjectDataByIndex(mapObjectDataIndex);
+                DoRemoveMapObjectDataByIndex(mapObjectDataIndex);
             }
             EditorGUILayout.EndHorizontal();
         }
@@ -1383,7 +1664,7 @@ namespace MapEditor
                 if (GUILayout.Button("+", GUILayout.ExpandWidth(true)))
                 {
                     var addMapDataValue = mAddMapDataIndexProperty.intValue;
-                    AddMapData(addMapDataValue);
+                    DoAddMapData(addMapDataValue);
                 }
                 EditorGUILayout.EndHorizontal();
             }
@@ -1493,20 +1774,20 @@ namespace MapEditor
             EditorGUILayout.LabelField(des, MapStyles.TabMiddleStyle, GUILayout.Width(100f));
             if (GUILayout.Button("↑", GUILayout.Width(40f)))
             {
-                MovePropertyDataUpByIndex(mMapDataListProperty, mapDataIndex);
+                DoMovePropertyDataUpByIndex(mMapDataListProperty, mapDataIndex);
             }
             if (GUILayout.Button("↓", GUILayout.Width(40f)))
             {
-                MovePropertyDataDownByIndex(mMapDataListProperty, mapDataIndex);
+                DoMovePropertyDataDownByIndex(mMapDataListProperty, mapDataIndex);
             }
             if (GUILayout.Button("+", GUILayout.Width(40f)))
             {
                 var addMapDataValue = mAddMapDataIndexProperty.intValue;
-                AddMapData(addMapDataValue, mapDataIndex);
+                DoAddMapData(addMapDataValue, mapDataIndex);
             }
             if (GUILayout.Button("-", GUILayout.Width(40f)))
             {
-                RemoveMapDataByIndex(mapDataIndex);
+                DoRemoveMapDataByIndex(mapDataIndex);
             }
             EditorGUILayout.EndHorizontal();
         }
