@@ -37,7 +37,7 @@ namespace MapEditor
 
         }
 
-        public MonsterGroupMapData(int uid, Vector3 position) : base(uid, position)
+        public MonsterGroupMapData(int uid, Vector3 position, Vector3 rotation) : base(uid, position, rotation)
         {
 
         }

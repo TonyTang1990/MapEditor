@@ -25,7 +25,7 @@ namespace MapEditor
 
         }
 
-        public MonsterMapData(int uid, Vector3 position) : base(uid, position)
+        public MonsterMapData(int uid, Vector3 position, Vector3 rotation) : base(uid, position, rotation)
         {
 
         }

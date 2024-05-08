@@ -856,7 +856,7 @@ namespace MapEditor
                 var insertMapData = insertMapDataProperty.managedReferenceValue as MapData;
                 mapDataPosition = insertMapData != null ? insertMapData.Position : mapDataPosition;
             }
-            var newMapData = MapUtilities.CreateMapDataByType(mapDataType, uid, mapDataPosition);
+            var newMapData = MapUtilities.CreateMapDataByType(mapDataType, uid, mapDataPosition, mapDataConfig.Rotation);
             var newMapObjectDataProperty = mMapObjectDataListProperty.GetArrayElementAtIndex(insertPos);
             newMapObjectDataProperty.managedReferenceValue = newMapData;
             serializedObject.ApplyModifiedProperties();

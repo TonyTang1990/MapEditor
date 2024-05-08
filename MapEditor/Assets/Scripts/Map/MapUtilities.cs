@@ -54,20 +54,21 @@ namespace MapEditor
         /// <param name="mapDataType"></param>
         /// <param name="uid"></param>
         /// <param name="position"></param>
+        /// <param name="rotation"></param>
         /// <returns></returns>
-        public static MapData CreateMapDataByType(MapDataType mapDataType, int uid, Vector3 position)
+        public static MapData CreateMapDataByType(MapDataType mapDataType, int uid, Vector3 position, Vector3 rotation)
         {
             if (mapDataType == MapDataType.MONSTER)
             {
-                return new MonsterMapData(uid, position);
+                return new MonsterMapData(uid, position, rotation);
             }
             else if(mapDataType == MapDataType.MONSTER_GROUP)
             {
-                return new MonsterGroupMapData(uid, position);
+                return new MonsterGroupMapData(uid, position, rotation);
             }
             else
             {
-                return new MapData(uid, position);
+                return new MapData(uid, position, rotation);
             }
         }
 

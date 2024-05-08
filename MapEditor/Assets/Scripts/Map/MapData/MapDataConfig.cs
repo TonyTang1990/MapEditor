@@ -41,6 +41,12 @@ namespace MapEditor
         public Color SceneSphereColor = Color.red;
 
         /// <summary>
+        /// 初始旋转
+        /// </summary>
+        [Header("初始旋转")]
+        public Vector3 Rotation = Vector.zero;
+
+        /// <summary>
         /// 描述
         /// </summary>
         [Header("描述")]

@@ -38,11 +38,11 @@ namespace MapEditor
             UID = uid;
         }
 
-        public MapData(int uid, Vector3 position)
+        public MapData(int uid, Vector3 position, Vector3 rotation)
         {
             UID = uid;
             Position = position;
-            Rotation = Vector3.zero;
+            Rotation = rotation;
         }
     }
 }

@@ -85,6 +85,11 @@ namespace MapEditor
         public const float MapDataColorUIWidth = 150f;
 
         /// <summary>
+        /// 地图埋点初始旋转显示宽度
+        /// </summary>
+        public const float MapDataRotationUIWidth = 160f;
+
+        /// <summary>
         /// 地图埋点描述UI显示宽度
         /// </summary>
         public const float MapDataDesUIWidth = 120f;
