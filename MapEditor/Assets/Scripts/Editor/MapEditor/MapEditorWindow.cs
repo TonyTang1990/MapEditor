@@ -204,10 +204,19 @@ namespace MapEditor
         /// </summary>
         private void DoQuickSelectGameMapInScene()
         {
-            var map = GameObject.FindObjectOfType<Map>();
-            if (map != null)
+            var currentPrefabStage = PrefabUtility.GetCurrentPrefabStage();
+            if(currentPrefabStage != null)
             {
-                Selection.SetActiveObjectWithContext(map.gameObject, map.gameObject);
+                var map = GameObject.FindObjectOfType<Map>();
+                if (map != null)
+                {
+                    Selection.SetActiveObjectWithContext(map.gameObject, map.gameObject);
+                }
+            }
+            else
+            {
+                var prefabRootContent = currentPrefabStage.prefabContentsRoot;
+                Selection.SetActiveObjectWithContext(prefabRootContent, prefabRootContent);
             }
         }
 

@@ -1004,7 +1004,7 @@ namespace MapEditor
             if(!IsOperationAvalible())
             {
                 var gameObjectStatus = GetGameObjectStatus();
-                Debug.Log($"当前操作对象处于:{gameObjectStatus.ToString()}状态下不允许操作！");
+                EditorUtility.DisplayDialog("地图编辑器", $"当前操作对象处于:{gameObjectStatus.ToString()}状态下不允许操作！", "确认");
                 TryOpenPrefabContent();
                 return false;
             }
@@ -1194,19 +1194,19 @@ namespace MapEditor
             var navMeshSurface = mTarget.GetComponent<NavMeshSurface>();
             if(navMeshSurface == null)
             {
-                Debug.LogError($"找不到寻路NavMeshSurface组件，烘焙和拷贝寻路数据Asset失败！");
+                EditorUtility.DisplayDialog("拷贝寻路数据Asset", "找不到寻路NavMeshSurface组件，烘焙和拷贝寻路数据Asset失败！", "确认");
                 return;
             }
             var mapAssetPath = GetMapAssetPath();
             if(string.IsNullOrEmpty(mapAssetPath))
             {
-                Debug.LogError($"当前对象:{mTarget.name}未保存成任何本地Asset，复制寻路数据Asset失败！");
+                EditorUtility.DisplayDialog("拷贝寻路数据Asset", $"当前对象:{mTarget.name}未保存成任何本地Asset，复制寻路数据Asset失败！", "确认");
                 return;
             }
             var navMeshAssetPath = AssetDatabase.GetAssetPath(navMeshSurface.navMeshData);
             if(navMeshSurface.navMeshData == null || string.IsNullOrEmpty(navMeshAssetPath))
             {
-                Debug.LogError($"未烘焙任何有效寻路数据Asset，复制寻路数据Asset失败！");
+                EditorUtility.DisplayDialog("拷贝寻路数据Asset", "未烘焙任何有效寻路数据Asset，复制寻路数据Asset失败！", "确认");
                 return;
             }
             navMeshAssetPath = PathUtilities.GetRegularPath(navMeshAssetPath);
@@ -1269,7 +1269,7 @@ namespace MapEditor
         {
             if(!MapEditorUtilities.CheckIsGameMapAvalibleExport(mTarget))
             {
-                Debug.LogError($"场景数据有问题，不满足导出条件，导出场景数据失败！");
+                EditorUtility.DisplayDialog("导出地图数据", "场景数据有问题，不满足导出条件，导出场景数据失败！", "确认");
                 return;
             }
             // 流程上说场景给客户端使用一定会经历导出流程
