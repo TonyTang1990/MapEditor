@@ -33,6 +33,12 @@ namespace MapEditor
         /// </summary>
         public Vector3 Rotation;
 
+        /// <summary>
+        /// 批量操作开关
+        /// </summary>
+        [Header("批量操作开关")]
+        public bool BatchOperationSwitch;
+
         public MapData(int uid)
         {
             UID = uid;

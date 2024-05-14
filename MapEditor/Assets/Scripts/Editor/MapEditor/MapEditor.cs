@@ -1074,6 +1074,19 @@ namespace MapEditor
         }
 
         /// <summary>
+        /// 一键清除地图埋点批量勾选
+        /// </summary>
+        private void OneKeySwitchOffMapDataBatchOperation()
+        {
+            for(int i = 0, length = mMapDataListProperty.arraySize; i < length; i++)
+            {
+                var mapDataProperty = mMapDataListProperty.GetArrayElementAtIndex(i);
+                var batchOperationSwitchProperty = mapDataProperty.FindPropertyRelative("BatchOperationSwitch");
+                batchOperationSwitchProperty.boolValue = false;
+            }
+        }
+
+        /// <summary>
         /// 清除动态地图对象GameObjects
         /// </summary>
         private void CleanDynamicMaoObjectGos()
@@ -1387,6 +1400,46 @@ namespace MapEditor
         }
 
         /// <summary>
+        /// 响应指定索引的地图数据埋点位置移动
+        /// </summary>
+        /// <param name="mapDataIndex"></param>
+        /// <param name="positionOffset"></param>
+        private void OnMapDataPositionMove(int mapDataIndex, Vector3 positionOffset)
+        {
+            var mapDataProperty = mMapDataListProperty.GetArrayElementAtIndex(mapDataIndex);
+            var positionProperty = mapDataProperty.FindPropertyRelative("Position");
+            positionProperty.vector3Value = positionProperty.vector3Value + positionOffset;
+            var batchOperationSwitchProperty = mapDataProperty.FindPropertyRelative("BatchOperationSwitch");
+            if(batchOperationSwitchProperty.boolValue)
+            {
+                DoMapDataBatchMoveExcept(mapDataIndex, positionOffset);
+            }
+        }
+
+        /// <summary>
+        /// 执行指定索引外的批量数据埋点位置移动
+        /// </summary>
+        /// <param name="mapDataIndex"></param>
+        /// <param name="positionOffset"></param>
+        private void DoMapDataBatchMoveExcept(int mapDataIndex, Vector3 positionOffset)
+        {
+            for(int i = 0, length = mMapDataListProperty.arraySize; i < length; i++)
+            {
+                if(i == mapDataIndex)
+                {
+                    continue;
+                }
+                var mapDataProperty = mMapDataListProperty.GetArrayElementAtIndex(i);
+                var batchOperationSwitch = mapDataProperty.FindPropertyRelative("BatchOperationSwitch");
+                if(batchOperationSwitch.boolValue)
+                {
+                    var positionProperty = mapDataProperty.FIndPropertyRelative("Position");
+                    positionProperty.vector3Value = positionProperty.vector3Value + positionOffset;
+                }
+            }
+        }
+
+        /// <summary>
         /// Inspector自定义显示
         /// </summary>
         public override void OnInspectorGUI()
@@ -1684,6 +1737,10 @@ namespace MapEditor
                     DoAddMapData(addMapDataValue);
                 }
                 EditorGUILayout.EndHorizontal();
+                if(GUILayout.Button("一键清除批量勾选", GUILayout.ExpandWidth(true)))
+                {
+                    OneKeySwitchOffMapDataBatchOperation();
+                }
             }
             else
             {
@@ -1724,6 +1781,7 @@ namespace MapEditor
         private void DrawMapDataTitleArea()
         {
             EditorGUILayout.BeginHorizontal("box");
+            EditorGUILayout.LabelField("批量", MapStyles.TabMiddleStyle, GUILayout.Width(40f));
             EditorGUILayout.LabelField("索引", MapStyles.TabMiddleStyle, GUILayout.Width(40f));
             EditorGUILayout.LabelField("UID", MapStyles.TabMiddleStyle, GUILayout.Width(60f));
             EditorGUILayout.LabelField("埋点类型", MapStyles.TabMiddleStyle, GUILayout.Width(150f));
@@ -1746,6 +1804,9 @@ namespace MapEditor
         {
             EditorGUILayout.BeginHorizontal();
             var mapDataProperty = mMapDataListProperty.GetArrayElementAtIndex(mapDataIndex);
+            var batchOperationSwitchProperty = mapDataProperty.FindPropertyRelative("BatchOperationSwitch");
+            EditorGUILayout.Space(10f, false);
+            batchOperationSwitchProperty.boolValue = EditorGUILayout.Toggle(batchOperationSwitchProperty.boolValue, GUILayout.Width(30f));
             var uidProperty = mapDataProperty.FindPropertyRelative("UID");
             var uid = uidProperty.intValue;
             var positionProperty = mapDataProperty.FindPropertyRelative("Position");
@@ -1772,7 +1833,8 @@ namespace MapEditor
             newVector3Value.z = EditorGUILayout.FloatField(newVector3Value.z, GUILayout.Width(40f));
             if(EditorGUI.EndChangeCheck())
             {
-                positionProperty.vector3Value = newVector3Value;
+                var positionOffset = newVector3Value - positionProperty.vector3Value;
+                OnMapDataPositionMove(mapDataIndex, positionOffset);
             }
             var rotationProperty = mapDataProperty.FindPropertyRelative("Rotation");
             var newRotationVector3Value = rotationProperty.vector3Value;
@@ -2116,7 +2178,8 @@ namespace MapEditor
                 var newTargetPosition = Handles.PositionHandle(mapDataPositionProperty.vector3Value, rotationQuaternion);
                 if(EditorGUI.EndChangeCheck())
                 {
-                    mapDataPositionProperty.vector3Value = newTargetPosition;
+                    var positionOffset = newTargetPosition - mapDataPositionProperty.vector3Value;
+                    OnMapDataPositionMove(i, positionOffset);
                     serializedObject.ApplyModifiedProperties();
                 }
             }
