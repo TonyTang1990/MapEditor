@@ -8,8 +8,11 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Threading.Tasks;
 using Unity.AI.Navigation;
+using Unity.AI.Navigation.Editor;
 using UnityEditor;
+using UnityEditor.SceneManagement;
 using UnityEngine;
 
 namespace MapEditor
@@ -1121,7 +1124,7 @@ namespace MapEditor
                 return;
             }
             var goProperty = mapObjectDataProperty.FindPropertyRelative("Go");
-            var gameObject = goProperty.objectReference as GameObject;
+            var gameObject = goProperty.objectReferenceValue as GameObject;
             if(gameObject != null)
             {
                 GameObject.DestroyImmediate(gameObject);
@@ -1131,16 +1134,16 @@ namespace MapEditor
             {
                 var positionProperty = mapObjectDataProperty.FindPropertyRelative("Position");
                 var rotationProperty = mapObjectDataProperty.FindPropertyRelative("Roation");
-                var localScaleProperty = mapObjectDataProperty.FIndPropertyRelative("LocalScale");
+                var localScaleProperty = mapObjectDataProperty.FindPropertyRelative("LocalScale");
                 instanceGo.transform.position = positionProperty.vector3Value;
-                instanceGo.transform.rotation = rotationProperty.vector3Value;
+                instanceGo.transform.rotation = Quaternion.Euler(rotationProperty.vector3Value);
                 instanceGo.transform.localScale = localScaleProperty.vector3Value;
-                goProperty.objectReference = instanceGo;
+                goProperty.objectReferenceValue = instanceGo;
                 if(mapObjectConfig.IsDynamic)
                 {
                     var colliderCenterProperty = mapObjectDataProperty.FindPropertyRelative("ColliderCenter");
                     var colliderSizeProperty = mapObjectDataProperty.FindPropertyRelative("ColliderSize");
-                    var collider = instanceGo.GetComponnet<BoxCollider>();
+                    var collider = instanceGo.GetComponent<BoxCollider>();
                     collider.center = colliderCenterProperty.vector3Value;
                     collider.size = colliderSizeProperty.vector3Value;
                 }
@@ -1322,7 +1325,7 @@ namespace MapEditor
                 AssetDatabase.DeleteAsset(navMeshDataAssetPath);
             }
             NavMeshAssetManager.instance.StartBakingSurfaces(navMeshSurfaces);
-            while(NavMeshAssetManager.instance.IsSurfaceBaking(navMeshSurfaces))
+            while(NavMeshAssetManager.instance.IsSurfaceBaking(navMeshSurface))
             {
                 await Task.Delay(1);
             }
@@ -1365,11 +1368,11 @@ namespace MapEditor
             var mapDataChoiceValues = mMapDataChoiceValuesMap[addMapDataType];
             if (mapDataChoiceValues != null && mapDataChoiceValues.Length > 0)
             {
-                mAddMapIndexProperty.intValue = mapDataChoiceValues[0];
+                mAddMapDataIndexProperty.intValue = mapDataChoiceValues[0];
             }
             else
             {
-                mAddMapIndexProperty.intValue = 0;
+                mAddMapDataIndexProperty.intValue = 0;
             }
             serializedObject.ApplyModifiedProperties();
             OnAddMapDataIndexChange();
@@ -1503,7 +1506,7 @@ namespace MapEditor
         /// </summary>
         private void DrawMapObjectDataOperationArea()
         {
-            if(mMapObjectDataChoiceOptionsMap != null && mMapObjectDataChoiceOptionsMap.Length > 0)
+            if(mMapObjectDataChoiceOptionsMap != null && mMapObjectDataChoiceOptionsMap.Count > 0)
             {
                 EditorGUILayout.BeginHorizontal();
                 EditorGUILayout.LabelField("地图对象类型:", GUILayout.Width(90f));
@@ -1641,7 +1644,7 @@ namespace MapEditor
         /// </summary>
         private void DrawMapDataOperationArea()
         {
-            if (mMapDataChoiceOptionsMap.Length > 0)
+            if (mMapDataChoiceOptionsMap.Count > 0)
             {
                 EditorGUILayout.BeginHorizontal();
                 EditorGUILayout.LabelField("地图埋点类型:", GUILayout.Width(90f));
@@ -1980,7 +1983,7 @@ namespace MapEditor
                 {
                     OnWKeyboardClick();
                 }
-                if(IsKeyCodeDown(keyCode.E))
+                if(IsKeyCodeDown(KeyCode.E))
                 {
                     OnEKeyboardClick();
                 }
