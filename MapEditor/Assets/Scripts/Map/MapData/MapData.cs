@@ -29,8 +29,9 @@ namespace MapEditor
         public Vector3 Position;
 
         /// <summary>
-        /// 旋转
+        /// 埋点旋转
         /// </summary>
+        [Header("埋点旋转")]
         public Vector3 Rotation;
 
         /// <summary>
