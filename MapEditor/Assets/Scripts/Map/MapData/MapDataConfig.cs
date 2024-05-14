@@ -44,7 +44,7 @@ namespace MapEditor
         /// 初始旋转
         /// </summary>
         [Header("初始旋转")]
-        public Vector3 Rotation = Vector.zero;
+        public Vector3 Rotation = Vector3.zero;
 
         /// <summary>
         /// 描述
