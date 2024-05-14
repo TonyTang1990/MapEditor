@@ -204,7 +204,7 @@ namespace MapEditor
         /// </summary>
         private void DoQuickSelectGameMapInScene()
         {
-            var currentPrefabStage = PrefabUtility.GetCurrentPrefabStage();
+            var currentPrefabStage = PrefabStageUtility.GetCurrentPrefabStage();
             if(currentPrefabStage != null)
             {
                 var map = GameObject.FindObjectOfType<Map>();

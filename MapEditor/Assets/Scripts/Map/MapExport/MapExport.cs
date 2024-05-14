@@ -20,7 +20,7 @@ namespace MapEditor
         /// <summary>
         /// 地图导出数据成员
         /// </summary>
-        public MapDataExport MapData;
+        public MapDataExport MapData = new MapDataExport();
 
         /// <summary>
         /// 所有只包含基础数据的动态物体导出数据成员

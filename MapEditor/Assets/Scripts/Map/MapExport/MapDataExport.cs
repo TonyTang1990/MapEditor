@@ -37,6 +37,11 @@ namespace MapEditor
         /// </summary>
         public List<Vector3> BirthPos = new List<Vector3>();
 
+        public MapDataExport()
+        {
+
+        }
+
         public MapDataExport(int width, int height, Vector3 startPos, List<Vector3> birthPos)
         {
             Width = width;

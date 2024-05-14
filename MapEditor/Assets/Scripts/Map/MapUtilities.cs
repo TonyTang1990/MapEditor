@@ -80,22 +80,46 @@ namespace MapEditor
         /// <returns></returns>
         public static void UpdateColliderByColliderData(GameObject go, Vector3 center, Vector3 size, float radius = 0f)
         {
-            // 有ColliderDataMono则根据对应信息更新碰撞器数据
             if(go == null)
             {
                 return;
             }
             var boxCollider = go.GetComponent<BoxCollider>();
-            if (boxCollider != null)
-            {
-                boxCollider.center = center;
-                boxCollider.size = size;
-            }
             var sphereCollider = go.GetComponent<SphereCollider>();
-            if (sphereCollider != null)
+            // 没有碰撞体有ColliderDataMono则根据对应信息更新碰撞器数据
+            // 反之则根据传入的碰撞体数据初始化碰撞体数据
+            if (boxCollider == null && sphereCollider == null)
             {
-                sphereCollider.center = center;
-                sphereCollider.radius = radius;
+                var colliderDataMono = go.GetComponent<ColliderDataMono>();
+                if (colliderDataMono == null)
+                {
+                    return;
+                }
+                if(colliderDataMono.ColliderType == ColliderType.BOX)
+                {
+                    boxCollider = go.AddComponent<BoxCollider>();
+                    boxCollider.center = colliderDataMono.Center;
+                    boxCollider.size = colliderDataMono.Size;
+                }
+                else if(colliderDataMono.ColliderType == ColliderType.SPHERE)
+                {
+                    sphereCollider = go.AddComponent<SphereCollider>();
+                    sphereCollider.center = colliderDataMono.Center;
+                    sphereCollider.radius = colliderDataMono.Radius;
+                }
+            }
+            else
+            {
+                if (boxCollider != null)
+                {
+                    boxCollider.center = center;
+                    boxCollider.size = size;
+                }
+                if (sphereCollider != null)
+                {
+                    sphereCollider.center = center;
+                    sphereCollider.radius = radius;
+                }
             }
         }
 

@@ -22,7 +22,7 @@ namespace MapEditor
         /// <summary>
         /// 地图导出目录相对路径(相对Asset目录)
         /// </summary>
-        public const string MapExportRelativePath = "/Resources/MapExport";
+        public const string MapExportRelativePath = "Assets/Resources/MapExport";
 
         /// <summary>
         /// 地图对象UID UI显示宽度

@@ -1,0 +1,272 @@
+{
+    "MapData": {
+        "Width": 8,
+        "Height": 30,
+        "StartPos": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": 0.0
+        },
+        "BirthPos": [
+            {
+                "x": 4.0,
+                "y": 0.0,
+                "z": 2.0
+            }
+        ]
+    },
+    "AllBaseMapObjectExportDatas": [
+        {
+            "MapObjectType": 2,
+            "ConfId": 1,
+            "Position": {
+                "x": 4.0,
+                "y": 1.0,
+                "z": 3.7200000286102297
+            },
+            "Rotation": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
+            }
+        },
+        {
+            "MapObjectType": 2,
+            "ConfId": 1,
+            "Position": {
+                "x": 4.0,
+                "y": 1.0,
+                "z": 11.600000381469727
+            },
+            "Rotation": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
+            }
+        }
+    ],
+    "AllColliderMapDynamicExportDatas": [
+        {
+            "MapObjectType": 1,
+            "ConfId": 2,
+            "Position": {
+                "x": 4.0,
+                "y": 0.25,
+                "z": 8.149999618530274
+            },
+            "Rotation": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
+            },
+            "ColliderCenter": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
+            },
+            "ColliderSize": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
+            },
+            "ColliderRiduis": 0.5
+        },
+        {
+            "MapObjectType": 0,
+            "ConfId": 3,
+            "Position": {
+                "x": 4.0,
+                "y": 0.5,
+                "z": 18.809999465942384
+            },
+            "Rotation": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
+            },
+            "ColliderCenter": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
+            },
+            "ColliderSize": {
+                "x": 1.0,
+                "y": 1.0,
+                "z": 1.0
+            },
+            "ColliderRiduis": 0.0
+        },
+        {
+            "MapObjectType": 0,
+            "ConfId": 3,
+            "Position": {
+                "x": 4.0,
+                "y": 0.5,
+                "z": 14.899999618530274
+            },
+            "Rotation": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
+            },
+            "ColliderCenter": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
+            },
+            "ColliderSize": {
+                "x": 1.0,
+                "y": 1.0,
+                "z": 1.0
+            },
+            "ColliderRiduis": 0.0
+        }
+    ],
+    "AllMonsterGroupMapDatas": [
+        {
+            "MapDataType": 2,
+            "ConfId": 0,
+            "Position": {
+                "x": 4.0,
+                "y": 0.0,
+                "z": 8.0
+            },
+            "Roation": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
+            },
+            "GroupId": 1,
+            "MonsterCreateRadius": 4.0,
+            "MonsterActiveRadius": 3.0,
+            "AllMonsterMapExportDatas": [
+                {
+                    "MapDataType": 1,
+                    "ConfId": 1,
+                    "Position": {
+                        "x": 4.0,
+                        "y": 0.0,
+                        "z": 7.0
+                    },
+                    "Roation": {
+                        "x": 0.0,
+                        "y": 90.0,
+                        "z": 0.0
+                    },
+                    "GroupId": 1
+                },
+                {
+                    "MapDataType": 1,
+                    "ConfId": 1,
+                    "Position": {
+                        "x": 5.0,
+                        "y": 0.0,
+                        "z": 9.0
+                    },
+                    "Roation": {
+                        "x": 0.0,
+                        "y": 90.0,
+                        "z": 0.0
+                    },
+                    "GroupId": 1
+                },
+                {
+                    "MapDataType": 1,
+                    "ConfId": 1,
+                    "Position": {
+                        "x": 6.0,
+                        "y": 0.0,
+                        "z": 8.0
+                    },
+                    "Roation": {
+                        "x": 0.0,
+                        "y": 90.0,
+                        "z": 0.0
+                    },
+                    "GroupId": 1
+                }
+            ]
+        },
+        {
+            "MapDataType": 2,
+            "ConfId": 0,
+            "Position": {
+                "x": 4.0,
+                "y": 0.0,
+                "z": 25.0
+            },
+            "Roation": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
+            },
+            "GroupId": 2,
+            "MonsterCreateRadius": 6.0,
+            "MonsterActiveRadius": 4.0,
+            "AllMonsterMapExportDatas": [
+                {
+                    "MapDataType": 1,
+                    "ConfId": 1,
+                    "Position": {
+                        "x": 4.0,
+                        "y": 0.0,
+                        "z": 26.0
+                    },
+                    "Roation": {
+                        "x": 0.0,
+                        "y": 90.0,
+                        "z": 0.0
+                    },
+                    "GroupId": 2
+                },
+                {
+                    "MapDataType": 1,
+                    "ConfId": 1,
+                    "Position": {
+                        "x": 5.0,
+                        "y": 0.0,
+                        "z": 26.0
+                    },
+                    "Roation": {
+                        "x": 0.0,
+                        "y": 90.0,
+                        "z": 0.0
+                    },
+                    "GroupId": 2
+                },
+                {
+                    "MapDataType": 1,
+                    "ConfId": 1,
+                    "Position": {
+                        "x": 3.0,
+                        "y": 0.0,
+                        "z": 25.0
+                    },
+                    "Roation": {
+                        "x": 0.0,
+                        "y": 90.0,
+                        "z": 0.0
+                    },
+                    "GroupId": 2
+                },
+                {
+                    "MapDataType": 1,
+                    "ConfId": 1,
+                    "Position": {
+                        "x": 5.0,
+                        "y": 0.0,
+                        "z": 23.0
+                    },
+                    "Roation": {
+                        "x": 0.0,
+                        "y": 90.0,
+                        "z": 0.0
+                    },
+                    "GroupId": 2
+                }
+            ]
+        }
+    ],
+    "ALlNoGroupMonsterMapDatas": [],
+    "AllOtherMapDatas": []
+}

@@ -394,13 +394,14 @@ namespace MapEditor
                         colliderCenterProperty.vector3Value = boxCollider.center;
                         colliderSizeProperty.vector3Value = boxCollider.size;
                     }
-                    else if(sphereCollider != null)
+                    if(sphereCollider != null)
                     {
                         colliderCenterProperty.vector3Value = sphereCollider.center;
                         colliderRadiusProperty.floatValue = sphereCollider.radius;
                     }
                 }
             }
+            serializedObject.ApplyModifiedProperties();
         }
 
         /// <summary>
@@ -419,10 +420,7 @@ namespace MapEditor
             {
                 mAddMapObjectIndexProperty.intValue = mapObjectDataValueOptions[0];
             }
-            else
-            {
-                mAddMapObjectIndexProperty.intValue = 0;
-            }
+            serializedObject.ApplyModifiedProperties();
         }
 
         /// <summary>
@@ -441,10 +439,7 @@ namespace MapEditor
             {
                 mAddMapDataIndexProperty.intValue = mapDataValueOptions[0];
             }
-            else
-            {
-                mAddMapDataIndexProperty.intValue = 0;
-            }
+            serializedObject.ApplyModifiedProperties();
         }
 
         /// <summary>
@@ -860,8 +855,9 @@ namespace MapEditor
                 mapDataPosition = insertMapData != null ? insertMapData.Position : mapDataPosition;
             }
             var newMapData = MapUtilities.CreateMapDataByType(mapDataType, uid, mapDataPosition, mapDataConfig.Rotation);
-            var newMapObjectDataProperty = mMapObjectDataListProperty.GetArrayElementAtIndex(insertPos);
-            newMapObjectDataProperty.managedReferenceValue = newMapData;
+            mMapDataListProperty.InsertArrayElementAtIndex(insertPos);
+            var newMapDataProperty = mMapDataListProperty.GetArrayElementAtIndex(insertPos);
+            newMapDataProperty.managedReferenceValue = newMapData;
             serializedObject.ApplyModifiedProperties();
             return true;
         }
@@ -887,7 +883,7 @@ namespace MapEditor
         /// <returns></returns>
         private bool RemoveMapDataByIndex(int index)
         {
-            var mapDataNum = mMapObjectDataListProperty.arraySize;
+            var mapDataNum = mMapDataListProperty.arraySize;
             if (index < 0 || index >= mapDataNum)
             {
                 Debug.LogError($"指定索引:{index}不是有效索引范围:0-{mapDataNum - 1},移除地图埋点数据失败！");
@@ -1146,7 +1142,7 @@ namespace MapEditor
             if(instanceGo != null)
             {
                 var positionProperty = mapObjectDataProperty.FindPropertyRelative("Position");
-                var rotationProperty = mapObjectDataProperty.FindPropertyRelative("Roation");
+                var rotationProperty = mapObjectDataProperty.FindPropertyRelative("Rotation");
                 var localScaleProperty = mapObjectDataProperty.FindPropertyRelative("LocalScale");
                 instanceGo.transform.position = positionProperty.vector3Value;
                 instanceGo.transform.rotation = Quaternion.Euler(rotationProperty.vector3Value);
@@ -1156,9 +1152,8 @@ namespace MapEditor
                 {
                     var colliderCenterProperty = mapObjectDataProperty.FindPropertyRelative("ColliderCenter");
                     var colliderSizeProperty = mapObjectDataProperty.FindPropertyRelative("ColliderSize");
-                    var collider = instanceGo.GetComponent<BoxCollider>();
-                    collider.center = colliderCenterProperty.vector3Value;
-                    collider.size = colliderSizeProperty.vector3Value;
+                    var colliderRadiusProperty = mapObjectDataProperty.FindPropertyRelative("ColliderRadius");
+                    MapUtilities.UpdateColliderByColliderData(instanceGo, colliderCenterProperty.vector3Value, colliderSizeProperty.vector3Value, colliderRadiusProperty.floatValue);
                 }
             }
         }
@@ -1433,7 +1428,7 @@ namespace MapEditor
                 var batchOperationSwitch = mapDataProperty.FindPropertyRelative("BatchOperationSwitch");
                 if(batchOperationSwitch.boolValue)
                 {
-                    var positionProperty = mapDataProperty.FIndPropertyRelative("Position");
+                    var positionProperty = mapDataProperty.FindPropertyRelative("Position");
                     positionProperty.vector3Value = positionProperty.vector3Value + positionOffset;
                 }
             }
@@ -1463,6 +1458,7 @@ namespace MapEditor
             {
                 UpdateMapSizeDrawDatas();
                 UpdateMapGOPosition();
+                UpdateTerrianSizeAndPos();
             }
 
             EditorGUI.BeginChangeCheck();
