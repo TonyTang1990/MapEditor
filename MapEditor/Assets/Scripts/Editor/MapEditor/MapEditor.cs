@@ -1567,6 +1567,7 @@ namespace MapEditor
             EditorGUILayout.LabelField("是否动态", MapStyles.TabMiddleStyle, GUILayout.Width(60f));
             EditorGUILayout.LabelField("配置Id", MapStyles.TabMiddleStyle, GUILayout.Width(100f));
             EditorGUILayout.LabelField("实体对象", MapStyles.TabMiddleStyle, GUILayout.Width(100f));
+            EditorGUILayout.LabelField("位置", MapStyles.TabMiddleStyle, GUILayout.Width(160f));
             EditorGUILayout.LabelField("描述", MapStyles.TabMiddleStyle, GUILayout.Width(100f));
             EditorGUILayout.LabelField("上移", MapStyles.TabMiddleStyle, GUILayout.Width(40f));
             EditorGUILayout.LabelField("下移", MapStyles.TabMiddleStyle, GUILayout.Width(40f));
@@ -1602,7 +1603,20 @@ namespace MapEditor
                 EditorGUILayout.LabelField("找不到是否动态数据", MapStyles.TabMiddleStyle, GUILayout.Width(60f));
                 EditorGUILayout.LabelField("找不到关联Id数据", MapStyles.TabMiddleStyle, GUILayout.Width(100f));
             }
+            var gameObject = goProperty.objectReferenceValue as GameObject;
             EditorGUILayout.ObjectField(goProperty.objectReferenceValue, MapConst.GameObjectType, true, GUILayout.Width(100f));
+            var newVector3Value = gameObject != null ? gameObject.transform.position : Vector3.zero;
+            EditorGUI.BeginChangeCheck();
+            EditorGUILayout.LabelField("X", GUILayout.Width(10f));
+            newVector3Value.x = EditorGUILayout.FloatField(newVector3Value.x, GUILayout.Width(40f));
+            EditorGUILayout.LabelField("Y", GUILayout.Width(10f));
+            newVector3Value.y = EditorGUILayout.FloatField(newVector3Value.y, GUILayout.Width(40f));
+            EditorGUILayout.LabelField("Z", GUILayout.Width(10f));
+            newVector3Value.z = EditorGUILayout.FloatField(newVector3Value.z, GUILayout.Width(40f));
+            if (gameObject != null && EditorGUI.EndChangeCheck())
+            {
+                gameObject.transform.position = newVector3Value;
+            }
             var des = mapObjectConfig != null ? mapObjectConfig.Des : "";
             EditorGUILayout.LabelField(des, MapStyles.TabMiddleStyle, GUILayout.Width(100f));
             if (GUILayout.Button("↑", GUILayout.Width(40f)))
