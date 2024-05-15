@@ -584,6 +584,15 @@ namespace MapEditor
                 var instanceGoName = instanceGo.name.RemoveSubStr("(Clone)");
                 instanceGoName = $"{instanceGoName}_{uid}";
                 instanceGo.name = instanceGoName;
+                // 动态物体碰撞器统一代码创建
+                if(mapObjectConfig.IsDynamic)
+                {
+                    MapUtilities.AddOrUpdateColliderByColliderDataMono(instanceGo);
+                }
+                else
+                {
+                    MapUtilities.UpdateColliderByColliderDataMono(instanceGo);
+                }
                 MapEditorUtilities.AddOrUpdateMapObjectDataMono(instanceGo, uid);
             }
             return instanceGo;
@@ -755,7 +764,6 @@ namespace MapEditor
                 Selection.SetActiveObjectWithContext(instanceGo, instanceGo);
             }
             instanceGo.transform.position = mapObjectPosition;
-            MapUtilities.UpdateColliderByColliderDataMono(instanceGo);
             var newMapObjectData = new MapObjectData(uid, instanceGo);
             mMapObjectDataListProperty.InsertArrayElementAtIndex(insertPos);
             var newMapObjectDataProperty = mMapObjectDataListProperty.GetArrayElementAtIndex(insertPos);
@@ -1148,13 +1156,15 @@ namespace MapEditor
                 instanceGo.transform.rotation = Quaternion.Euler(rotationProperty.vector3Value);
                 instanceGo.transform.localScale = localScaleProperty.vector3Value;
                 goProperty.objectReferenceValue = instanceGo;
-                if(mapObjectConfig.IsDynamic)
-                {
-                    var colliderCenterProperty = mapObjectDataProperty.FindPropertyRelative("ColliderCenter");
-                    var colliderSizeProperty = mapObjectDataProperty.FindPropertyRelative("ColliderSize");
-                    var colliderRadiusProperty = mapObjectDataProperty.FindPropertyRelative("ColliderRadius");
-                    MapUtilities.UpdateColliderByColliderData(instanceGo, colliderCenterProperty.vector3Value, colliderSizeProperty.vector3Value, colliderRadiusProperty.floatValue);
-                }
+                // 存的碰撞体数据只用于导出，不用于还原
+                // 是否有碰撞体，碰撞体数据有多少由预制件自身和预制件自身是否挂在ColliderDataMono脚本决定
+                //if(mapObjectConfig.IsDynamic)
+                //{
+                //    var colliderCenterProperty = mapObjectDataProperty.FindPropertyRelative("ColliderCenter");
+                //    var colliderSizeProperty = mapObjectDataProperty.FindPropertyRelative("ColliderSize");
+                //    var colliderRadiusProperty = mapObjectDataProperty.FindPropertyRelative("ColliderRadius");
+                //    MapUtilities.UpdateColliderByColliderData(instanceGo, colliderCenterProperty.vector3Value, colliderSizeProperty.vector3Value, colliderRadiusProperty.floatValue);
+                //}
             }
         }
 
@@ -1181,17 +1191,7 @@ namespace MapEditor
                 var goProperty = mapObjectDataProperty.FindPropertyRelative("Go");
                 if (mapObjectConfig.IsDynamic && goProperty.objectReferenceValue == null)
                 {
-                    var instanceGo = CreateGameObjectByUID(mapObjectUID);
-                    if(instanceGo != null)
-                    {
-                        var positionProperty = mapObjectDataProperty.FindPropertyRelative("Position");
-                        var colliderCenterProperty = mapObjectDataProperty.FindPropertyRelative("ColliderCenter");
-                        var colliderSizeProperty = mapObjectDataProperty.FindPropertyRelative("ColliderSize");
-                        var colliderRadiusProperty = mapObjectDataProperty.FindPropertyRelative("ColliderRadius");
-                        instanceGo.transform.position = positionProperty.vector3Value;
-                        goProperty.objectReferenceValue = instanceGo;
-                        MapUtilities.UpdateColliderByColliderData(instanceGo, colliderCenterProperty.vector3Value, colliderSizeProperty.vector3Value, colliderRadiusProperty.floatValue);
-                    }
+                    RecreateMapObjectGo(mapObjectDataProperty);
                 }
             }
             serializedObject.ApplyModifiedProperties();

@@ -123,6 +123,40 @@ namespace MapEditor
             }
         }
 
+
+        /// <summary>
+        /// 指定GameObject根据挂载的ColliderDataMono更新碰撞体数据
+        /// </summary>
+        /// <param name="go"></param>
+        public static void AddOrUpdateColliderByColliderDataMono(GameObject go)
+        {
+            if (go == null)
+            {
+                return;
+            }
+            var colliderDataMono = go.GetComponent<ColliderDataMono>();
+            if (colliderDataMono == null)
+            {
+                // 没有统一添加矩形碰撞体
+                go.GetOrAddComponet<BoxCollider>();
+            }
+            else
+            {
+                if (colliderDataMono.ColliderType == ColliderType.BOX)
+                {
+                    var boxCollider = go.GetOrAddComponet<BoxCollider>();
+                    boxCollider.center = colliderDataMono.Center;
+                    boxCollider.size = colliderDataMono.Size;
+                }
+                else if (colliderDataMono.ColliderType == ColliderType.SPHERE)
+                {
+                    var sphereCollider = go.GetOrAddComponet<SphereCollider>();
+                    sphereCollider.center = colliderDataMono.Center;
+                    sphereCollider.radius = colliderDataMono.Radius;
+                }
+            }
+        }
+
         /// <summary>
         /// 指定GameObject根据挂载的ColliderDataMono更新碰撞体数据
         /// </summary>
