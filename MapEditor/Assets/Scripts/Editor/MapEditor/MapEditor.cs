@@ -120,9 +120,14 @@ namespace MapEditor
         private SerializedProperty mExportTypeProperty;
 
         /// <summary>
-        /// Label显示GUIStyle
+        /// 红色Label显示GUIStyle
         /// </summary>
-        private GUIStyle mLabelGUIStyle;
+        private GUIStyle mRedLabelGUIStyle;
+
+        /// <summary>
+        /// 黄色Label显示GUIStyle
+        /// </summary>
+        private GUIStyle mYellowLabelGUIStyle;
 
         /// <summary>
         /// 横向绘制线条数据列表<起点, 终点>列表
@@ -262,12 +267,19 @@ namespace MapEditor
         /// </summary>
         private void InitGUIStyles()
         {
-            if(mLabelGUIStyle == null)
+            if(mRedLabelGUIStyle == null)
             {
-                mLabelGUIStyle = new GUIStyle();
-                mLabelGUIStyle.fontSize = 15;
-                mLabelGUIStyle.alignment = TextAnchor.MiddleCenter;
-                mLabelGUIStyle.normal.textColor = Color.red;
+                mRedLabelGUIStyle = new GUIStyle();
+                mRedLabelGUIStyle.fontSize = 15;
+                mRedLabelGUIStyle.alignment = TextAnchor.MiddleCenter;
+                mRedLabelGUIStyle.normal.textColor = Color.red;
+            }
+            if (mYellowLabelGUIStyle == null)
+            {
+                mYellowLabelGUIStyle = new GUIStyle();
+                mYellowLabelGUIStyle.fontSize = 15;
+                mYellowLabelGUIStyle.alignment = TextAnchor.MiddleCenter;
+                mYellowLabelGUIStyle.normal.textColor = Color.yellow;
             }
         }
 
@@ -2124,7 +2136,7 @@ namespace MapEditor
                 var mapObjectDes = mapObjectConfig != null ? mapObjectConfig.Des : "";
                 var mapObjectLabelName = $"[{i}]{mapObjectDes}";
                 var labelPos = go.transform.position + MapEditorConst.MapObjectDataLabelPosOffset;
-                Handles.Label(labelPos, mapObjectLabelName, mLabelGUIStyle);
+                Handles.Label(labelPos, mapObjectLabelName, mRedLabelGUIStyle);
             }
         }
 
@@ -2138,8 +2150,10 @@ namespace MapEditor
                 var mapDataProperty = mMapDataListProperty.GetArrayElementAtIndex(i);
                 string mapDataLabelName = MapEditorUtilities.GetMapDataPropertyLabelName(mMapDataListProperty, i);
                 var mapDataPositionProperty = mapDataProperty.FindPropertyRelative("Position");
+                var mapDataBatchOperationSwitchProperty = mapDataProperty.FindPropertyRelative("BatchOperationSwitch");
                 var labelPos = mapDataPositionProperty.vector3Value + MapEditorConst.MapDAtaLabelPosOffset;
-                Handles.Label(labelPos, mapDataLabelName, mLabelGUIStyle);
+                var displayGUIStyle = mapDataBatchOperationSwitchProperty.boolValue ? mYellowLabelGUIStyle : mRedLabelGUIStyle;
+                Handles.Label(labelPos, mapDataLabelName, displayGUIStyle);
             }
         }
 
