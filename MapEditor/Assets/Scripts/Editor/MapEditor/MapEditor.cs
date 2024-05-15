@@ -1331,6 +1331,11 @@ namespace MapEditor
             {
                 NavMeshAssetManager.instance.ClearSurfaces(navMeshSurfaces);
                 AssetDatabase.DeleteAsset(navMeshDataAssetPath);
+                // 确保删除成功
+                while(AssetDatabase.LoadAssetAtPath<NavMeshData>(navMeshDataAssetPath) != null)
+                {
+                    await Task.Delay(1);
+                }
             }
             NavMeshAssetManager.instance.StartBakingSurfaces(navMeshSurfaces);
             while(NavMeshAssetManager.instance.IsSurfaceBaking(navMeshSurface))
