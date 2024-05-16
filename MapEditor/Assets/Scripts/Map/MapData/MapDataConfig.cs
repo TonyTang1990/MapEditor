@@ -66,7 +66,7 @@ namespace MapEditor
         /// <returns></returns>
         public string GetOptionName()
         {
-            return $"{UID}({DataType.ToString()})({Des})";
+            return $"{UID}({Des})";
         }
     }
 }
