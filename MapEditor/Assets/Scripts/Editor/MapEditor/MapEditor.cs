@@ -14,6 +14,7 @@ using Unity.AI.Navigation.Editor;
 using UnityEditor;
 using UnityEditor.SceneManagement;
 using UnityEngine;
+using UnityEngine.AI;
 
 namespace MapEditor
 {
@@ -1700,7 +1701,7 @@ namespace MapEditor
                 var addMapObjectType = (MapObjectType)mAddMapObjectTypeProperty.intValue;
                 var mapObjectDataChoiceOptions = GetMapObjectDataChoiceOptionsByType(addMapObjectType);
                 var mapObjectDataChoiceValues = GetMapObjectDataChoiceValuesByType(addMapObjectType);
-                mAddMapObjectIndexProperty.intValue = EditorGUILayout.IntPopup(mAddMapObjectIndexProperty.intValue, mapObjectDataChoiceOptions, mapObjectDataChoiceValues, GUILayout.Width(250f));
+                mAddMapObjectIndexProperty.intValue = EditorGUILayout.IntPopup(mAddMapObjectIndexProperty.intValue, mapObjectDataChoiceOptions, mapObjectDataChoiceValues, GUILayout.Width(150f));
                 if(EditorGUI.EndChangeCheck())
                 {
                     OnAddMapObjectIndexChange();
@@ -1748,7 +1749,7 @@ namespace MapEditor
             EditorGUILayout.LabelField("对象类型", MapStyles.TabMiddleStyle, GUILayout.Width(150f));
             EditorGUILayout.LabelField("是否动态", MapStyles.TabMiddleStyle, GUILayout.Width(60f));
             EditorGUILayout.LabelField("配置Id", MapStyles.TabMiddleStyle, GUILayout.Width(100f));
-            EditorGUILayout.LabelField("实体对象", MapStyles.TabMiddleStyle, GUILayout.Width(100f));
+            EditorGUILayout.LabelField("实体对象", MapStyles.TabMiddleStyle, GUILayout.Width(150f));
             EditorGUILayout.LabelField("位置", MapStyles.TabMiddleStyle, GUILayout.Width(160f));
             EditorGUILayout.LabelField("描述", MapStyles.TabMiddleStyle, GUILayout.Width(100f));
             EditorGUILayout.LabelField("上移", MapStyles.TabMiddleStyle, GUILayout.Width(40f));
@@ -1794,15 +1795,15 @@ namespace MapEditor
                 EditorGUILayout.LabelField("找不到关联Id数据", MapStyles.TabMiddleStyle, GUILayout.Width(100f));
             }
             var gameObject = goProperty.objectReferenceValue as GameObject;
-            EditorGUILayout.ObjectField(goProperty.objectReferenceValue, MapConst.GameObjectType, true, GUILayout.Width(100f));
+            EditorGUILayout.ObjectField(goProperty.objectReferenceValue, MapConst.GameObjectType, true, GUILayout.Width(150f));
             var newVector3Value = gameObject != null ? gameObject.transform.position : Vector3.zero;
             EditorGUI.BeginChangeCheck();
             EditorGUILayout.LabelField("X", GUILayout.Width(10f));
-            newVector3Value.x = EditorGUILayout.FloatField(newVector3Value.x, GUILayout.Width(40f));
+            newVector3Value.x = EditorGUILayout.FloatField(newVector3Value.x, GUILayout.Width(39f));
             EditorGUILayout.LabelField("Y", GUILayout.Width(10f));
-            newVector3Value.y = EditorGUILayout.FloatField(newVector3Value.y, GUILayout.Width(40f));
+            newVector3Value.y = EditorGUILayout.FloatField(newVector3Value.y, GUILayout.Width(39f));
             EditorGUILayout.LabelField("Z", GUILayout.Width(10f));
-            newVector3Value.z = EditorGUILayout.FloatField(newVector3Value.z, GUILayout.Width(40f));
+            newVector3Value.z = EditorGUILayout.FloatField(newVector3Value.z, GUILayout.Width(39f));
             if (gameObject != null && EditorGUI.EndChangeCheck())
             {
                 gameObject.transform.position = newVector3Value;
@@ -1860,7 +1861,7 @@ namespace MapEditor
                 var addMapDataType = (MapDataType)mAddMapDataTypeProperty.intValue;
                 var mapDataChoiceOptions = mMapDataChoiceOptionsMap[addMapDataType];
                 var mapDataChoiceValues = mMapDataChoiceValuesMap[addMapDataType];
-                mAddMapDataIndexProperty.intValue = EditorGUILayout.IntPopup(mAddMapDataIndexProperty.intValue, mapDataChoiceOptions, mapDataChoiceValues, GUILayout.Width(250f));
+                mAddMapDataIndexProperty.intValue = EditorGUILayout.IntPopup(mAddMapDataIndexProperty.intValue, mapDataChoiceOptions, mapDataChoiceValues, GUILayout.Width(150f));
                 if (EditorGUI.EndChangeCheck())
                 {
                     OnAddMapDataIndexChange();
@@ -1953,7 +1954,7 @@ namespace MapEditor
             uid = EditorGUILayout.IntPopup(uid, mapDataChoiceOptions, mapDataChoiceValues, GUILayout.Width(150f));
             if (EditorGUI.EndChangeCheck())
             {
-                DoChangeMapDataUID(mapObjectDataIndex, uid);
+                DoChangeMapDataUID(mapDataIndex, uid);
             }
             if (mapDataConfig != null)
             {
@@ -1968,11 +1969,11 @@ namespace MapEditor
             var newVector3Value = positionProperty.vector3Value;
             EditorGUI.BeginChangeCheck();
             EditorGUILayout.LabelField("X", GUILayout.Width(10f));
-            newVector3Value.x = EditorGUILayout.FloatField(newVector3Value.x, GUILayout.Width(40f));
+            newVector3Value.x = EditorGUILayout.FloatField(newVector3Value.x, GUILayout.Width(39f));
             EditorGUILayout.LabelField("Y", GUILayout.Width(10f));
-            newVector3Value.y = EditorGUILayout.FloatField(newVector3Value.y, GUILayout.Width(40f));
+            newVector3Value.y = EditorGUILayout.FloatField(newVector3Value.y, GUILayout.Width(39f));
             EditorGUILayout.LabelField("Z", GUILayout.Width(10f));
-            newVector3Value.z = EditorGUILayout.FloatField(newVector3Value.z, GUILayout.Width(40f));
+            newVector3Value.z = EditorGUILayout.FloatField(newVector3Value.z, GUILayout.Width(39f));
             if(EditorGUI.EndChangeCheck())
             {
                 var positionOffset = newVector3Value - positionProperty.vector3Value;
@@ -1982,11 +1983,11 @@ namespace MapEditor
             var newRotationVector3Value = rotationProperty.vector3Value;
             EditorGUI.BeginChangeCheck();
             EditorGUILayout.LabelField("X", GUILayout.Width(10f));
-            newRotationVector3Value.x = EditorGUILayout.FloatField(newRotationVector3Value.x, GUILayout.Width(40f));
+            newRotationVector3Value.x = EditorGUILayout.FloatField(newRotationVector3Value.x, GUILayout.Width(39f));
             EditorGUILayout.LabelField("Y", GUILayout.Width(10f));
-            newRotationVector3Value.y = EditorGUILayout.FloatField(newRotationVector3Value.y, GUILayout.Width(40f));
+            newRotationVector3Value.y = EditorGUILayout.FloatField(newRotationVector3Value.y, GUILayout.Width(39f));
             EditorGUILayout.LabelField("Z", GUILayout.Width(10f));
-            newRotationVector3Value.z = EditorGUILayout.FloatField(newRotationVector3Value.z, GUILayout.Width(40f));
+            newRotationVector3Value.z = EditorGUILayout.FloatField(newRotationVector3Value.z, GUILayout.Width(39f));
             if (EditorGUI.EndChangeCheck())
             {
                 rotationProperty.vector3Value = newRotationVector3Value;
@@ -2158,7 +2159,7 @@ namespace MapEditor
             if (guiSwitchOffProperty != null)
             {
                 EditorGUILayout.Space(30f, false);
-                guiSwitchOffProperty.boolValue = EditorGUILayout.Toggle(guiSwitchOffProperty.floatValue, GUILayout.Width(70f));
+                guiSwitchOffProperty.boolValue = EditorGUILayout.Toggle(guiSwitchOffProperty.boolValue, GUILayout.Width(70f));
             }
             EditorGUILayout.EndHorizontal();
         }
