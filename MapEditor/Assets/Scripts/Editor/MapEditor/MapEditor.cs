@@ -172,12 +172,12 @@ namespace MapEditor
         /// <summary>
         /// 地图对象类型和选项数组(显示名字数组)Map<地图对象类型, 选项数组>
         /// </summary>
-        private Dictionary<MapObjectType, string[]> mMapObjectDataChoiceOptionsMap;
+        private Dictionary<MapObjectType, string[]> mMapObjectDataChoiceOptionsMap = new Dictionary<MapObjectType, string[]>();
 
         /// <summary>
         /// 地图对象类型和选项值数组(UID数组)Map<地图对象类型， 选项值数组>
         /// </summary>
-        private Dictionary<MapObjectType, int[]> mMapObjectDataChoiceValuesMap;
+        private Dictionary<MapObjectType, int[]> mMapObjectDataChoiceValuesMap = new Dictionary<MapObjectType, int[]>();
 
         /// <summary>
         /// 地图埋点数据区域是否展开显示
@@ -201,12 +201,12 @@ namespace MapEditor
         /// <summary>
         /// 地图埋点类型和选项数组(显示名字数组)Map<地图埋点类型, 选项数组>
         /// </summary>
-        private Dictionary<MapDataType, string[]> mMapDataChoiceOptionsMap;
+        private Dictionary<MapDataType, string[]> mMapDataChoiceOptionsMap = new Dictionary<MapDataType, string[]>();
 
         /// <summary>
         /// 地图埋点类型和选项值数组(UID数组)Map<地图埋点类型， 选项值数组>
         /// </summary>
-        private Dictionary<MapDataType, int[]> mMapDataChoiceValuesMap;
+        private Dictionary<MapDataType, int[]> mMapDataChoiceValuesMap = new Dictionary<MapDataType, int[]>();
 
         /// <summary>
         /// 按键按下Map<按键值， 是否按下>
@@ -421,7 +421,7 @@ namespace MapEditor
         /// </summary>
         private void CorrectAddMapObjectIndexValue()
         {
-            if(mMapObjectDataChoiceOptionsMap == null)
+            if(mMapObjectDataChoiceOptionsMap == null || mMapObjectDataChoiceOptionsMap.Count == 0)
             {
                 return;
             }
@@ -440,7 +440,7 @@ namespace MapEditor
         /// </summary>
         private void CorrectAddMapDataIndexValue()
         {
-            if (mMapDataChoiceOptionsMap == null)
+            if (mMapDataChoiceOptionsMap == null || mMapDataChoiceOptionsMap.Count == 0)
             {
                 return;
             }
@@ -461,8 +461,8 @@ namespace MapEditor
         {
             var objectSetting = MapSetting.GetEditorInstance().ObjectSetting;
             var mapObjectTypeValues = Enum.GetValues(MapConst.MapObjectType);
-            mMapObjectDataChoiceOptionsMap = new Dictionary<MapObjectType, string[]>();
-            mMapObjectDataChoiceValuesMap = new Dictionary<MapObjectType, int[]>();
+            mMapObjectDataChoiceOptionsMap.Clear();
+            mMapObjectDataChoiceValuesMap.Clear();
             foreach(var mapObjectTypeValue in mapObjectTypeValues)
             {
                 var mapObjectType = (MapObjectType)mapObjectTypeValue;
@@ -482,14 +482,44 @@ namespace MapEditor
         }
 
         /// <summary>
+        /// 获取指定地图对象类型的选项数组
+        /// </summary>
+        /// <param name="mapObjectType"></param>
+        /// <returns></returns>
+        private string[] GetMapObjectDataChoiceOptionsByType(MapObjectType mapObjectType)
+        {
+            string[] mapObjectDataChoiceOptions;
+            if (!mMapObjectDataChoiceOptionsMap.TryGetValue(mapObjectType, out mapObjectDataChoiceOptions))
+            {
+                mapObjectDataChoiceOptions = new string[0];
+            }
+            return mapObjectDataChoiceOptions;
+        }
+
+        /// <summary>
+        /// 获取指定地图对象类型的选项值数组
+        /// </summary>
+        /// <param name="mapObjectType"></param>
+        /// <returns></returns>
+        private int[] GetMapObjectDataChoiceValuesByType(MapObjectType mapObjectType)
+        {
+            int[] mapObjectDataChoiceValues;
+            if (!mMapObjectDataChoiceValuesMap.TryGetValue(mapObjectType, out mapObjectDataChoiceValues))
+            {
+                mapObjectDataChoiceValues = new int[0];
+            }
+            return mapObjectDataChoiceValues;
+        }
+
+        /// <summary>
         /// 更新地图埋点选择数据
         /// </summary>
         private void UpdateMapDataChoiceDatas()
         {
             var dataSetting = MapSetting.GetEditorInstance().DataSetting;
             var mapDataTypeValues = Enum.GetValues(MapConst.MapDataType);
-            mMapDataChoiceOptionsMap = new Dictionary<MapDataType, string[]>();
-            mMapDataChoiceValuesMap = new Dictionary<MapDataType, int[]>();
+            mMapDataChoiceOptionsMap.Clear();
+            mMapDataChoiceValuesMap.Clear();
             foreach (var mapDataTypeValue in mapDataTypeValues)
             {
                 var mapDataType = (MapDataType)mapDataTypeValue;
@@ -506,6 +536,36 @@ namespace MapEditor
                 mMapDataChoiceOptionsMap.Add(mapDataType, allChoiceOptions);
                 mMapDataChoiceValuesMap.Add(mapDataType, allValueOptions);
             }
+        }
+
+        /// <summary>
+        /// 获取指定地图埋点类型的选项数组
+        /// </summary>
+        /// <param name="mapDataType"></param>
+        /// <returns></returns>
+        private string[] GetMapDataChoiceOptionsByType(MapDataType mapDataType)
+        {
+            string[] mapDataChoiceOptions;
+            if(!mMapDataChoiceOptionsMap.TryGetValue(mapDataType, out mapDataChoiceOptions))
+            {
+                mapDataChoiceOptions = new string[0];
+            }
+            return mapDataChoiceOptions;
+        }
+
+        /// <summary>
+        /// 获取指定地图埋点类型的选项值数组
+        /// </summary>
+        /// <param name="mapDataType"></param>
+        /// <returns></returns>
+        private int[] GetMapDataChoiceValuesByType(MapDataType mapDataType)
+        {
+            int[] mapDataChoiceValues;
+            if (!mMapDataChoiceValuesMap.TryGetValue(mapDataType, out mapDataChoiceValues))
+            {
+                mapDataChoiceValues = new int[0];
+            }
+            return mapDataChoiceValues;
         }
 
         /// <summary>
@@ -1404,9 +1464,62 @@ namespace MapEditor
         }
 
         /// <summary>
+        /// 执行指定地图对象索引的UID变化
+        /// </summary>
+        /// <param name="mapObjectDataIndex"></param>
+        /// <param name="newUID"></param>
+        private void DoChangeMapObjectDataUID(int mapObjectDataIndex, int newUID)
+        {
+            if (!CheckOperationAvalible())
+            {
+                return;
+            }
+            var mapObjectDataProperty = mMapObjectDataListProperty.GetArrayElementAtIndex(mapObjectDataIndex);
+            var uidProperty = mapObjectDataProperty.FindPropertyRelative("UID");
+            uidProperty.intValue = newUID;
+            OnMapObjectDataUIDChange(mapObjectDataIndex);
+        }
+
+        /// <summary>
+        /// 响应指定地图对象索引的UID变化
+        /// </summary>
+        /// <param name="mapObjectDataIndex"></param>
+        private void OnMapObjectDataUIDChange(int mapObjectDataIndex)
+        {
+            var mapObjectDataProperty = mMapObjectDataListProperty.GetArrayElementAtIndex(mapObjectDataIndex);
+            RecreateMapObjectGo(mapObjectDataProperty);
+        }
+
+        /// <summary>
         /// 响应添加地图埋点索引选择变化
         /// </summary>
         private void OnAddMapDataIndexChange()
+        {
+
+        }
+
+        /// <summary>
+        /// 执行指定地图埋点索引的UID变化
+        /// </summary>
+        /// <param name="mapDataIndex"></param>
+        /// <param name="newUID"></param>
+        private void DoChangeMapDataUID(int mapDataIndex, int newUID)
+        {
+            if(!CheckOperationAvalible())
+            {
+                return;
+            }
+            var mapDataProperty = mMapDataListProperty.GetArrayElementAtIndex(mapDataIndex);
+            var uidProperty = mapDataProperty.FindPropertyRelative("UID");
+            uidProperty.intValue = newUID;
+            OnMapDataUIDChange(mapDataIndex);
+        }
+
+        /// <summary>
+        /// 响应指定地图埋点索引的UID变化
+        /// </summary>
+        /// <param name="mapDataIndex"></param>
+        private void OnMapDataUIDChange(int mapDataIndex)
         {
 
         }
@@ -1585,8 +1698,8 @@ namespace MapEditor
                 EditorGUILayout.LabelField("地图对象选择:", GUILayout.Width(90f));
                 EditorGUI.BeginChangeCheck();
                 var addMapObjectType = (MapObjectType)mAddMapObjectTypeProperty.intValue;
-                var mapObjectDataChoiceOptions = mMapObjectDataChoiceOptionsMap[addMapObjectType];
-                var mapObjectDataChoiceValues = mMapObjectDataChoiceValuesMap[addMapObjectType];
+                var mapObjectDataChoiceOptions = GetMapObjectDataChoiceOptionsByType(addMapObjectType);
+                var mapObjectDataChoiceValues = GetMapObjectDataChoiceValuesByType(addMapObjectType);
                 mAddMapObjectIndexProperty.intValue = EditorGUILayout.IntPopup(mAddMapObjectIndexProperty.intValue, mapObjectDataChoiceOptions, mapObjectDataChoiceValues, GUILayout.Width(250f));
                 if(EditorGUI.EndChangeCheck())
                 {
@@ -1631,7 +1744,7 @@ namespace MapEditor
         {
             EditorGUILayout.BeginHorizontal("box");
             EditorGUILayout.LabelField("索引", MapStyles.TabMiddleStyle, GUILayout.Width(40f));
-            EditorGUILayout.LabelField("UID", MapStyles.TabMiddleStyle, GUILayout.Width(60f));
+            EditorGUILayout.LabelField("UID", MapStyles.TabMiddleStyle, GUILayout.Width(150f));
             EditorGUILayout.LabelField("对象类型", MapStyles.TabMiddleStyle, GUILayout.Width(150f));
             EditorGUILayout.LabelField("是否动态", MapStyles.TabMiddleStyle, GUILayout.Width(60f));
             EditorGUILayout.LabelField("配置Id", MapStyles.TabMiddleStyle, GUILayout.Width(100f));
@@ -1657,8 +1770,16 @@ namespace MapEditor
             var uid = uidProperty.intValue;
             var goProperty = mapObjectDataProperty.FindPropertyRelative("Go");
             EditorGUILayout.LabelField($"{mapObjectDataIndex}", MapStyles.TabMiddleStyle, GUILayout.Width(40f));
-            EditorGUILayout.LabelField($"{uid}", MapStyles.TabMiddleStyle, GUILayout.Width(60f));
             var mapObjectConfig = MapSetting.GetEditorInstance().ObjectSetting.GetMapObjectConfigByUID(uid);
+            EditorGUI.BeginChangeCheck();
+            var mapObjectType = mapObjectConfig != null ? mapObjectConfig.ObjectType : MapObjectType.TREASURE_BOX;
+            var mapObjectDataChoiceOptions = GetMapObjectDataChoiceOptionsByType(mapObjectType);
+            var mapObjectDataChoiceValues = GetMapObjectDataChoiceValuesByType(mapObjectType);
+            uid = EditorGUILayout.IntPopup(uid, mapObjectDataChoiceOptions, mapObjectDataChoiceValues, GUILayout.Width(150f));
+            if(EditorGUI.EndChangeCheck())
+            {
+                DoChangeMapObjectDataUID(mapObjectDataIndex, uid);
+            }
             if(mapObjectConfig != null)
             {
                 EditorGUILayout.LabelField(mapObjectConfig.ObjectType.ToString(), MapStyles.TabMiddleStyle, GUILayout.Width(150f));
@@ -1796,7 +1917,7 @@ namespace MapEditor
             EditorGUILayout.BeginHorizontal("box");
             EditorGUILayout.LabelField("批量", MapStyles.TabMiddleStyle, GUILayout.Width(40f));
             EditorGUILayout.LabelField("索引", MapStyles.TabMiddleStyle, GUILayout.Width(40f));
-            EditorGUILayout.LabelField("UID", MapStyles.TabMiddleStyle, GUILayout.Width(60f));
+            EditorGUILayout.LabelField("UID", MapStyles.TabMiddleStyle, GUILayout.Width(150f));
             EditorGUILayout.LabelField("埋点类型", MapStyles.TabMiddleStyle, GUILayout.Width(150f));
             EditorGUILayout.LabelField("配置Id", MapStyles.TabMiddleStyle, GUILayout.Width(100f));
             EditorGUILayout.LabelField("位置", MapStyles.TabMiddleStyle, GUILayout.Width(160f));
@@ -1824,8 +1945,16 @@ namespace MapEditor
             var uid = uidProperty.intValue;
             var positionProperty = mapDataProperty.FindPropertyRelative("Position");
             EditorGUILayout.LabelField($"{mapDataIndex}", MapStyles.TabMiddleStyle, GUILayout.Width(40f));
-            EditorGUILayout.LabelField($"{uid}", MapStyles.TabMiddleStyle, GUILayout.Width(60f));
             var mapDataConfig = MapSetting.GetEditorInstance().DataSetting.GetMapDataConfigByUID(uid);
+            EditorGUI.BeginChangeCheck();
+            var mapDataType = mapDataConfig != null ? mapDataConfig.DataType : MapDataType.PLAYER_SPAWN;
+            var mapDataChoiceOptions = GetMapDataChoiceOptionsByType(mapDataType);
+            var mapDataChoiceValues = GetMapDataChoiceValuesByType(mapDataType);
+            uid = EditorGUILayout.IntPopup(uid, mapDataChoiceOptions, mapDataChoiceValues, GUILayout.Width(150f));
+            if (EditorGUI.EndChangeCheck())
+            {
+                DoChangeMapDataUID(mapObjectDataIndex, uid);
+            }
             if (mapDataConfig != null)
             {
                 EditorGUILayout.LabelField(mapDataConfig.DataType.ToString(), MapStyles.TabMiddleStyle, GUILayout.Width(150f));
