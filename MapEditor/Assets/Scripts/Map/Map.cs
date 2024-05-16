@@ -174,6 +174,10 @@ namespace MapEditor
             {
                 return;
             }
+            if(monsterGroupMapData.GUISwitchOff)
+            {
+                return;
+            }
             var position = monsterGroupMapData.Position;
             var preGizmosColor = Gizmos.color;
             Gizmos.color = Color.green;

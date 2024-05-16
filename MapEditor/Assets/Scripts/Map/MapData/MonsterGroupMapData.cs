@@ -32,6 +32,12 @@ namespace MapEditor
         [Header("怪物警戒半径")]
         public float MonsterActiveRadius = 3;
 
+        /// <summary>
+        /// GUI关闭开关
+        /// </summary>
+        [Header("GUI关闭开关")]
+        public bool GUISwitchOff = false;
+
         public MonsterGroupMapData(int uid) : base(uid)
         {
 

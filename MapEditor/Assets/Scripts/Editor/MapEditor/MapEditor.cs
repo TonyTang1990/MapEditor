@@ -2123,6 +2123,7 @@ namespace MapEditor
             EditorGUILayout.LabelField("组Id", MapStyles.TabMiddleStyle, GUILayout.Width(60f));
             EditorGUILayout.LabelField("怪物创建半径", MapStyles.TabMiddleStyle, GUILayout.Width(100f));
             EditorGUILayout.LabelField("怪物警戒半径", MapStyles.TabMiddleStyle, GUILayout.Width(100f));
+            EditorGUILayout.LabelField("GUI关闭开关", MapStyles.TabMiddleStyle, GUILayout.Width(100f));
             EditorGUILayout.EndHorizontal();
         }
 
@@ -2152,6 +2153,12 @@ namespace MapEditor
             if (monsterActiveRadiusProperty != null)
             {
                 monsterActiveRadiusProperty.floatValue = EditorGUILayout.FloatField(monsterActiveRadiusProperty.floatValue, GUILayout.Width(100f));
+            }
+            var guiSwitchOffProperty = mapDataProperty.FindPropertyRelative("GUISwitchOff");
+            if (guiSwitchOffProperty != null)
+            {
+                EditorGUILayout.Space(30f, false);
+                guiSwitchOffProperty.boolValue = EditorGUILayout.Toggle(guiSwitchOffProperty.floatValue, GUILayout.Width(70f));
             }
             EditorGUILayout.EndHorizontal();
         }
