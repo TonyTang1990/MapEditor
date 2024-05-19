@@ -180,8 +180,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   SceneGUISwitch: 1
+  MapLineGUISwitch: 1
   MapObjectSceneGUISwitch: 1
   MapDataSceneGUISwitch: 1
+  MapObjectAddedAutoFocus: 1
   MapWidth: 8
   MapHeight: 30
   MapStartPos: {x: 0, y: 0, z: 0}
@@ -291,6 +293,7 @@ MonoBehaviour:
         GroupId: 1
         MonsterCreateRadius: 4
         MonsterActiveRadius: 3
+        GUISwitchOff: 0
     - rid: 6165940593996857347
       type: {class: MonsterGroupMapData, ns: MapEditor, asm: Assembly-CSharp}
       data:
@@ -301,6 +304,7 @@ MonoBehaviour:
         GroupId: 2
         MonsterCreateRadius: 6
         MonsterActiveRadius: 4
+        GUISwitchOff: 0
     - rid: 6165940593996857348
       type: {class: MonsterMapData, ns: MapEditor, asm: Assembly-CSharp}
       data:

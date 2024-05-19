@@ -83,6 +83,27 @@
     <Compile Include="Assets\Scripts\Map\MapConst.cs" />
     <Compile Include="Assets\Scripts\Map\MapExport\BaseMapDataExport.cs" />
     <Compile Include="Assets\Scripts\Map\MapObject\MapObjectData.cs" />
+    <Compile Include="Assets\Scripts\Camera\CameraRayCastVisualizationMono.cs" />
+    <Compile Include="Assets\Scripts\Utilities\Vector3Utilities.cs" />
+    <Compile Include="Assets\Scripts\Camera\CameraAreaVisualizationMono.cs" />
+    <Compile Include="Assets\Scripts\Utilities\CameraUtilities.cs" />
+    <Compile Include="Assets\Scripts\Core\Collision\Collision2D\VisibleDraw\Sector2DVisible.cs" />
+    <Compile Include="Assets\Scripts\Core\Collision\Collision2D\VisibleDraw\AABB2DVisible.cs" />
+    <Compile Include="Assets\Scripts\Core\Collision\Collision2D\VisibleDraw\Polygon2DVisible.cs" />
+    <Compile Include="Assets\Scripts\Core\Collision\MeshUtilities.cs" />
+    <Compile Include="Assets\Scripts\Core\Collision\Collision2D\Circle2D.cs" />
+    <Compile Include="Assets\Scripts\Core\Collision\Collision3D\VisibleDraw\Sphere3DVisible.cs" />
+    <Compile Include="Assets\Scripts\Core\Collision\Collision2D\Capsule2D.cs" />
+    <Compile Include="Assets\Scripts\Core\Collision\Collision3D\Collision3DUtilities.cs" />
+    <Compile Include="Assets\Scripts\Core\Collision\Collision2D\VisibleDraw\Circle2DVisible.cs" />
+    <Compile Include="Assets\Scripts\Core\Collision\Collision2D\Collision2DUtilities.cs" />
+    <Compile Include="Assets\Scripts\Core\Collision\Collision2D\Sector2D.cs" />
+    <Compile Include="Assets\Scripts\Core\Collision\Collision2D\VisibleDraw\Capsule2DVisible.cs" />
+    <Compile Include="Assets\Scripts\Core\Collision\Collision2D\VisibleDraw\OBB2DVisible.cs" />
+    <Compile Include="Assets\Scripts\Core\Collision\Collision2D\OBB2D.cs" />
+    <Compile Include="Assets\Scripts\Core\Collision\Collision2D\AABB2D.cs" />
+    <Compile Include="Assets\Scripts\Core\Collision\Collision2D\Polygon2D.cs" />
+    <Compile Include="Assets\Scripts\Core\Collision\Collision3D\Sphere3D.cs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="UnityEngine">
