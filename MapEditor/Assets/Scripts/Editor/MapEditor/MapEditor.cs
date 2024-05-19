@@ -56,6 +56,11 @@ namespace MapEditor
         private SerializedProperty mSceneGUISwitchProperty;
 
         /// <summary>
+        /// MapLineGUISwitch属性
+        /// </summary>
+        private SerializedProperty mMapLineGUISwitchProperty;
+
+        /// <summary>
         /// MapObjectSceneGUISwitch属性
         /// </summary>
         private SerializedProperty mMapObjectSceneGUISwitchProperty;
@@ -64,6 +69,11 @@ namespace MapEditor
         /// SceneGUISwitch属性
         /// </summary>
         private SerializedProperty mMapDataSceneGUISwitchProperty;
+
+        /// <summary>
+        /// MapObjectAddedAutoFocus属性
+        /// </summary>
+        private SerializedProperty mMapObjectAddedAutoFocusProperty;
 
         /// <summary>
         /// MapWidth属性
@@ -248,8 +258,10 @@ namespace MapEditor
         private void InitProperties()
         {
             mSceneGUISwitchProperty ??= serializedObject.FindProperty("SceneGUISwitch");
+            mMapLineGUISwitchProperty ??= serializedObject.FindProperty("MapLineGUISwitch");            
             mMapObjectSceneGUISwitchProperty ??= serializedObject.FindProperty("MapObjectSceneGUISwitch");
             mMapDataSceneGUISwitchProperty ??= serializedObject.FindProperty("MapDataSceneGUISwitch");
+            mMapObjectAddedAutoFocusProperty ??= serializedObject.FindProperty("MapObjectAddedAutoFocus");            
             mMapWidthProperty ??= serializedObject.FindProperty("MapWidth");
             mMapHeightProperty ??= serializedObject.FindProperty("MapHeight");
             mMapStartPosProperty ??= serializedObject.FindProperty("MapStartPos");
@@ -832,7 +844,7 @@ namespace MapEditor
                 mapObjectPosition = insertMapObjectData.Go != null ? insertMapObjectData.Go.transform.position : insertMapObjectData.Position;
             }
             var instanceGo = CreateGameObjectByUID(uid);
-            if(instanceGo != null)
+            if(instanceGo != null && mMapObjectAddedAutoFocusProperty.boolValue)
             {
                 Selection.SetActiveObjectWithContext(instanceGo, instanceGo);
             }
@@ -1579,8 +1591,10 @@ namespace MapEditor
 
             EditorGUILayout.BeginVertical();
             EditorGUILayout.PropertyField(mSceneGUISwitchProperty);
+            EditorGUILayout.PropertyField(mMapLineGUISwitchProperty);
             EditorGUILayout.PropertyField(mMapObjectSceneGUISwitchProperty);
             EditorGUILayout.PropertyField(mMapDataSceneGUISwitchProperty);
+            EditorGUILayout.PropertyField(mMapObjectAddedAutoFocusProperty);
 
             EditorGUI.BeginChangeCheck();
             EditorGUILayout.PropertyField(mMapWidthProperty);
@@ -2171,8 +2185,11 @@ namespace MapEditor
                 var currentEvent = Event.current;
                 if (currentEvent.type == EventType.Repaint)
                 {
-                    DrawMapLines();
-                    if(mMapObjectSceneGUISwitchProperty != null && mMapObjectSceneGUISwitchProperty.boolValue)
+                    if(mMapLineGUISwitchProperty.boolValue)
+                    {
+                        DrawMapLines();
+                    }
+                    if (mMapObjectSceneGUISwitchProperty != null && mMapObjectSceneGUISwitchProperty.boolValue)
                     {
                         DrawMapObjectDataLabels();
                     }

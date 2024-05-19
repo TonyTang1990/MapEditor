@@ -23,6 +23,12 @@ namespace MapEditor
         public bool SceneGUISwitch = true;
 
         /// <summary>
+        /// 地图线条GUI开关
+        /// </summary>
+        [Header("地图线条GUI开关")]
+        public bool MapLineGUISwitch = true;
+
+        /// <summary>
         /// 地图对象场景GUI开关
         /// </summary>
         [Header("地图对象场景GUI开关")]
@@ -33,6 +39,12 @@ namespace MapEditor
         /// </summary>
         [Header("地图埋点场景GUI开关")]
         public bool MapDataSceneGUISwitch = true;
+
+        /// <summary>
+        /// 地图对象创建自动聚焦开关
+        /// </summary>
+        [Header("地图对象创建自动聚焦开关")]
+        public bool MapObjectAddedAutoFocus = true;
 
         /// <summary>
         /// 地图横向大小
