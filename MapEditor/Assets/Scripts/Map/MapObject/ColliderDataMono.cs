@@ -45,24 +45,24 @@ namespace MapEditor
         /// </summary>
         public void OnDrawGizmosSelected()
         {
-            var localScale = gameObject.transform.localScale;
+            var preGizmosMatrix = Gizmos.matrix;
+            var colliderMatrix = gameObject.transform.localToWorldMatrix;
+            Gizmos.matrix = colliderMatrix;
             var preGizmoColor = Gizmos.color;
             Gizmos.color = Color.green;
             if(ColliderType == ColliderType.BOX)
             {
-                var cubeSize = Size;
-                cubeSize.x = cubeSize.x * localScale.x;
-                cubeSize.y = cubeSize.y * localScale.y;
-                cubeSize.z = cubeSize.z * localScale.z;
-                Gizmos.DrawWireCube(Center, cubeSize);
+                Gizmos.DrawWireCube(Center, Size);
             }
             else if(ColliderType == ColliderType.SPHERE)
             {
-                var maxLocalScaleValue = Mathf.Max(localScale.x, localScale.y, localScale.z);
-                var sphereRadius = Radius * maxLocalScaleValue;
+                var lossyScale = gameObject.transform.lossyScale;
+                var maxLossyScaleValue = Mathf.Max(lossyScale.x, lossyScale.y, lossyScale.z);
+                var sphereRadius = Radius * maxLossyScaleValue;
                 Gizmos.DrawWireSphere(Center, sphereRadius);
             }
             Gizmos.color = preGizmoColor;
+            Gizmos.matrix = preGizmosMatrix;
         }
     }
 }
