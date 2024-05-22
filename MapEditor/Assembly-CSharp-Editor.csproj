@@ -8,8 +8,7 @@
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProductVersion>10.0.20506</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
-    <RootNamespace>
-    </RootNamespace>
+    <RootNamespace></RootNamespace>
     <ProjectGuid>{188B6004-DD78-1262-F94D-3A5FF65D7E3D}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
@@ -58,16 +57,16 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Assets\Scripts\Editor\Common\FolderUtilities.cs" />
-    <Compile Include="Assets\Scripts\Editor\MapEditor\ColliderDataMonoEditor.cs" />
     <Compile Include="Assets\Scripts\Editor\MapEditor\MapEditorUtilities.cs" />
     <Compile Include="Assets\Scripts\Editor\Common\StringExt.cs" />
     <Compile Include="Assets\Scripts\Editor\MapEditor\MapStyles.cs" />
     <Compile Include="Assets\Scripts\Editor\MapEditor\MapEditor.cs" />
     <Compile Include="Assets\Scripts\Editor\MapEditor\MapEditorWindow.cs" />
     <Compile Include="Assets\Scripts\Editor\AssetProcesserHook\ScriptAutoProcess\ScriptKeywordProcesser.cs" />
-    <Compile Include="Assets\Scripts\Editor\MapEditor\MapEditorConst.cs" />
-    <Compile Include="Assets\Scripts\Editor\Camera\CameraRayCastVisualizationMonoEditor.cs" />
     <Compile Include="Assets\Scripts\Editor\Camera\CameraAreaVisualizationMonoEditor.cs" />
+    <Compile Include="Assets\Scripts\Editor\Camera\CameraRayCastVisualizationMonoEditor.cs" />
+    <Compile Include="Assets\Scripts\Editor\MapEditor\MapEditorConst.cs" />
+    <Compile Include="Assets\Scripts\Editor\MapEditor\ColliderDataMonoEditor.cs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="UnityEngine">
