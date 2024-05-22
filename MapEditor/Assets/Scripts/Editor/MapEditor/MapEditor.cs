@@ -301,6 +301,10 @@ namespace MapEditor
         /// </summary>
         private void CreateAllNodes()
         {
+            if(!IsOperationAvalible())
+            {
+                return;
+            }
             CreateAllMapObjectParentNodes();
             CreateMapTerrianNode();
             CreateNavMeshSurface();
@@ -311,6 +315,10 @@ namespace MapEditor
         /// </summary>
         private void CreateAllMapObjectParentNodes()
         {
+            if (!IsOperationAvalible())
+            {
+                return;
+            }
             var mapObjectParentNode = MapEditorUtilities.GetOrCreateMapObjectParentNode(mTarget.gameObject);
             if(mapObjectParentNode != null)
             {
@@ -331,6 +339,10 @@ namespace MapEditor
         /// </summary>
         private void CreateMapTerrianNode()
         {
+            if (!IsOperationAvalible())
+            {
+                return;
+            }
             var customAsset = mMapTerrianAssetProperty.objectReferenceValue as GameObject;
             var mapTerrianTransform = MapEditorUtilities.GetOrCreateMapTerrianNode(mTarget.gameObject, customAsset);
             if(mapTerrianTransform != null)
@@ -344,6 +356,10 @@ namespace MapEditor
         /// </summary>
         private void RecreateMapTerrianNode()
         {
+            if (!CheckOperationAvalible())
+            {
+                return;
+            }
             var mapTerrianTransform = MapEditorUtilities.GetOrCreateMapTerrianNode(mTarget.gameObject);
             if(mapTerrianTransform != null)
             {
@@ -358,6 +374,10 @@ namespace MapEditor
         /// </summary>
         private void CreateNavMeshSurface()
         {
+            if (!IsOperationAvalible())
+            {
+                return;
+            }
             MapEditorUtilities.GetOrCreateNavMeshSurface(mTarget.gameObject);
         }
 
