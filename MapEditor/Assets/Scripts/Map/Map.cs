@@ -4,8 +4,10 @@
  * Create Date:             2024/04/08
  */
 
+using System;
 using System.Collections;
 using System.Collections.Generic;
+using UnityEditor;
 using UnityEngine;
 
 namespace MapEditor
@@ -124,7 +126,7 @@ namespace MapEditor
         /// <param name="insertIndex"></param>
         /// <param name="copyRotation">是否复制旋转</param>
         /// <returns></returns>
-        private MapObjectData DoAddMapObjectData(int uid, int insertIndex = -1, bool copyRotation = false)
+        public MapObjectData DoAddMapObjectData(int uid, int insertIndex = -1, bool copyRotation = false)
         {
             if (!MapUtilities.CheckOperationAvalible(gameObject))
             {
@@ -166,7 +168,7 @@ namespace MapEditor
                 var insertMapObjectPos = Math.Clamp(insertPos, 0, maxInsertIndex - 1);
                 var insertMapObjectData = MapObjectDataList[insertMapObjectPos];
                 mapObjectPosition = insertMapObjectData.Go != null ? insertMapObjectData.Go.transform.position : insertMapObjectData.Position;
-                mapObjectRotation = insertMapObjectData.Go != null ? insertMapObjectData.Go.transform.rotation : insertMapObjectData.Rotation;
+                mapObjectRotation = insertMapObjectData.Go != null ? insertMapObjectData.Go.transform.rotation : Quaternion.Euler(insertMapObjectData.Rotation);
             }
             var instanceGo = CreateGameObjectByUID(uid);
             if (instanceGo != null && MapObjectAddedAutoFocus)
@@ -217,7 +219,7 @@ namespace MapEditor
         /// </summary>
         /// <param name="index"></param>
         /// <returns></returns>
-        private bool DoRemoveMapObjectDataByIndex(int index)
+        public bool DoRemoveMapObjectDataByIndex(int index)
         {
             if (!MapUtilities.CheckOperationAvalible(gameObject))
             {
@@ -257,7 +259,7 @@ namespace MapEditor
         /// <param name="copyRotation">是否复制旋转值</param>
         /// <param name="positionOffset">位置偏移</param>
         /// <returns></returns>
-        private MapData DoAddMapData(int uid, int insertIndex = -1, bool copyRotation = false, Vector3? positionOffset = null)
+        public MapData DoAddMapData(int uid, int insertIndex = -1, bool copyRotation = false, Vector3? positionOffset = null)
         {
             if (!MapUtilities.CheckOperationAvalible(gameObject))
             {
@@ -294,7 +296,7 @@ namespace MapEditor
             {
                 insertPos = Math.Clamp(insertIndex, 0, maxInsertIndex);
             }
-            var mapDataPosition = MapStartPos.vector3Value;
+            var mapDataPosition = MapStartPos;
             var mapDataRotation = mapDataConfig.Rotation;
             if (mapDataTotalNum != 0)
             {
@@ -320,7 +322,7 @@ namespace MapEditor
         /// </summary>
         /// <param name="index"></param>
         /// <returns></returns>
-        private bool DoRemoveMapDataByIndex(int index)
+        public bool DoRemoveMapDataByIndex(int index)
         {
             if (!MapUtilities.CheckOperationAvalible(gameObject))
             {
@@ -344,6 +346,43 @@ namespace MapEditor
             }
             MapDataList.RemoveAt(index);
             return true;
+        }
+
+        /// <summary>
+        /// 创建之地给你地图对象UID配置的实体对象(未配置Asset返回null)
+        /// </summary>
+        /// <param name="uid"></param>
+        /// <returns></returns>
+        public GameObject CreateGameObjectByUID(int uid)
+        {
+            var mapObjectConfig = MapSetting.GetEditorInstance().ObjectSetting.GetMapObjectConfigByUID(uid);
+            if (mapObjectConfig == null)
+            {
+                Debug.LogError($"未配置地图对象UID:{uid}配置数据，不支持创建地图实体对象！");
+                return null;
+            }
+            var instanceGo = mapObjectConfig.Asset != null ? PrefabUtility.InstantiatePrefab(mapObjectConfig.Asset) as GameObject : null;
+            if (instanceGo != null)
+            {
+                var mapObjectType = mapObjectConfig.ObjectType;
+                var parentNodeTransform = MapUtilities.GetOrCreateMapObjectTypeParentNode(gameObject, mapObjectType);
+                instanceGo.transform.SetParent(parentNodeTransform);
+                instanceGo.transform.position = MapStartPos;
+                var instanceGoName = instanceGo.name.RemoveSubStr("(Clone)");
+                instanceGoName = $"{instanceGoName}_{uid}";
+                instanceGo.name = instanceGoName;
+                // 动态物体碰撞器统一代码创建
+                if (mapObjectConfig.IsDynamic)
+                {
+                    MapUtilities.AddOrUpdateColliderByColliderDataMono(instanceGo);
+                }
+                else
+                {
+                    MapUtilities.UpdateColliderByColliderDataMono(instanceGo);
+                }
+                MapUtilities.AddOrUpdateMapObjectDataMono(instanceGo, uid);
+            }
+            return instanceGo;
         }
 
         /// <summary>

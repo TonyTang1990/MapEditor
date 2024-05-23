@@ -66,7 +66,7 @@ namespace MapEditor
             var dumplicatedNum = DumplicatedMapObjectDatas.Count;
             if(dumplicatedNum == 0)
             {
-                var selectionGos = new Object[dumplicatedNum];
+                var selectionGos = new UnityEngine.Object[dumplicatedNum];
                 for(int i = 0; i < dumplicatedNum; i++)
                 {
                     selectionGos[i] = DumplicatedMapObjectDatas[i].Go;
@@ -132,7 +132,7 @@ namespace MapEditor
         /// </summary>
         /// <param name="objects"></param>
         /// <returns></returns>
-        private static bool CheckSelfOrParentHasMapScript(Object[] objects)
+        private static bool CheckSelfOrParentHasMapScript(UnityEngine.Object[] objects)
         {
             var targetGameObjects = objects;
             if(targetGameObjects == null || targetGameObjects.Length == 0)
@@ -190,7 +190,7 @@ namespace MapEditor
         static bool MapDataDumplicateValidateFunction(MenuCommand menuCommand)
         {
             Debug.Log($"MapDataDumplicateValidateFunction()");
-            return CheckSelfOrParentHasMapScript(Selection.objects);
+            return CheckSelfHasMapScript(Selection.objects);
         }
 
         /// <summary>
@@ -278,7 +278,7 @@ namespace MapEditor
         /// </summary>
         /// <param name="objects"></param>
         /// <returns></returns>
-        private static bool CheckSelfHasMapScript(Object[] objects)
+        private static bool CheckSelfHasMapScript(UnityEngine.Object[] objects)
         {
             var targetGameObjects = objects;
             if (targetGameObjects == null || targetGameObjects.Length == 0)
@@ -365,7 +365,7 @@ namespace MapEditor
             {
                 return null;
             }
-            var map = go.GetComponent<Map>(true);
+            var map = go.GetComponent<Map>();
             if (map == null)
             {
                 Debug.LogError($"选中对象:{go.name}没有Map脚本，不应该进入这里，游戏地图批量选中埋点数据复制失败！");
@@ -484,62 +484,6 @@ namespace MapEditor
         }
 
         /// <summary>
-        /// 获取制定地图对象类型的父节点挂点名
-        /// </summary>
-        /// <param name="mapObjectType"></param>
-        /// <returns></returns>
-        public static string GetMapObjectTypeParentNodeName(MapObjectType mapObjectType)
-        {
-            var parentNodeName = Enum.GetName(MapConst.MapObjectType, mapObjectType);
-            return parentNodeName;
-        }
-        
-        /// <summary>
-        /// 获取或创建指定地图GameObject的地图对象父挂点
-        /// </summary>
-        /// <param name="mapGO"></param>
-        /// <returns></returns>
-        public static Transform GetOrCreateMapObjectParentNode(GameObject mapGO)
-        {
-            if(mapGO == null)
-            {
-                Debug.LogError($"不允许传空地图GameObject，获取或创建地图对象父挂点失败！");
-                return null;
-            }
-            var mapObjectParentTransform = mapGO.transform.Find(MapConst.MapObjectParentNodeName);
-            if(mapObjectParentTransform == null)
-            {
-                mapObjectParentTransform = new GameObject(MapConst.MapObjectParentNodeName).transform;
-                mapObjectParentTransform.SetParent(mapGO.transform);
-            }
-            return mapObjectParentTransform;
-        }
-
-        /// <summary>
-        /// 获取或创建指定地图GameObject的指定地图对象类型挂在节点
-        /// </summary>
-        /// <param name="mapGO"></param>
-        /// <param name="mapObjectType"></param>
-        /// <returns></returns>
-        public static Transform GetOrCreateMapObjectTypeParentNode(GameObject mapGO, MapObjectType mapObjectType)
-        {
-            if (mapGO == null)
-            {
-                Debug.LogError($"不允许传空地图GameObject，获取或创建指定地图对象类型的父挂在节点失败！");
-                return null;
-            }
-            var mapObjectParentNode = GetOrCreateMapObjectParentNode(mapGO);
-            var mapObjectTypeParentNodeName = GetMapObjectTypeParentNodeName(mapObjectType);
-            var mapObjectTypeParentNodeTransform = mapObjectParentNode.Find(mapObjectTypeParentNodeName);
-            if (mapObjectTypeParentNodeTransform == null)
-            {
-                mapObjectTypeParentNodeTransform = new GameObject(mapObjectTypeParentNodeName).transform;
-                mapObjectTypeParentNodeTransform.SetParent(mapObjectParentNode);
-            }
-            return mapObjectTypeParentNodeTransform;
-        }
-
-        /// <summary>
         /// 获取或创建指定地图地形节点
         /// </summary>
         /// <param name="mapGO"></param>
@@ -589,36 +533,6 @@ namespace MapEditor
             navMeshSurface.collectObjects = CollectObjects.Children;
             navMeshSurface.useGeometry = NavMeshCollectGeometry.PhysicsColliders;
             return navMeshSurface;
-        }
-
-        /// <summary>
-        /// 指定GameObject添加或更新指定地图对象UID的MapObjectDataMono数据
-        /// </summary>
-        /// <param name="go"></param>
-        /// <param name="uid"></param>
-        /// <returns></returns>
-        public static MapObjectDataMono AddOrUpdateMapObjectDataMono(GameObject go, int uid)
-        {
-            if(go == null)
-            {
-                Debug.LogError($"不允许给空GameObject添加MapObjectDataMono脚本！");
-                return null;
-            }
-            var mapObjectConfig = MapSetting.GetEditorInstance().ObjectSetting.GetMapObjectConfigByUID(uid);
-            if(mapObjectConfig == null)
-            {
-                Debug.LogError($"找不到UID:{uid}的地图对象配置数据，GameObject:{go.name}添加MapObjectDataMono脚本失败！");
-                return null;
-            }
-            var mapObjectDataMono = go.GetComponent<MapObjectDataMono>();
-            if(mapObjectDataMono == null)
-            {
-                mapObjectDataMono = go.AddComponent<MapObjectDataMono>();
-            }
-            mapObjectDataMono.UID = uid;
-            mapObjectDataMono.ObjectType = mapObjectConfig.ObjectType;
-            mapObjectDataMono.ConfId = mapObjectDataMono.ConfId;
-            return mapObjectDataMono;
         }
 
         /// <summary>

@@ -279,9 +279,9 @@ MonoBehaviour:
       type: {class: MonsterMapData, ns: MapEditor, asm: Assembly-CSharp}
       data:
         UID: 2
-        Position: {x: 6, y: 0, z: 8}
+        Position: {x: 5.043041, y: 0, z: 8}
         Rotation: {x: 0, y: 90, z: 0}
-        BatchOperationSwitch: 0
+        BatchOperationSwitch: 1
         GroupId: 1
     - rid: 6165940593996857346
       type: {class: MonsterGroupMapData, ns: MapEditor, asm: Assembly-CSharp}
@@ -317,9 +317,9 @@ MonoBehaviour:
       type: {class: MonsterMapData, ns: MapEditor, asm: Assembly-CSharp}
       data:
         UID: 2
-        Position: {x: 5, y: 0, z: 9}
+        Position: {x: 4.043041, y: 0, z: 9}
         Rotation: {x: 0, y: 90, z: 0}
-        BatchOperationSwitch: 0
+        BatchOperationSwitch: 1
         GroupId: 1
     - rid: 6165940593996857350
       type: {class: MonsterMapData, ns: MapEditor, asm: Assembly-CSharp}

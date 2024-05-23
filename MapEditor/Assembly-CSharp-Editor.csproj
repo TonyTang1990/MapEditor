@@ -58,7 +58,6 @@
   <ItemGroup>
     <Compile Include="Assets\Scripts\Editor\Common\FolderUtilities.cs" />
     <Compile Include="Assets\Scripts\Editor\MapEditor\MapEditorUtilities.cs" />
-    <Compile Include="Assets\Scripts\Editor\Common\StringExt.cs" />
     <Compile Include="Assets\Scripts\Editor\MapEditor\MapStyles.cs" />
     <Compile Include="Assets\Scripts\Editor\MapEditor\MapEditor.cs" />
     <Compile Include="Assets\Scripts\Editor\MapEditor\MapEditorWindow.cs" />

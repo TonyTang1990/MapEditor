@@ -4,8 +4,10 @@
  * Create Date:             2024/04/08
  */
 
+using System;
 using System.IO;
 using UnityEditor;
+using UnityEditor.SceneManagement;
 using UnityEngine;
 
 namespace MapEditor
@@ -46,6 +48,92 @@ namespace MapEditor
             Debug.LogError($"非Editor不允许加载地图配置数据，加载地图配置数据失败！");
             return null;
 #endif
+        }
+
+        /// <summary>
+        /// 获取或创建指定地图GameObject的指定地图对象类型挂在节点
+        /// </summary>
+        /// <param name="mapGO"></param>
+        /// <param name="mapObjectType"></param>
+        /// <returns></returns>
+        public static Transform GetOrCreateMapObjectTypeParentNode(GameObject mapGO, MapObjectType mapObjectType)
+        {
+            if (mapGO == null)
+            {
+                Debug.LogError($"不允许传空地图GameObject，获取或创建指定地图对象类型的父挂在节点失败！");
+                return null;
+            }
+            var mapObjectParentNode = GetOrCreateMapObjectParentNode(mapGO);
+            var mapObjectTypeParentNodeName = GetMapObjectTypeParentNodeName(mapObjectType);
+            var mapObjectTypeParentNodeTransform = mapObjectParentNode.Find(mapObjectTypeParentNodeName);
+            if (mapObjectTypeParentNodeTransform == null)
+            {
+                mapObjectTypeParentNodeTransform = new GameObject(mapObjectTypeParentNodeName).transform;
+                mapObjectTypeParentNodeTransform.SetParent(mapObjectParentNode);
+            }
+            return mapObjectTypeParentNodeTransform;
+        }
+
+        /// <summary>
+        /// 获取或创建指定地图GameObject的地图对象父挂点
+        /// </summary>
+        /// <param name="mapGO"></param>
+        /// <returns></returns>
+        public static Transform GetOrCreateMapObjectParentNode(GameObject mapGO)
+        {
+            if (mapGO == null)
+            {
+                Debug.LogError($"不允许传空地图GameObject，获取或创建地图对象父挂点失败！");
+                return null;
+            }
+            var mapObjectParentTransform = mapGO.transform.Find(MapConst.MapObjectParentNodeName);
+            if (mapObjectParentTransform == null)
+            {
+                mapObjectParentTransform = new GameObject(MapConst.MapObjectParentNodeName).transform;
+                mapObjectParentTransform.SetParent(mapGO.transform);
+            }
+            return mapObjectParentTransform;
+        }
+
+        /// <summary>
+        /// 获取制定地图对象类型的父节点挂点名
+        /// </summary>
+        /// <param name="mapObjectType"></param>
+        /// <returns></returns>
+        public static string GetMapObjectTypeParentNodeName(MapObjectType mapObjectType)
+        {
+            var parentNodeName = Enum.GetName(MapConst.MapObjectType, mapObjectType);
+            return parentNodeName;
+        }
+
+        /// <summary>
+        /// 指定GameObject添加或更新指定地图对象UID的MapObjectDataMono数据
+        /// </summary>
+        /// <param name="go"></param>
+        /// <param name="uid"></param>
+        /// <returns></returns>
+        public static MapObjectDataMono AddOrUpdateMapObjectDataMono(GameObject go, int uid)
+        {
+            if (go == null)
+            {
+                Debug.LogError($"不允许给空GameObject添加MapObjectDataMono脚本！");
+                return null;
+            }
+            var mapObjectConfig = MapSetting.GetEditorInstance().ObjectSetting.GetMapObjectConfigByUID(uid);
+            if (mapObjectConfig == null)
+            {
+                Debug.LogError($"找不到UID:{uid}的地图对象配置数据，GameObject:{go.name}添加MapObjectDataMono脚本失败！");
+                return null;
+            }
+            var mapObjectDataMono = go.GetComponent<MapObjectDataMono>();
+            if (mapObjectDataMono == null)
+            {
+                mapObjectDataMono = go.AddComponent<MapObjectDataMono>();
+            }
+            mapObjectDataMono.UID = uid;
+            mapObjectDataMono.ObjectType = mapObjectConfig.ObjectType;
+            mapObjectDataMono.ConfId = mapObjectConfig.ConfId;
+            return mapObjectDataMono;
         }
 
         /// <summary>
@@ -123,7 +211,6 @@ namespace MapEditor
             }
         }
 
-
         /// <summary>
         /// 指定GameObject根据挂载的ColliderDataMono更新碰撞体数据
         /// </summary>
@@ -186,12 +273,13 @@ namespace MapEditor
             }
         }
 
+#if UNITY_EDITOR
         /// <summary>
         /// 获取当前脚本GameObject状态
         /// </summary>
         /// <param name="go"></param>
         /// <returns></returns>
-        private GameObjectStatus GetGameObjectStatus(GameObject go)
+        public static GameObjectStatus GetGameObjectStatus(GameObject go)
         {
             if(go == null)
             {
@@ -219,13 +307,12 @@ namespace MapEditor
             return GameObjectStatus.Normal;
         }
 
-
         /// <summary>
         /// 操作是否可用
         /// </summary>
         /// <param name="go"></param>
         /// <returns></returns>
-        public static bool IsOperationAvalible(GameObjectExtension go)
+        public static bool IsOperationAvalible(GameObject go)
         {
             if(go == null)
             {
@@ -253,11 +340,11 @@ namespace MapEditor
             var prefabAssetPath = string.Empty;
             if (gameObjectStatus == GameObjectStatus.Asset)
             {
-                prefabAssetPath = AssetDatabase.GetAssetPath(mTarget.gameObject);
+                prefabAssetPath = AssetDatabase.GetAssetPath(go);
             }
             else if (gameObjectStatus == GameObjectStatus.PrefabInstance)
             {
-                var prefabAsset = PrefabUtility.GetCorrespondingObjectFromSource(mTarget.gameObject);
+                var prefabAsset = PrefabUtility.GetCorrespondingObjectFromSource(go);
                 prefabAssetPath = AssetDatabase.GetAssetPath(prefabAsset);
             }
             if (string.IsNullOrEmpty(prefabAssetPath))
@@ -282,10 +369,11 @@ namespace MapEditor
             {
                 var gameObjectStatus = GetGameObjectStatus(go);
                 EditorUtility.DisplayDialog("地图编辑器", $"当前操作对象处于:{gameObjectStatus.ToString()}状态下不允许操作！", "确认");
-                TryOpenPrefabContent();
+                TryOpenPrefabContent(go);
                 return false;
             }
             return true;
         }
+#endif
     }
 }

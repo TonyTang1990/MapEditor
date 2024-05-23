@@ -308,7 +308,7 @@ namespace MapEditor
             {
                 return;
             }
-            var mapObjectParentNode = MapEditorUtilities.GetOrCreateMapObjectParentNode(mTarget?.gameObject);
+            var mapObjectParentNode = MapUtilities.GetOrCreateMapObjectParentNode(mTarget?.gameObject);
             if(mapObjectParentNode != null)
             {
                 mapObjectParentNode.transform.localPosition = Vector3.zero;
@@ -318,7 +318,7 @@ namespace MapEditor
             foreach(var mapObjectTypeValue in mapObjectTypeValues)
             {
                 var mapObjectType = (MapObjectType)mapObjectTypeValue;
-                var mapObjectTypeParentNodeTransform = MapEditorUtilities.GetOrCreateMapObjectTypeParentNode(mTarget?.gameObject, mapObjectType);
+                var mapObjectTypeParentNodeTransform = MapUtilities.GetOrCreateMapObjectTypeParentNode(mTarget?.gameObject, mapObjectType);
                 mapObjectTypeParentNodeTransform.localPosition = Vector3.zero;
             }
         }
@@ -656,43 +656,6 @@ namespace MapEditor
         }
 
         /// <summary>
-        /// 创建之地给你地图对象UID配置的实体对象(未配置Asset返回null)
-        /// </summary>
-        /// <param name="uid"></param>
-        /// <returns></returns>
-        private GameObject CreateGameObjectByUID(int uid)
-        {
-            var mapObjectConfig = MapSetting.GetEditorInstance().ObjectSetting.GetMapObjectConfigByUID(uid);
-            if(mapObjectConfig == null)
-            {
-                Debug.LogError($"未配置地图对象UID:{uid}配置数据，不支持创建地图实体对象！");
-                return null;
-            }
-            var instanceGo = mapObjectConfig.Asset != null ? PrefabUtility.InstantiatePrefab(mapObjectConfig.Asset) as GameObject : null;
-            if(instanceGo != null)
-            {
-                var mapObjectType = mapObjectConfig.ObjectType;
-                var parentNodeTransform = MapEditorUtilities.GetOrCreateMapObjectTypeParentNode(mTarget?.gameObject, mapObjectType);
-                instanceGo.transform.SetParent(parentNodeTransform);
-                instanceGo.transform.position = mMapStartPosProperty.vector3Value;
-                var instanceGoName = instanceGo.name.RemoveSubStr("(Clone)");
-                instanceGoName = $"{instanceGoName}_{uid}";
-                instanceGo.name = instanceGoName;
-                // 动态物体碰撞器统一代码创建
-                if(mapObjectConfig.IsDynamic)
-                {
-                    MapUtilities.AddOrUpdateColliderByColliderDataMono(instanceGo);
-                }
-                else
-                {
-                    MapUtilities.UpdateColliderByColliderDataMono(instanceGo);
-                }
-                MapEditorUtilities.AddOrUpdateMapObjectDataMono(instanceGo, uid);
-            }
-            return instanceGo;
-        }
-
-        /// <summary>
         /// 交换指定属性和交换索引数据
         /// </summary>
         /// <param name="propertyList"></param>
@@ -812,7 +775,7 @@ namespace MapEditor
         /// <returns></returns>
         private MapObjectData DoAddMapObjectData(int uid, int insertIndex = -1)
         {
-             return mTarget != null mTarget.DoAddMapObjectData(uid, insertIndex) : null;
+             return mTarget != null ? mTarget.DoAddMapObjectData(uid, insertIndex) : null;
         }
 
         /// <summary>
@@ -822,7 +785,7 @@ namespace MapEditor
         /// <returns></returns>
         private bool DoRemoveMapObjectDataByIndex(int index)
         {
-            return mTarget != null mTarget.DoRemoveMapObjectDataByIndex(index) : false;
+            return mTarget != null ? mTarget.DoRemoveMapObjectDataByIndex(index) : false;
         }
 
         /// <summary>
@@ -833,7 +796,7 @@ namespace MapEditor
         /// <returns></returns>
         private MapData DoAddMapData(int uid, int insertIndex = -1)
         {
-            return mTarget != null mTarget.DoAddMapData(uid, insertIndex) : null;
+            return mTarget != null ? mTarget.DoAddMapData(uid, insertIndex) : null;
         }
 
 
@@ -844,7 +807,7 @@ namespace MapEditor
         /// <returns></returns>
         private bool DoRemoveMapDataByIndex(int index)
         {
-            return mTarget != null mTarget.DoRemoveMapDataByIndex(index) : false;
+            return mTarget != null ? mTarget.DoRemoveMapDataByIndex(index) : false;
         }
 
         /// <summary>
@@ -946,27 +909,35 @@ namespace MapEditor
         }
 
         /// <summary>
-        /// 清除动态地图对象GameObjects
+        /// 清除动态数据
         /// </summary>
-        private void CleanDynamicMaoObjectGos()
+        private void CleanDynamicDatas()
         {
             if(!MapUtilities.CheckOperationAvalible(mTarget?.gameObject))
             {
                 return;
             }
             UpdateMapObjectDataLogicDatas();
-            for(int i = 0; i < mMapObjectDataListProperty.arraySize; i++)
+            CleanDynamicMapObjectGos();
+        }
+
+        /// <summary>
+        /// 清除动态地图对象GameObjects
+        /// </summary>
+        private void CleanDynamicMapObjectGos()
+        {
+            for (int i = 0; i < mMapObjectDataListProperty.arraySize; i++)
             {
                 var mapObjectDataProperty = mMapObjectDataListProperty.GetArrayElementAtIndex(i);
                 var uidProperty = mapObjectDataProperty.FindPropertyRelative("UID");
                 var mapObjectUID = uidProperty.intValue;
                 var mapObjectConfig = MapSetting.GetEditorInstance().ObjectSetting.GetMapObjectConfigByUID(mapObjectUID);
-                if(mapObjectConfig == null)
+                if (mapObjectConfig == null)
                 {
                     continue;
                 }
                 var goProperty = mapObjectDataProperty.FindPropertyRelative("Go");
-                if(mapObjectConfig.IsDynamic && goProperty.objectReferenceValue != null)
+                if (mapObjectConfig.IsDynamic && goProperty.objectReferenceValue != null)
                 {
                     var go = goProperty.objectReferenceValue as GameObject;
                     GameObject.DestroyImmediate(go);
@@ -975,7 +946,6 @@ namespace MapEditor
             }
             serializedObject.ApplyModifiedProperties();
         }
-
         /// <summary>
         /// 恢复指定MapObject属性地图对象
         /// </summary>
@@ -1001,7 +971,7 @@ namespace MapEditor
             {
                 GameObject.DestroyImmediate(gameObject);
             }
-            var instanceGo = CreateGameObjectByUID(mapObjectUID);
+            var instanceGo = mTarget != null ? mTarget.CreateGameObjectByUID(mapObjectUID) : null;
             if(instanceGo != null)
             {
                 var positionProperty = mapObjectDataProperty.FindPropertyRelative("Position");
@@ -1024,15 +994,23 @@ namespace MapEditor
         }
 
         /// <summary>
-        /// 回复动态地图对象GameObjects
+        /// 恢复动态数据
         /// </summary>
-        private void RecoverDynamicMapObjectGos()
+        private void RecoverDynamicDatas()
         {
             if (!MapUtilities.CheckOperationAvalible(mTarget?.gameObject))
             {
                 return;
             }
             UpdateMapObjectDataLogicDatas();
+            RecoverDynamicMapObjectGos();
+        }
+
+        /// <summary>
+        /// 恢复动态地图对象GameObjects
+        /// </summary>
+        private void RecoverDynamicMapObjectGos()
+        {
             for (int i = 0; i < mMapObjectDataListProperty.arraySize; i++)
             {
                 var mapObjectDataProperty = mMapObjectDataListProperty.GetArrayElementAtIndex(i);
@@ -1124,7 +1102,7 @@ namespace MapEditor
                 }
                 var uidProperty = mapObjectDataProperty.FindPropertyRelative("UID");
                 var go = goProperty.objectReferenceValue as GameObject;
-                MapEditorUtilities.AddOrUpdateMapObjectDataMono(go, uidProperty.intValue);
+                MapUtilities.AddOrUpdateMapObjectDataMono(go, uidProperty.intValue);
             }
         }
 
@@ -1162,12 +1140,12 @@ namespace MapEditor
             {
                 return;
             }
-            RecoverDynamicMapObjectGos();
+            RecoverDynamicDatas();
             var navMeshSurface = MapEditorUtilities.GetOrCreateNavMeshSurface(mTarget?.gameObject);
             var bakePathTask = BakePathTask(navMeshSurface);
             var bakePathResult = await bakePathTask;
             CopyNavMeshAsset();
-            CleanDynamicMaoObjectGos();
+            CleanDynamicDatas();
             ExportMapData();
             AssetDatabase.SaveAssets();
             Debug.Log($"一键烘焙拷贝导出地图数据完成！");
@@ -1399,13 +1377,13 @@ namespace MapEditor
         {
             EditorGUILayout.BeginVertical("box");
             EditorGUILayout.BeginHorizontal();
-            if(GUILayout.Button("清除动态对象显示", GUILayout.ExpandWidth(true)))
+            if(GUILayout.Button("清除动态数据", GUILayout.ExpandWidth(true)))
             {
-                CleanDynamicMaoObjectGos();
+                CleanDynamicDatas();
             }
-            if(GUILayout.Button("恢复动态对象显示", GUILayout.ExpandWidth(true)))
+            if(GUILayout.Button("恢复动态数据", GUILayout.ExpandWidth(true)))
             {
-                RecoverDynamicMapObjectGos();
+                RecoverDynamicDatas();
             }
             if(GUILayout.Button("拷贝NavMesh Asset", GUILayout.ExpandWidth(true)))
             {
