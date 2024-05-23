@@ -108,5 +108,10 @@ namespace MapEditor
         /// 地图埋点数据标签位置显示偏移
         /// </summary>
         public static readonly Vector3 MapDAtaLabelPosOffset = new Vector3(0f, 0.5f, 0f);
+
+        /// <summary>
+        /// 地图埋点数据复制位置偏移(避免复制埋点坐标轴重叠不好操作)
+        /// </summary>
+        public static readonly Vector3 MapDataDuplicatePositionOffset = new Vector3(1f, 0f, 0f);
     }
 }

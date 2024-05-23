@@ -185,5 +185,107 @@ namespace MapEditor
                 sphereCollider.radius = colliderDataMono.Radius;
             }
         }
+
+        /// <summary>
+        /// 获取当前脚本GameObject状态
+        /// </summary>
+        /// <param name="go"></param>
+        /// <returns></returns>
+        private GameObjectStatus GetGameObjectStatus(GameObject go)
+        {
+            if(go == null)
+            {
+                Debug.LogError($"传入空GameObject，获取GameObject状态失败！");
+                return GameObjectStatus.INVALIDE;
+            }
+            // 未做成预制件的所有操作可用
+            // 做成预制件的必须进入预制件编辑模式才可行
+            var assetPath = AssetDatabase.GetAssetPath(go);
+            if (!string.IsNullOrEmpty(assetPath))
+            {
+                return GameObjectStatus.Asset;
+            }
+            if (PrefabStageUtility.GetPrefabStage(go) != null)
+            {
+                return GameObjectStatus.PrefabContent;
+            }
+            else
+            {
+                if (PrefabUtility.IsPartOfPrefabInstance(go))
+                {
+                    return GameObjectStatus.PrefabInstance;
+                }
+            }
+            return GameObjectStatus.Normal;
+        }
+
+
+        /// <summary>
+        /// 操作是否可用
+        /// </summary>
+        /// <param name="go"></param>
+        /// <returns></returns>
+        public static bool IsOperationAvalible(GameObjectExtension go)
+        {
+            if(go == null)
+            {
+                return false;
+            }
+            var gameObjectStatus = GetGameObjectStatus(go);
+            if (gameObjectStatus == GameObjectStatus.Normal || gameObjectStatus == GameObjectStatus.PrefabContent)
+            {
+                return true;
+            }
+            return false;
+        }
+
+        /// <summary>
+        /// 尝试打开预制件编辑模式
+        /// </summary>
+        /// <param name="go"></param>
+        public static void TryOpenPrefabContent(GameObject go)
+        {
+            var gameObjectStatus = GetGameObjectStatus(go);
+            if (gameObjectStatus == GameObjectStatus.INVALIDE || gameObjectStatus == GameObjectStatus.Normal || gameObjectStatus == GameObjectStatus.PrefabContent)
+            {
+                return;
+            }
+            var prefabAssetPath = string.Empty;
+            if (gameObjectStatus == GameObjectStatus.Asset)
+            {
+                prefabAssetPath = AssetDatabase.GetAssetPath(mTarget.gameObject);
+            }
+            else if (gameObjectStatus == GameObjectStatus.PrefabInstance)
+            {
+                var prefabAsset = PrefabUtility.GetCorrespondingObjectFromSource(mTarget.gameObject);
+                prefabAssetPath = AssetDatabase.GetAssetPath(prefabAsset);
+            }
+            if (string.IsNullOrEmpty(prefabAssetPath))
+            {
+                return;
+            }
+            PrefabStageUtility.OpenPrefab(prefabAssetPath);
+        }
+
+        /// <summary>
+        /// 检查操作是否可用
+        /// </summary>
+        /// <param name="go"></param>
+        /// <returns></returns>
+        public static bool CheckOperationAvalible(GameObject go)
+        {
+            if(go == null)
+            {
+                return false;
+            }
+            if (!IsOperationAvalible(go))
+            {
+                var gameObjectStatus = GetGameObjectStatus(go);
+                EditorUtility.DisplayDialog("地图编辑器", $"当前操作对象处于:{gameObjectStatus.ToString()}状态下不允许操作！", "确认");
+                TryOpenPrefabContent();
+                return false;
+            }
+            return true;
+        }
     }
 }

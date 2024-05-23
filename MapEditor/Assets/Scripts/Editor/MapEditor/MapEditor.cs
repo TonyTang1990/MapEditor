@@ -26,17 +26,6 @@ namespace MapEditor
     public class MapEditor : Editor
     {
         /// <summary>
-        /// 实体对象状态
-        /// </summary>
-        private enum GameObjectStatus
-        {
-            Normal = 0,             // 普通GameObject
-            Asset = 1,              // Asset
-            PrefabInstance = 2,     // 预制件实例对象
-            PrefabContent = 3,      // 预制件编辑模式对象
-        }
-
-        /// <summary>
         /// 地图编辑器页签类型
         /// </summary>
         private enum MapTabType
@@ -301,7 +290,7 @@ namespace MapEditor
         /// </summary>
         private void CreateAllNodes()
         {
-            if(!IsOperationAvalible())
+            if(!MapUtilities.IsOperationAvalible(mTarget?.gameObject))
             {
                 return;
             }
@@ -315,11 +304,11 @@ namespace MapEditor
         /// </summary>
         private void CreateAllMapObjectParentNodes()
         {
-            if (!IsOperationAvalible())
+            if (!MapUtilities.IsOperationAvalible(mTarget?.gameObject))
             {
                 return;
             }
-            var mapObjectParentNode = MapEditorUtilities.GetOrCreateMapObjectParentNode(mTarget.gameObject);
+            var mapObjectParentNode = MapEditorUtilities.GetOrCreateMapObjectParentNode(mTarget?.gameObject);
             if(mapObjectParentNode != null)
             {
                 mapObjectParentNode.transform.localPosition = Vector3.zero;
@@ -329,7 +318,7 @@ namespace MapEditor
             foreach(var mapObjectTypeValue in mapObjectTypeValues)
             {
                 var mapObjectType = (MapObjectType)mapObjectTypeValue;
-                var mapObjectTypeParentNodeTransform = MapEditorUtilities.GetOrCreateMapObjectTypeParentNode(mTarget.gameObject, mapObjectType);
+                var mapObjectTypeParentNodeTransform = MapEditorUtilities.GetOrCreateMapObjectTypeParentNode(mTarget?.gameObject, mapObjectType);
                 mapObjectTypeParentNodeTransform.localPosition = Vector3.zero;
             }
         }
@@ -339,12 +328,12 @@ namespace MapEditor
         /// </summary>
         private void CreateMapTerrianNode()
         {
-            if (!IsOperationAvalible())
+            if (!MapUtilities.IsOperationAvalible(mTarget?.gameObject))
             {
                 return;
             }
             var customAsset = mMapTerrianAssetProperty.objectReferenceValue as GameObject;
-            var mapTerrianTransform = MapEditorUtilities.GetOrCreateMapTerrianNode(mTarget.gameObject, customAsset);
+            var mapTerrianTransform = MapEditorUtilities.GetOrCreateMapTerrianNode(mTarget?.gameObject, customAsset);
             if(mapTerrianTransform != null)
             {
                 mapTerrianTransform.localPosition = Vector3.zero;
@@ -356,11 +345,11 @@ namespace MapEditor
         /// </summary>
         private void RecreateMapTerrianNode()
         {
-            if (!CheckOperationAvalible())
+            if (!MapUtilities.CheckOperationAvalible(mTarget?.gameObject))
             {
                 return;
             }
-            var mapTerrianTransform = MapEditorUtilities.GetOrCreateMapTerrianNode(mTarget.gameObject);
+            var mapTerrianTransform = MapEditorUtilities.GetOrCreateMapTerrianNode(mTarget?.gameObject);
             if(mapTerrianTransform != null)
             {
                 GameObject.DestroyImmediate(mapTerrianTransform.gameObject);
@@ -374,11 +363,11 @@ namespace MapEditor
         /// </summary>
         private void CreateNavMeshSurface()
         {
-            if (!IsOperationAvalible())
+            if (!MapUtilities.IsOperationAvalible(mTarget?.gameObject))
             {
                 return;
             }
-            MapEditorUtilities.GetOrCreateNavMeshSurface(mTarget.gameObject);
+            MapEditorUtilities.GetOrCreateNavMeshSurface(mTarget?.gameObject);
         }
 
         /// <summary>
@@ -386,7 +375,7 @@ namespace MapEditor
         /// </summary>
         private void UpdateTerrianSizeAndPos()
         {
-            var mapTerrianTransform = MapEditorUtilities.GetOrCreateMapTerrianNode(mTarget.gameObject);
+            var mapTerrianTransform = MapEditorUtilities.GetOrCreateMapTerrianNode(mTarget?.gameObject);
             if(mapTerrianTransform == null)
             {
                 return;
@@ -683,7 +672,7 @@ namespace MapEditor
             if(instanceGo != null)
             {
                 var mapObjectType = mapObjectConfig.ObjectType;
-                var parentNodeTransform = MapEditorUtilities.GetOrCreateMapObjectTypeParentNode(mTarget.gameObject, mapObjectType);
+                var parentNodeTransform = MapEditorUtilities.GetOrCreateMapObjectTypeParentNode(mTarget?.gameObject, mapObjectType);
                 instanceGo.transform.SetParent(parentNodeTransform);
                 instanceGo.transform.position = mMapStartPosProperty.vector3Value;
                 var instanceGoName = instanceGo.name.RemoveSubStr("(Clone)");
@@ -745,7 +734,7 @@ namespace MapEditor
         /// <returns></returns>
         private bool DoMovePropertyDataUpByIndex(SerializedProperty propertyList, int index)
         {
-            if(!CheckOperationAvalible())
+            if(!MapUtilities.CheckOperationAvalible(mTarget?.gameObject))
             {
                 return false;
             }
@@ -784,7 +773,7 @@ namespace MapEditor
         /// <returns></returns>
         private bool DoMovePropertyDataDownByIndex(SerializedProperty propertyList, int index)
         {
-            if (!CheckOperationAvalible())
+            if (!MapUtilities.CheckOperationAvalible(mTarget?.gameObject))
             {
                 return false;
             }
@@ -821,62 +810,10 @@ namespace MapEditor
         /// <param name="uid"></param>
         /// <param name="insertIndex"></param>
         /// <returns></returns>
-        private bool DoAddMapObjectData(int uid, int insertIndex = -1)
+        private MapObjectData DoAddMapObjectData(int uid, int insertIndex = -1)
         {
-            if(!CheckOperationAvalible())
-            {
-                return false;
-            }
-            return AddMapObjectData(uid, insertIndex);
+             return mTarget != null mTarget.DoAddMapObjectData(uid, insertIndex) : null;
         }
-
-        /// <summary>
-        /// 添加指定地图对象UID数据
-        /// </summary>
-        /// <param name="uid"></param>
-        /// <param name="insertIndex"></param>
-        /// <returns></returns>
-        private bool AddMapObjectData(int uid, int insertIndex = -1)
-        {
-            var mapObjectConfig = MapSetting.GetEditorInstance().ObjectSetting.GetMapObjectConfigByUID(uid);
-            if(mapObjectConfig == null)
-            {
-                Debug.LogError($"未配置地图对象UID:{uid}配置数据，不支持添加此地图对象数据！");
-                return false;
-            }
-            var mapObjectDataTotalNum = mMapObjectDataListProperty.arraySize;
-            var maxInsertIndex = mapObjectDataTotalNum == 0 ? 0 : mapObjectDataTotalNum;
-            var insertPos = 0;
-            if(insertIndex == -1)
-            {
-                insertPos = maxInsertIndex;
-            }
-            else
-            {
-                insertPos = Math.Clamp(insertIndex, 0, maxInsertIndex);
-            }
-            var mapObjectPosition = mMapStartPosProperty.vector3Value;
-            if(mapObjectDataTotalNum != 0)
-            {
-                var insertMapObjectPos = Math.Clamp(insertPos, 0, maxInsertIndex - 1);
-                var insertMapObjectProperty = mMapObjectDataListProperty.GetArrayElementAtIndex(insertMapObjectPos);
-                var insertMapObjectData = insertMapObjectProperty.managedReferenceValue as MapObjectData;
-                mapObjectPosition = insertMapObjectData.Go != null ? insertMapObjectData.Go.transform.position : insertMapObjectData.Position;
-            }
-            var instanceGo = CreateGameObjectByUID(uid);
-            if(instanceGo != null && mMapObjectAddedAutoFocusProperty.boolValue)
-            {
-                Selection.SetActiveObjectWithContext(instanceGo, instanceGo);
-            }
-            instanceGo.transform.position = mapObjectPosition;
-            var newMapObjectData = new MapObjectData(uid, instanceGo);
-            mMapObjectDataListProperty.InsertArrayElementAtIndex(insertPos);
-            var newMapObjectDataProperty = mMapObjectDataListProperty.GetArrayElementAtIndex(insertPos);
-            newMapObjectDataProperty.managedReferenceValue = newMapObjectData;
-            serializedObject.ApplyModifiedProperties();
-            return true;
-        }
-
 
         /// <summary>
         /// 执行移除指定索引的地图对象数据
@@ -885,37 +822,7 @@ namespace MapEditor
         /// <returns></returns>
         private bool DoRemoveMapObjectDataByIndex(int index)
         {
-            if (!CheckOperationAvalible())
-            {
-                return false;
-            }
-            return RemoveMapObjectDataByIndex(index);
-        }
-
-        /// <summary>
-        /// 移除指定索引的地图对象数据
-        /// </summary>
-        /// <param name="index"></param>
-        /// <returns></returns>
-        private bool RemoveMapObjectDataByIndex(int index)
-        {
-            var mapObjectDataNum = mMapObjectDataListProperty.arraySize;
-            if(index < 0 || index >= mapObjectDataNum)
-            {
-                Debug.LogError($"指定索引:{index}不是有效索引范围:0-{mapObjectDataNum - 1},移除地图对象数据失败！");
-                return false;
-            }
-            var mapObjectDataProperty = mMapObjectDataListProperty.GetArrayElementAtIndex(index);
-            var goProperty = mapObjectDataProperty.FindPropertyRelative("Go");
-            if(goProperty.objectReferenceValue != null)
-            {
-                var positionProperty = mapObjectDataProperty.FindPropertyRelative("Position");
-                positionProperty.vector3Value = Vector3.zero;
-                GameObject.DestroyImmediate(goProperty.objectReferenceValue);
-            }
-            mMapObjectDataListProperty.DeleteArrayElementAtIndex(index);
-            serializedObject.ApplyModifiedProperties();
-            return true;
+            return mTarget != null mTarget.DoRemoveMapObjectDataByIndex(index) : false;
         }
 
         /// <summary>
@@ -924,56 +831,11 @@ namespace MapEditor
         /// <param name="uid"></param>
         /// <param name="insertIndex"></param>
         /// <returns></returns>
-        private bool DoAddMapData(int uid, int insertIndex = -1)
+        private MapData DoAddMapData(int uid, int insertIndex = -1)
         {
-            if(!CheckOperationAvalible())
-            {
-                return false;
-            }
-            return AddMapData(uid, insertIndex);
+            return mTarget != null mTarget.DoAddMapData(uid, insertIndex) : null;
         }
 
-        /// <summary>
-        /// 添加指定地图埋点UID数据
-        /// </summary>
-        /// <param name="uid"></param>
-        /// <param name="insertIndex"></param>
-        /// <returns></returns>
-        private bool AddMapData(int uid, int insertIndex = -1)
-        {
-            var mapDataConfig = MapSetting.GetEditorInstance().DataSetting.GetMapDataConfigByUID(uid);
-            if (mapDataConfig == null)
-            {
-                Debug.LogError($"未配置地图埋点UID:{uid}配置数据，不支持添加此地图埋点数据！");
-                return false;
-            }
-            var mapDataType = mapDataConfig.DataType;
-            var mapDataTotalNum = mMapDataListProperty.arraySize;
-            var maxInsertIndex = mapDataTotalNum == 0 ? 0 : mapDataTotalNum;
-            var insertPos = 0;
-            if (insertIndex == -1)
-            {
-                insertPos = maxInsertIndex;
-            }
-            else
-            {
-                insertPos = Math.Clamp(insertIndex, 0, maxInsertIndex);
-            }
-            var mapDataPosition = mMapStartPosProperty.vector3Value;
-            if(mapDataTotalNum != 0)
-            {
-                var insertMapDataPos = Math.Clamp(insertPos, 0, maxInsertIndex - 1);
-                var insertMapDataProperty = mMapDataListProperty.GetArrayElementAtIndex(insertMapDataPos);
-                var insertMapData = insertMapDataProperty.managedReferenceValue as MapData;
-                mapDataPosition = insertMapData != null ? insertMapData.Position : mapDataPosition;
-            }
-            var newMapData = MapUtilities.CreateMapDataByType(mapDataType, uid, mapDataPosition, mapDataConfig.Rotation);
-            mMapDataListProperty.InsertArrayElementAtIndex(insertPos);
-            var newMapDataProperty = mMapDataListProperty.GetArrayElementAtIndex(insertPos);
-            newMapDataProperty.managedReferenceValue = newMapData;
-            serializedObject.ApplyModifiedProperties();
-            return true;
-        }
 
         /// <summary>
         /// 执行移除指定索引的地图埋点数据
@@ -982,57 +844,7 @@ namespace MapEditor
         /// <returns></returns>
         private bool DoRemoveMapDataByIndex(int index)
         {
-            if(!CheckOperationAvalible())
-            {
-                return false;
-            }
-            return RemoveMapDataByIndex(index);
-        }
-
-        /// <summary>
-        /// 移除指定索引的地图埋点数据
-        /// </summary>
-        /// <param name="index"></param>
-        /// <returns></returns>
-        private bool RemoveMapDataByIndex(int index)
-        {
-            var mapDataNum = mMapDataListProperty.arraySize;
-            if (index < 0 || index >= mapDataNum)
-            {
-                Debug.LogError($"指定索引:{index}不是有效索引范围:0-{mapDataNum - 1},移除地图埋点数据失败！");
-                return false;
-            }
-            mMapDataListProperty.DeleteArrayElementAtIndex(index);
-            serializedObject.ApplyModifiedProperties();
-            return true;
-        }
-
-        /// <summary>
-        /// 获取当前脚本GameObject状态
-        /// </summary>
-        /// <returns></returns>
-        private GameObjectStatus GetGameObjectStatus()
-        {
-            // 未做成预制件的所有操作可用
-            // 做成预制件的必须进入预制件编辑模式才可行
-            var go = mTarget.gameObject;
-            var assetPath = AssetDatabase.GetAssetPath(go);
-            if(!string.IsNullOrEmpty(assetPath))
-            {
-                return GameObjectStatus.Asset;
-            }
-            if(PrefabStageUtility.GetPrefabStage(go) != null)
-            {
-                return GameObjectStatus.PrefabContent;
-            }
-            else
-            {
-                if(PrefabUtility.IsPartOfPrefabInstance(go))
-                {
-                    return GameObjectStatus.PrefabInstance;
-                }
-            }
-            return GameObjectStatus.Normal;
+            return mTarget != null mTarget.DoRemoveMapDataByIndex(index) : false;
         }
 
         /// <summary>
@@ -1044,83 +856,26 @@ namespace MapEditor
         private string GetMapAssetPath()
         {
             string assetPath = null;
-            var gameObjectStatus = GetGameObjectStatus();
+            var gameObjectStatus = MapUtilities.GetGameObjectStatus(mTarget?.gameObject);
             if (gameObjectStatus == GameObjectStatus.Normal)
             {
                 return null;
             }
             else if (gameObjectStatus == GameObjectStatus.PrefabInstance)
             {
-                var asset = PrefabUtility.GetCorrespondingObjectFromSource(mTarget.gameObject);
+                var asset = PrefabUtility.GetCorrespondingObjectFromSource(mTarget?.gameObject);
                 assetPath = AssetDatabase.GetAssetPath(asset);
             }
             else if (gameObjectStatus == GameObjectStatus.Asset)
             {
-                assetPath = AssetDatabase.GetAssetPath(mTarget.gameObject);
+                assetPath = AssetDatabase.GetAssetPath(mTarget?.gameObject);
             }
             else if(gameObjectStatus == GameObjectStatus.PrefabContent)
             {
-                var prefabStage = PrefabStageUtility.GetPrefabStage(mTarget.gameObject);
+                var prefabStage = PrefabStageUtility.GetPrefabStage(mTarget?.gameObject);
                 assetPath = prefabStage != null ? prefabStage.assetPath : null;
             }
             return assetPath;
-        }
-
-        /// <summary>
-        /// 尝试打开预制件编辑模式
-        /// </summary>
-        private void TryOpenPrefabContent()
-        {
-            var gameObjectStatus = GetGameObjectStatus();
-            if(gameObjectStatus == GameObjectStatus.Normal || gameObjectStatus == GameObjectStatus.PrefabContent)
-            {
-                return;
-            }
-            var prefabAssetPath = string.Empty;
-            if(gameObjectStatus == GameObjectStatus.Asset)
-            {
-                prefabAssetPath = AssetDatabase.GetAssetPath(mTarget.gameObject);
-            }
-            else if(gameObjectStatus == GameObjectStatus.PrefabInstance)
-            {
-                var prefabAsset = PrefabUtility.GetCorrespondingObjectFromSource(mTarget.gameObject);
-                prefabAssetPath = AssetDatabase.GetAssetPath(prefabAsset);
-            }
-            if(string.IsNullOrEmpty(prefabAssetPath))
-            {
-                return;
-            }
-            PrefabStageUtility.OpenPrefab(prefabAssetPath);
-        }
-
-        /// <summary>
-        /// 操作是否可用
-        /// </summary>
-        /// <returns></returns>
-        private bool IsOperationAvalible()
-        {
-            var gameObjectStatus = GetGameObjectStatus();
-            if(gameObjectStatus == GameObjectStatus.Normal || gameObjectStatus == GameObjectStatus.PrefabContent)
-            {
-                return true;
-            }
-            return false;
-        }
-
-        /// <summary>
-        /// 检查操作是否可用
-        /// </summary>
-        /// <returns></returns>
-        private bool CheckOperationAvalible()
-        {
-            if(!IsOperationAvalible())
-            {
-                var gameObjectStatus = GetGameObjectStatus();
-                EditorUtility.DisplayDialog("地图编辑器", $"当前操作对象处于:{gameObjectStatus.ToString()}状态下不允许操作！", "确认");
-                TryOpenPrefabContent();
-                return false;
-            }
-            return true;
         }
 
         /// <summary>
@@ -1187,12 +942,7 @@ namespace MapEditor
         /// </summary>
         private void OneKeySwitchOffMapDataBatchOperation()
         {
-            for(int i = 0, length = mMapDataListProperty.arraySize; i < length; i++)
-            {
-                var mapDataProperty = mMapDataListProperty.GetArrayElementAtIndex(i);
-                var batchOperationSwitchProperty = mapDataProperty.FindPropertyRelative("BatchOperationSwitch");
-                batchOperationSwitchProperty.boolValue = false;
-            }
+            mTarget?.ClearAllMapDataBatchOperation();
         }
 
         /// <summary>
@@ -1200,7 +950,7 @@ namespace MapEditor
         /// </summary>
         private void CleanDynamicMaoObjectGos()
         {
-            if(!CheckOperationAvalible())
+            if(!MapUtilities.CheckOperationAvalible(mTarget?.gameObject))
             {
                 return;
             }
@@ -1278,7 +1028,7 @@ namespace MapEditor
         /// </summary>
         private void RecoverDynamicMapObjectGos()
         {
-            if (!CheckOperationAvalible())
+            if (!MapUtilities.CheckOperationAvalible(mTarget?.gameObject))
             {
                 return;
             }
@@ -1346,7 +1096,7 @@ namespace MapEditor
         /// </summary>
         private void OneKeyRecreateMapObjectGos()
         {
-            if (!CheckOperationAvalible())
+            if (!MapUtilities.CheckOperationAvalible(mTarget?.gameObject))
             {
                 return;
             }
@@ -1394,11 +1144,11 @@ namespace MapEditor
             UpdateAllMapObjectDataMonos();
             // 确保所有数据运用到最新
             serializedObject.ApplyModifiedProperties();
-            var isPrefabAssetInstance = PrefabUtility.IsPartOfPrefabInstance(mTarget.gameObject);
+            var isPrefabAssetInstance = PrefabUtility.IsPartOfPrefabInstance(mTarget?.gameObject);
             // 确保数据应用到对应Asset上
             if(isPrefabAssetInstance)
             {
-                PrefabUtility.ApplyPrefabInstance(mTarget.gameObject, InteractionMode.AutomatedAction);
+                PrefabUtility.ApplyPrefabInstance(mTarget?.gameObject, InteractionMode.AutomatedAction);
             }
             MapEditorUtilities.ExportGameMapData(mTarget);
         }
@@ -1408,12 +1158,12 @@ namespace MapEditor
         /// </summary>
         private async void OneKeyBakeAndExport()
         {
-            if(!CheckOperationAvalible())
+            if(!MapUtilities.CheckOperationAvalible(mTarget?.gameObject))
             {
                 return;
             }
             RecoverDynamicMapObjectGos();
-            var navMeshSurface = MapEditorUtilities.GetOrCreateNavMeshSurface(mTarget.gameObject);
+            var navMeshSurface = MapEditorUtilities.GetOrCreateNavMeshSurface(mTarget?.gameObject);
             var bakePathTask = BakePathTask(navMeshSurface);
             var bakePathResult = await bakePathTask;
             CopyNavMeshAsset();
@@ -1503,7 +1253,7 @@ namespace MapEditor
         /// <param name="newUID"></param>
         private void DoChangeMapObjectDataUID(int mapObjectDataIndex, int newUID)
         {
-            if (!CheckOperationAvalible())
+            if (!MapUtilities.CheckOperationAvalible(mTarget?.gameObject))
             {
                 return;
             }
@@ -1538,7 +1288,7 @@ namespace MapEditor
         /// <param name="newUID"></param>
         private void DoChangeMapDataUID(int mapDataIndex, int newUID)
         {
-            if(!CheckOperationAvalible())
+            if(!MapUtilities.CheckOperationAvalible(mTarget?.gameObject))
             {
                 return;
             }

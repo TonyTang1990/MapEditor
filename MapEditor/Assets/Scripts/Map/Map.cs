@@ -116,6 +116,247 @@ namespace MapEditor
         [Header("导出类型")]
         public ExportType ExportType;
 
+#if UNITY_EDITOR
+        /// <summary>
+        /// 执行添加指定地图对象UID数据
+        /// </summary>
+        /// <param name="uid"></param>
+        /// <param name="insertIndex"></param>
+        /// <param name="copyRotation">是否复制旋转</param>
+        /// <returns></returns>
+        private MapObjectData DoAddMapObjectData(int uid, int insertIndex = -1, bool copyRotation = false)
+        {
+            if (!MapUtilities.CheckOperationAvalible(gameObject))
+            {
+                return null;
+            }
+            return AddMapObjectData(uid, insertIndex, copyRotation);
+        }
+
+        /// <summary>
+        /// 添加指定地图对象UID数据
+        /// </summary>
+        /// <param name="uid"></param>
+        /// <param name="insertIndex"></param>
+        /// <param name="copyRotation">是否复制旋转</param>
+        /// <returns></returns>
+        private MapObjectData AddMapObjectData(int uid, int insertIndex = -1, bool copyRotation = false)
+        {
+            var mapObjectConfig = MapSetting.GetEditorInstance().ObjectSetting.GetMapObjectConfigByUID(uid);
+            if (mapObjectConfig == null)
+            {
+                Debug.LogError($"未配置地图对象UID:{uid}配置数据，不支持添加此地图对象数据！");
+                return null;
+            }
+            var mapObjectDataTotalNum = MapObjectDataList.Count;
+            var maxInsertIndex = mapObjectDataTotalNum == 0 ? 0 : mapObjectDataTotalNum;
+            var insertPos = 0;
+            if (insertIndex == -1)
+            {
+                insertPos = maxInsertIndex;
+            }
+            else
+            {
+                insertPos = Math.Clamp(insertIndex, 0, maxInsertIndex);
+            }
+            var mapObjectPosition = MapStartPos;
+            var mapObjectRotation = Quaternion.identity;
+            if (mapObjectDataTotalNum != 0)
+            {
+                var insertMapObjectPos = Math.Clamp(insertPos, 0, maxInsertIndex - 1);
+                var insertMapObjectData = MapObjectDataList[insertMapObjectPos];
+                mapObjectPosition = insertMapObjectData.Go != null ? insertMapObjectData.Go.transform.position : insertMapObjectData.Position;
+                mapObjectRotation = insertMapObjectData.Go != null ? insertMapObjectData.Go.transform.rotation : insertMapObjectData.Rotation;
+            }
+            var instanceGo = CreateGameObjectByUID(uid);
+            if (instanceGo != null && MapObjectAddedAutoFocus)
+            {
+                Selection.SetActiveObjectWithContext(instanceGo, instanceGo);
+            }
+            instanceGo.transform.position = mapObjectPosition;
+            if(copyRotation)
+            {
+                instanceGo.transform.rotation = mapObjectRotation;
+            }
+            var newMapObjectData = new MapObjectData(uid, instanceGo);
+            MapObjectDataList.Insert(insertPos, newMapObjectData);
+            Debug.Log($"插入地图对象UID:{uid}索引:{insertPos}");
+            return newMapObjectData;
+        }
+
+        /// <summary>
+        /// 获取制定索引的地图对象数据
+        /// Note:
+        /// 返回null表示无效索引
+        /// </summary>
+        /// <param name="index"></param>
+        /// <returns></returns>
+        public MapObjectData GetMapObjectDataByIndex(int index)
+        {
+            if (index < 0 || index >= MapObjectDataList.Count)
+            {
+                return null;
+            }
+            return MapObjectDataList[index];
+        }
+
+        /// <summary>
+        /// 获取指定实例对象对应的地图对象数据索引
+        /// Note:
+        /// 返回-1表示找不到制定实例对象对应的地图对象数据
+        /// </summary>
+        /// <param name="go"></param>
+        /// <returns></returns>
+        public int GetMapObjectDataIndexByGo(GameObject go)
+        {
+            return MapObjectDataList.FindIndex(mapObjectData => mapObjectData.Go == go);
+        }
+
+        /// <summary>
+        /// 执行移除指定索引的地图对象数据
+        /// </summary>
+        /// <param name="index"></param>
+        /// <returns></returns>
+        private bool DoRemoveMapObjectDataByIndex(int index)
+        {
+            if (!MapUtilities.CheckOperationAvalible(gameObject))
+            {
+                return false;
+            }
+            return RemoveMapObjectDataByIndex(index);
+        }
+
+        /// <summary>
+        /// 移除指定索引的地图对象数据
+        /// </summary>
+        /// <param name="index"></param>
+        /// <returns></returns>
+        private bool RemoveMapObjectDataByIndex(int index)
+        {
+            var mapObjectDataNum = MapObjectDataList.Count;
+            if (index < 0 || index >= mapObjectDataNum)
+            {
+                Debug.LogError($"指定索引:{index}不是有效索引范围:0-{mapObjectDataNum - 1},移除地图对象数据失败！");
+                return false;
+            }
+            var mapObjectData = MapObjectDataList[index];
+            if (mapObjectData.Go != null)
+            {
+                mapObjectData.Position = Vector3.zero;
+                GameObject.DestroyImmediate(mapObjectData.Go);
+            }
+            MapObjectDataList.RemoveAt(index);
+            return true;
+        }
+
+        /// <summary>
+        /// 执行添加指定地图埋点UID数据
+        /// </summary>
+        /// <param name="uid"></param>
+        /// <param name="insertIndex">插入位置(-1表示插入尾部)</param>
+        /// <param name="copyRotation">是否复制旋转值</param>
+        /// <param name="positionOffset">位置偏移</param>
+        /// <returns></returns>
+        private MapData DoAddMapData(int uid, int insertIndex = -1, bool copyRotation = false, Vector3? positionOffset = null)
+        {
+            if (!MapUtilities.CheckOperationAvalible(gameObject))
+            {
+                return null;
+            }
+            return AddMapData(uid, insertIndex, copyRotation, positionOffset);
+        }
+
+        /// <summary>
+        /// 添加指定地图埋点UID数据
+        /// </summary>
+        /// <param name="uid"></param>
+        /// <param name="insertIndex">插入位置(-1表示插入尾部)</param>
+        /// <param name="copyRotation">是否复制旋转值</param>
+        /// <param name="positionOffset">位置偏移</param>
+        /// <returns></returns>
+        private MapData AddMapData(int uid, int insertIndex = -1, bool copyRotation = false, Vector3? positionOffset = null)
+        {
+            var mapDataConfig = MapSetting.GetEditorInstance().DataSetting.GetMapDataConfigByUID(uid);
+            if (mapDataConfig == null)
+            {
+                Debug.LogError($"未配置地图埋点UID:{uid}配置数据，不支持添加此地图埋点数据！");
+                return null;
+            }
+            var mapDataType = mapDataConfig.DataType;
+            var mapDataTotalNum = MapDataList.Count;
+            var maxInsertIndex = mapDataTotalNum == 0 ? 0 : mapDataTotalNum;
+            var insertPos = 0;
+            if (insertIndex == -1)
+            {
+                insertPos = maxInsertIndex;
+            }
+            else
+            {
+                insertPos = Math.Clamp(insertIndex, 0, maxInsertIndex);
+            }
+            var mapDataPosition = MapStartPos.vector3Value;
+            var mapDataRotation = mapDataConfig.Rotation;
+            if (mapDataTotalNum != 0)
+            {
+                var insertMapDataPos = Math.Clamp(insertPos, 0, maxInsertIndex - 1);
+                var insertMapData = MapDataList[insertMapDataPos];
+                mapDataPosition = insertMapData != null ? insertMapData.Position : mapDataPosition;
+                if(copyRotation)
+                {
+                    mapDataRotation = insertMapData != null ? insertMapData.Rotation : mapDataConfig.Rotation;
+                }
+            }
+            if(positionOffset != null)
+            {
+                mapDataPosition += (Vector3)positionOffset;
+            }
+            var newMapData = MapUtilities.CreateMapDataByType(mapDataType, uid, mapDataPosition, mapDataRotation);
+            MapDataList.Insert(insertPos, newMapData);
+            return newMapData;
+        }
+
+        /// <summary>
+        /// 执行移除指定索引的地图埋点数据
+        /// </summary>
+        /// <param name="index"></param>
+        /// <returns></returns>
+        private bool DoRemoveMapDataByIndex(int index)
+        {
+            if (!MapUtilities.CheckOperationAvalible(gameObject))
+            {
+                return false;
+            }
+            return RemoveMapDataByIndex(index);
+        }
+
+        /// <summary>
+        /// 移除指定索引的地图埋点数据
+        /// </summary>
+        /// <param name="index"></param>
+        /// <returns></returns>
+        private bool RemoveMapDataByIndex(int index)
+        {
+            var mapDataNum = MapDataList.Count;
+            if (index < 0 || index >= mapDataNum)
+            {
+                Debug.LogError($"指定索引:{index}不是有效索引范围:0-{mapDataNum - 1},移除地图埋点数据失败！");
+                return false;
+            }
+            MapDataList.RemoveAt(index);
+            return true;
+        }
+
+        /// <summary>
+        /// 清除所有地图埋点批量选择
+        /// </summary>
+        public void ClearAllMapDataBatchOperation()
+        {
+            for(int i = 0, length = MapDataList.Count; i < length; i++)
+            {
+                MapDataList[i].BatchOperationSwitch = false;
+            }
+        }
+
         /// <summary>
         /// 选中Gizmos显示
         /// </summary>
@@ -201,5 +442,6 @@ namespace MapEditor
             Gizmos.DrawWireSphere(position, monsterGroupMapData.MonsterActiveRadius);
             Gizmos.color = preGizmosColor;
         }
+#endif
     }
 }
