@@ -56,10 +56,7 @@ namespace MapEditor
             }
             else if(ColliderType == ColliderType.SPHERE)
             {
-                var lossyScale = gameObject.transform.lossyScale;
-                var maxLossyScaleValue = Mathf.Max(lossyScale.x, lossyScale.y, lossyScale.z);
-                var sphereRadius = Radius * maxLossyScaleValue;
-                Gizmos.DrawWireSphere(Center, sphereRadius);
+                Gizmos.DrawWireSphere(Center, Radius);
             }
             Gizmos.color = preGizmoColor;
             Gizmos.matrix = preGizmosMatrix;
