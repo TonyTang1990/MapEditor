@@ -30,6 +30,11 @@ namespace MapEditor
         public const int DefaultMapHeight = 30;
 
         /// <summary>
+        /// 地图九宫格默认大小
+        /// </summary>
+        public const float DefaultGridSize = 6f;
+
+        /// <summary>
         /// GameObject类型信息
         /// </summary>
         public static readonly Type GameObjectType = typeof(UnityEngine.GameObject);

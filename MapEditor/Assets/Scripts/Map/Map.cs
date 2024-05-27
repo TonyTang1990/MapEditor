@@ -25,10 +25,16 @@ namespace MapEditor
         public bool SceneGUISwitch = true;
 
         /// <summary>
-        /// 地图线条GUI开关
+        /// 地图网格GUI开关
         /// </summary>
-        [Header("地图线条GUI开关")]
+        [Header("地图网格GUI开关")]
         public bool MapLineGUISwitch = true;
+
+        /// <summary>
+        /// 地图区域GUI开关
+        /// </summary>
+        [Header("地图区域GUI开关")]
+        public bool MapAreaGUISwitch = false;
 
         /// <summary>
         /// 地图对象场景GUI开关
@@ -67,6 +73,13 @@ namespace MapEditor
         /// </summary>
         [Header("地图起始位置")]
         public Vector3 MapStartPos = Vector3.zero;
+
+        /// <summary>
+        /// 区域九宫格大小
+        /// </summary>
+        [Header("区域九宫格大小")]
+        [Range(1f, 100f)]
+        public float GridSize;
 
         /// <summary>
         /// 自定义地形Asset

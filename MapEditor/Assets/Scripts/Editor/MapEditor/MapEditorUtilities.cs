@@ -1076,5 +1076,90 @@ namespace MapEditor
             }
             return false;
         }
+
+        /// <summary>
+        /// 获取指定位置的九宫格的X和Z
+        /// </summary>
+        /// <param name="position"></param>
+        /// <param name="gridSize"></param>
+        /// <returns></returns>
+        public static int GetGridXZByPosition(Vector3 position, float gridSize)
+        {
+            // 不考虑地图起点偏移，默认参考0,0点计算
+            var gridX = position.x >= 0 ? Mathf.FloorToInt(position.x / gridSize) : -Mathf.CeilToInt(-position.x / gridSize);
+            var gridZ = position.z >= 0 ? Mathf.FloorToInt(position.z / gridSize) : -Mathf.CeilToInt(-position.z / gridSize);
+            return new KeyValuePair<int, int>(gridX, gridZ);
+
+
+        }
+
+        /// <summary>
+        /// 获取指定位置的九宫格UID
+        /// </summary>
+        /// <param name="position"></param>
+        /// <param name="gridSize"></param>
+        /// <returns></returns>
+        public static int GetGridUIDByPosition(Vector3 position, float gridSize)
+        {
+            var gridXZ = GetGridXYByPosition(position, gridSize);
+            return GetGridUID(gridXZ.Key, gridXZ.Value);
+        }
+
+        /// <summary>
+        /// 获取指定X和Z的九宫格UID
+        /// </summary>
+        /// <param name="gridX"></param>
+        /// <param name="gridZ"></param>
+        /// <returns></returns>
+        public static int GetGridUID(int gridX, int gridZ)
+        {
+            return gridX + gridZ * 10000;
+        }
+
+        /// <summary>
+        /// 获取指定数据所占据的UID列表
+        /// </summary>
+        /// <param name="position"></param>
+        /// <param name="rotation"></param>
+        /// <param name="colliderCenter"></param>
+        /// <param name="colliderSize"></param>
+        /// <param name="gridSize"></param>
+        /// <returns></returns>
+        public static List<int> GetGridUIDs(Vector3 position, Vector3 rotation, Vector3 colliderCenter, Vector3 colliderSize, float gridSize)
+        {
+            // 目前当做2D考虑，只考虑Y轴旋转
+            var gridUIDs = new List<int>();
+            var colCenter = position + colliderCenter;
+            var halfColliderSize = colliderSize / 2;
+            var boxBLPos = new Vector3(-halfColliderSize.x, 0, -halfColliderSize.z);
+            var boxTLPos = new Vector3(-halfColliderSize.x, 0, halfColliderSize.z);
+            var boxTRPos = new Vector3(-halfColliderSize.x, 0, halfColliderSize.z);
+            var boxBRPos = new Vector3(-halfColliderSize.x, 0, -halfColliderSize.z);
+            var rotationQuaterion = Quaternion.AngleAxis(rotation.y, Vector3.up);
+            boxBLPos = rotationQuaterion * boxBLPos + colCenter;
+            boxTLPos = rotationQuaterion * boxTLPos + colCenter;
+            boxTRPos = rotationQuaterion * boxTRPos + colCenter;
+            boxBRPos = rotationQuaterion * boxBRPos + colCenter;
+            var boxBLGridXZ = GetGridXZByPosition(boxBLPos);
+            var boxTLGridXZ = GetGridXZByPosition(boxTLPos);
+            var boxTRGridXZ = GetGridXZByPosition(boxTRPos);
+            var boxBRGridXZ = GetGridXZByPosition(boxBRPos);
+            var boxMinGridX = Mathf.Min(boxBLGridXZ.Key, boxTLGridXZ.Key, boxTRGridXZ.Key, boxBRGridXZ.Key);
+            var boxMaxGridX = Mathf.Max(boxBLGridXZ.Key, boxTLGridXZ.Key, boxTRGridXZ.Key, boxBRGridXZ.Key);
+            var boxMinGridZ = Mathf.Min(boxBLGridXZ.Value, boxTLGridXZ.Value, boxTRGridXZ.Value, boxBRGridXZ.Value);
+            var boxMaxGridZ = Mathf.Max(boxBLGridXZ.Value, boxTLGridXZ.Value, boxTRGridXZ.Value, boxBRGridXZ.Value);
+            for(int gridX = boxMinGridX; gridX <= boxMaxGridX; gridX++)
+            {
+                for(int gridZ = boxMinGridZ; gridZ <= boxMaxGridZ; gridZ++)
+                {
+                    var gridUID = GetGridUID(gridX, gridZ);
+                    if(!gridUIDs.Contains(gridUID))
+                    {
+                        gridUIDs.Add(gridUID);
+                    }
+                }
+            }
+            return gridUIDs;
+        }
     }
 }

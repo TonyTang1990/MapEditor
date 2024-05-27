@@ -46,6 +46,10 @@ namespace MapEditor
         [Range(1, 1000)]
         public int DefaultMapHeight = MapConst.DefaultMapHeight;
 
+        [Header("默认区域九宫格大小")]
+        [Range(1f, 100f)]
+        public float DefaultGridSize = MapConst.DefaultGridSize;
+
         /// <summary>
         /// 地图对象配置数据
         /// </summary>

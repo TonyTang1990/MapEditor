@@ -50,6 +50,11 @@ namespace MapEditor
         private SerializedProperty mMapLineGUISwitchProperty;
 
         /// <summary>
+        /// MapAreaGUISwitch属性
+        /// </summary>
+        private SerializedProperty mMapAreaGUISwitchProperty;
+
+        /// <summary>
         /// MapObjectSceneGUISwitch属性
         /// </summary>
         private SerializedProperty mMapObjectSceneGUISwitchProperty;
@@ -78,6 +83,11 @@ namespace MapEditor
         /// MapStartPos属性
         /// </summary>
         private SerializedProperty mMapStartPosProperty;
+
+        /// <summary>
+        /// GridSize属性
+        /// </summary>
+        private SerializedProperty mGridSizeProperty;
 
         /// <summary>
         /// MapTerrianAsset属性
@@ -138,6 +148,11 @@ namespace MapEditor
         /// 纵向绘制线条数据列表<起点, 终点>列表
         /// </summary>
         private List<KeyValuePair<Vector3, Vector3>> mVDrawLinesDataList = new List<KeyValuePair<Vector3, Vector3>>();
+
+        /// <summary>
+        /// 九宫格绘制数据<中心点，九宫格UID>列表
+        /// </summary>
+        private List<KeyValuePair<Vector3, int>> mGridDataList = new List<KeyValuePair<Vector3, int>>();
 
         /// <summary>
         /// 操作面板标题列表
@@ -220,6 +235,7 @@ namespace MapEditor
             InitGUIStyles();
             mMapWidthProperty.intValue = mMapWidthProperty.intValue == 0 ? MapSetting.GetEditorInstance().DefaultMapWidth : mMapWidthProperty.intValue;
             mMapHeightProperty.intValue = mMapHeightProperty.intValue == 0 ? MapSetting.GetEditorInstance().DefaultMapHeight : mMapHeightProperty.intValue;
+            mGridSizeProperty.floatValue = Mathf.Approximately(mGridSizeProperty.floatValue, 0f) ? MapSetting.GetEditorInstance().DefaultGridSize : mGridSizeProperty.floatValue;
             CreateAllNodes();
             UpdateMapObjectDataChoiceDatas();
             UpdateMapDataChoiceDatas();
@@ -247,13 +263,15 @@ namespace MapEditor
         private void InitProperties()
         {
             mSceneGUISwitchProperty ??= serializedObject.FindProperty("SceneGUISwitch");
-            mMapLineGUISwitchProperty ??= serializedObject.FindProperty("MapLineGUISwitch");            
+            mMapLineGUISwitchProperty ??= serializedObject.FindProperty("MapLineGUISwitch");
+            mMapAreaGUISwitchProperty ??= serializedObject.FindProperty("MapAreaGUISwitch");
             mMapObjectSceneGUISwitchProperty ??= serializedObject.FindProperty("MapObjectSceneGUISwitch");
             mMapDataSceneGUISwitchProperty ??= serializedObject.FindProperty("MapDataSceneGUISwitch");
             mMapObjectAddedAutoFocusProperty ??= serializedObject.FindProperty("MapObjectAddedAutoFocus");            
             mMapWidthProperty ??= serializedObject.FindProperty("MapWidth");
             mMapHeightProperty ??= serializedObject.FindProperty("MapHeight");
             mMapStartPosProperty ??= serializedObject.FindProperty("MapStartPos");
+            mGridSizeProperty ??= serializedObject.FindProperty("GridSize");
             mMapTerrianAssetProperty ??= serializedObject.FindProperty("MapTerrianAsset");
             mMapObjectDataListProperty ??= serializedObject.FindProperty("MapObjectDataList");
             mMapDataListProperty ??= serializedObject.FindProperty("MapDataList");
@@ -644,6 +662,19 @@ namespace MapEditor
         }
 
         /// <summary>
+        /// 更新地图区域九宫格大小绘制数据
+        /// </summary>
+        private void UpdateGridSizeDrawDatas()
+        {
+            mGridDataList.Clear();
+            var gridSize = mGridSizeProperty.floatValue;
+            var mapWidth = mMapWidthProperty.intValue;
+            var mapHeight = mMapHeightProperty.intValue;
+            var startPos = mMapStartPosProperty.vector3Value;
+            var mapStartGridXZ = MapEditorUtilities.
+        }
+
+        /// <summary>
         /// 更新地图对象位置
         /// </summary>
         private void UpdateMapGOPosition()
@@ -775,7 +806,58 @@ namespace MapEditor
         /// <returns></returns>
         private MapObjectData DoAddMapObjectData(int uid, int insertIndex = -1)
         {
-             return mTarget != null ? mTarget.DoAddMapObjectData(uid, insertIndex) : null;
+            if (!MapUtilities.IsOperationAvalible(mTarget?.gameObject))
+            {
+                return null;
+            }
+            return AddMapObjectData(uid, insertIndex);
+        }
+
+        /// <summary>
+        /// 添加指定地图对象UID数据
+        /// </summary>
+        /// <param name="uid"></param>
+        /// <param name="insertIndex"></param>
+        /// <returns></returns>
+        private MapObjectData AddMapObjectData(int uid, int insertIndex = -1)
+        {
+            var mapObjectConfig = MapSetting.GetEditorInstance().ObjectSetting.GetMapObjectConfigByUID(uid);
+            if (mapObjectConfig == null)
+            {
+                Debug.LogError($"未配置地图对象UID:{uid}配置数据，不支持添加此地图对象数据！");
+                return null;
+            }
+            var mapObjectDataTotalNum = mMapObjectDataListProperty.arraySize;
+            var maxInsertIndex = mapObjectDataTotalNum == 0 ? 0 : mapObjectDataTotalNum;
+            var insertPos = 0;
+            if (insertIndex == -1)
+            {
+                insertPos = maxInsertIndex;
+            }
+            else
+            {
+                insertPos = Math.Clamp(insertIndex, 0, maxInsertIndex);
+            }
+            var mapObjectPosition = mMapStartPosProperty.vector3Value;
+            if (mapObjectDataTotalNum != 0)
+            {
+                var insertMapObjectPos = Math.Clamp(insertPos, 0, maxInsertIndex - 1);
+                var insertMapObjectProperty = mMapObjectDataListProperty.GetArrayElementAtIndex(insertMapObjectPos);
+                var insertMapObjectData = insertMapObjectProperty.managedReferenceValue as MapObjectData;
+                mapObjectPosition = insertMapObjectData.Go != null ? insertMapObjectData.Go.transform.position : insertMapObjectData.Position;
+            }
+            var instanceGo = CreateGameObjectByUID(uid);
+            if (instanceGo != null && mMapObjectAddedAutoFocusProperty.boolValue)
+            {
+                Selection.SetActiveObjectWithContext(instanceGo, instanceGo);
+            }
+            instanceGo.transform.position = mapObjectPosition;
+            var newMapObjectData = new MapObjectData(uid, instanceGo);
+            mMapObjectDataListProperty.InsertArrayElementAtIndex(insertPos);
+            var newMapObjectDataProperty = mMapObjectDataListProperty.GetArrayElementAtIndex(insertPos);
+            newMapObjectDataProperty.managedReferenceValue = newMapObjectData;
+            serializedObject.ApplyModifiedProperties();
+            return newMapObjectData;
         }
 
         /// <summary>
@@ -785,7 +867,37 @@ namespace MapEditor
         /// <returns></returns>
         private bool DoRemoveMapObjectDataByIndex(int index)
         {
-            return mTarget != null ? mTarget.DoRemoveMapObjectDataByIndex(index) : false;
+            if (!MapUtilities.IsOperationAvalible(mTarget?.gameObject))
+            {
+                return false;
+            }
+            return RemoveMapObjectDataByIndex(index);
+        }
+
+        /// <summary>
+        /// 移除指定索引的地图对象数据
+        /// </summary>
+        /// <param name="index"></param>
+        /// <returns></returns>
+        private bool RemoveMapObjectDataByIndex(int index)
+        {
+            var mapObjectDataNum = mMapObjectDataListProperty.arraySize;
+            if (index < 0 || index >= mapObjectDataNum)
+            {
+                Debug.LogError($"指定索引:{index}不是有效索引范围:0-{mapObjectDataNum - 1},移除地图对象数据失败！");
+                return false;
+            }
+            var mapObjectDataProperty = mMapObjectDataListProperty.GetArrayElementAtIndex(index);
+            var goProperty = mapObjectDataProperty.FindPropertyRelative("Go");
+            if (goProperty.objectReferenceValue != null)
+            {
+                var positionProperty = mapObjectDataProperty.FindPropertyRelative("Position");
+                positionProperty.vector3Value = Vector3.zero;
+                GameObject.DestroyImmediate(goProperty.objectReferenceValue);
+            }
+            mMapObjectDataListProperty.DeleteArrayElementAtIndex(index);
+            serializedObject.ApplyModifiedProperties();
+            return true;
         }
 
         /// <summary>
@@ -796,9 +908,54 @@ namespace MapEditor
         /// <returns></returns>
         private MapData DoAddMapData(int uid, int insertIndex = -1)
         {
-            return mTarget != null ? mTarget.DoAddMapData(uid, insertIndex) : null;
+            if (!MapUtilities.IsOperationAvalible(mTarget?.gameObject))
+            {
+                return null;
+            }
+            return AddMapData(uid, insertIndex);
         }
 
+        /// <summary>
+        /// 添加指定地图埋点UID数据
+        /// </summary>
+        /// <param name="uid"></param>
+        /// <param name="insertIndex"></param>
+        /// <returns></returns>
+        private MapData AddMapData(int uid, int insertIndex = -1)
+        {
+            var mapDataConfig = MapSetting.GetEditorInstance().DataSetting.GetMapDataConfigByUID(uid);
+            if (mapDataConfig == null)
+            {
+                Debug.LogError($"未配置地图埋点UID:{uid}配置数据，不支持添加此地图埋点数据！");
+                return null;
+            }
+            var mapDataType = mapDataConfig.DataType;
+            var mapDataTotalNum = mMapDataListProperty.arraySize;
+            var maxInsertIndex = mapDataTotalNum == 0 ? 0 : mapDataTotalNum;
+            var insertPos = 0;
+            if (insertIndex == -1)
+            {
+                insertPos = maxInsertIndex;
+            }
+            else
+            {
+                insertPos = Math.Clamp(insertIndex, 0, maxInsertIndex);
+            }
+            var mapDataPosition = mMapStartPosProperty.vector3Value;
+            if (mapDataTotalNum != 0)
+            {
+                var insertMapDataPos = Math.Clamp(insertPos, 0, maxInsertIndex - 1);
+                var insertMapDataProperty = mMapDataListProperty.GetArrayElementAtIndex(insertMapDataPos);
+                var insertMapData = insertMapDataProperty.managedReferenceValue as MapData;
+                mapDataPosition = insertMapData != null ? insertMapData.Position : mapDataPosition;
+            }
+            var newMapData = MapUtilities.CreateMapDataByType(mapDataType, uid, mapDataPosition, mapDataConfig.Rotation);
+            mMapDataListProperty.InsertArrayElementAtIndex(insertPos);
+            var newMapDataProperty = mMapDataListProperty.GetArrayElementAtIndex(insertPos);
+            newMapDataProperty.managedReferenceValue = newMapData;
+            serializedObject.ApplyModifiedProperties();
+            return newMapData;
+        }
 
         /// <summary>
         /// 执行移除指定索引的地图埋点数据
@@ -807,7 +964,29 @@ namespace MapEditor
         /// <returns></returns>
         private bool DoRemoveMapDataByIndex(int index)
         {
-            return mTarget != null ? mTarget.DoRemoveMapDataByIndex(index) : false;
+            if (!MapUtilities.IsOperationAvalible(mTarget?.gameObject))
+            {
+                return false;
+            }
+            return RemoveMapDataByIndex(index);
+        }
+
+        /// <summary>
+        /// 移除指定索引的地图埋点数据
+        /// </summary>
+        /// <param name="index"></param>
+        /// <returns></returns>
+        private bool RemoveMapDataByIndex(int index)
+        {
+            var mapDataNum = mMapDataListProperty.arraySize;
+            if (index < 0 || index >= mapDataNum)
+            {
+                Debug.LogError($"指定索引:{index}不是有效索引范围:0-{mapDataNum - 1},移除地图埋点数据失败！");
+                return false;
+            }
+            mMapDataListProperty.DeleteArrayElementAtIndex(index);
+            serializedObject.ApplyModifiedProperties();
+            return true;
         }
 
         /// <summary>
@@ -1340,6 +1519,7 @@ namespace MapEditor
             EditorGUILayout.BeginVertical();
             EditorGUILayout.PropertyField(mSceneGUISwitchProperty);
             EditorGUILayout.PropertyField(mMapLineGUISwitchProperty);
+            EditorGUILayout.PropertyField(mMapAreaGUISwitchProperty);
             EditorGUILayout.PropertyField(mMapObjectSceneGUISwitchProperty);
             EditorGUILayout.PropertyField(mMapDataSceneGUISwitchProperty);
             EditorGUILayout.PropertyField(mMapObjectAddedAutoFocusProperty);
@@ -1352,6 +1532,23 @@ namespace MapEditor
                 UpdateMapSizeDrawDatas();
                 UpdateMapGOPosition();
                 UpdateTerrianSizeAndPos();
+                UpdateGridSizeDrawDatas();
+            }
+
+            EditorGUI.BeginChangeCheck();
+            EditorGUILayout.PropertyField(mMapStartPosProperty);
+            if(EditorGUI.EndChangeCheck())
+            {
+                UpdateMapSizeDrawDatas();
+                UpdateGridSizeDrawDatas();
+                UpdateMapGOPosition();
+            }
+
+            EditorGUILayout.BeginChangeCheck();
+            EditorGUILayout.PropertyField(mGridSizeProperty);
+            if(EditorGUI.EndChangeCheck())
+            {
+                UpdateGridSizeDrawDatas();
             }
 
             EditorGUI.BeginChangeCheck();
