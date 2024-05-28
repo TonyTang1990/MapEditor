@@ -945,8 +945,9 @@ namespace MapEditor
         /// 获取指定地图对象数据的地图动态对象碰撞体导出数据
         /// </summary>
         /// <param name="mapObjectData"></param>
+        /// <param name="gridSize"></param>
         /// <returns></returns>
-        private static ColliderMapDynamicExport GetColliderMapDynamicExport(MapObjectData mapObjectData)
+        private static ColliderMapDynamicExport GetColliderMapDynamicExport(MapObjectData mapObjectData, float gridSize)
         {
             if(mapObjectData == null)
             {
@@ -960,7 +961,8 @@ namespace MapEditor
                 Debug.LogError($"找不到地图对象UID:{mapObjectUID}的配置，获取地图动态对象数据碰撞体导出数据失败！");
                 return null;
             }
-            return new ColliderMapDynamicExport(mapObjectConfig.ObjectType, mapObjectConfig.ConfId, mapObjectData.Position, mapObjectData.Rotation,
+            var colliderGridGUIDs = GetGridUIDs(mapObjectData.Position, mapObjectData.Rotation, mapObjectData.ColliderCenter, mapObjectData.ColliderSize, gridSize);
+            return new ColliderMapDynamicExport(mapObjectConfig.ObjectType, mapObjectConfig.ConfId, mapObjectData.Position, mapObjectData.Rotation, colliderGridGUIDs,
                                                     mapObjectData.ColliderCenter, mapObjectData.ColliderSize, mapObjectData.ColliderRadius);
         }
 
@@ -1083,14 +1085,12 @@ namespace MapEditor
         /// <param name="position"></param>
         /// <param name="gridSize"></param>
         /// <returns></returns>
-        public static int GetGridXZByPosition(Vector3 position, float gridSize)
+        public static KeyValuePair<int, int> GetGridXZByPosition(Vector3 position, float gridSize)
         {
             // 不考虑地图起点偏移，默认参考0,0点计算
             var gridX = position.x >= 0 ? Mathf.FloorToInt(position.x / gridSize) : -Mathf.CeilToInt(-position.x / gridSize);
             var gridZ = position.z >= 0 ? Mathf.FloorToInt(position.z / gridSize) : -Mathf.CeilToInt(-position.z / gridSize);
             return new KeyValuePair<int, int>(gridX, gridZ);
-
-
         }
 
         /// <summary>
@@ -1101,7 +1101,7 @@ namespace MapEditor
         /// <returns></returns>
         public static int GetGridUIDByPosition(Vector3 position, float gridSize)
         {
-            var gridXZ = GetGridXYByPosition(position, gridSize);
+            var gridXZ = GetGridXZByPosition(position, gridSize);
             return GetGridUID(gridXZ.Key, gridXZ.Value);
         }
 
@@ -1140,10 +1140,10 @@ namespace MapEditor
             boxTLPos = rotationQuaterion * boxTLPos + colCenter;
             boxTRPos = rotationQuaterion * boxTRPos + colCenter;
             boxBRPos = rotationQuaterion * boxBRPos + colCenter;
-            var boxBLGridXZ = GetGridXZByPosition(boxBLPos);
-            var boxTLGridXZ = GetGridXZByPosition(boxTLPos);
-            var boxTRGridXZ = GetGridXZByPosition(boxTRPos);
-            var boxBRGridXZ = GetGridXZByPosition(boxBRPos);
+            var boxBLGridXZ = GetGridXZByPosition(boxBLPos, gridSize);
+            var boxTLGridXZ = GetGridXZByPosition(boxTLPos, gridSize);
+            var boxTRGridXZ = GetGridXZByPosition(boxTRPos, gridSize);
+            var boxBRGridXZ = GetGridXZByPosition(boxBRPos, gridSize);
             var boxMinGridX = Mathf.Min(boxBLGridXZ.Key, boxTLGridXZ.Key, boxTRGridXZ.Key, boxBRGridXZ.Key);
             var boxMaxGridX = Mathf.Max(boxBLGridXZ.Key, boxTLGridXZ.Key, boxTRGridXZ.Key, boxBRGridXZ.Key);
             var boxMinGridZ = Mathf.Min(boxBLGridXZ.Value, boxTLGridXZ.Value, boxTRGridXZ.Value, boxBRGridXZ.Value);

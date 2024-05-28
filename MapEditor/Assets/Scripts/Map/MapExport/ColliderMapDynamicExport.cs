@@ -31,9 +31,10 @@ namespace MapEditor
         /// </summary>
         public float ColliderRiduis;
 
-        public ColliderMapDynamicExport(MapObjectType mapObjectType, int confId, Vector3 position, Vector3 rotation,
-                                            Vector3 colliderCenter, Vector3 colliderSize, float colliderRiduis)
-                                                : base(mapObjectType, confId, position, rotation)
+        public ColliderMapDynamicExport(MapObjectType mapObjectType, int confId, Vector3 position,
+                                            Vector3 rotation, List<int> ownerGridUIDs, Vector3 colliderCenter,
+                                                Vector3 colliderSize, float colliderRiduis)
+                                                : base(mapObjectType, confId, position, rotation, ownerGridUIDs)
         {
             ColliderCenter = colliderCenter;
             ColliderSize = colliderSize;

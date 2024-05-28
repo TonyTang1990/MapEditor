@@ -31,6 +31,12 @@ namespace MapEditor
         public bool MapLineGUISwitch = true;
 
         /// <summary>
+        /// 区域GUI开关
+        /// </summary>
+        [Header("区域GUI开关")]
+        public bool MapAreaGUISwitch = false;
+
+        /// <summary>
         /// 地图区域GUI开关
         /// </summary>
         [Header("地图区域GUI开关")]

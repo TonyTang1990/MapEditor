@@ -244,6 +244,7 @@ namespace MapEditor
             UpdateMapGOPosition();
             UpdateTerrianSizeAndPos();
             UpdateMapObjectDataLogicDatas();
+            UpdateGridSizeDrawDatas();
             CorrectAddMapObjectIndexValue();
             CorrectAddMapDataIndexValue();
             serializedObject.ApplyModifiedProperties();
@@ -264,6 +265,7 @@ namespace MapEditor
         {
             mSceneGUISwitchProperty ??= serializedObject.FindProperty("SceneGUISwitch");
             mMapLineGUISwitchProperty ??= serializedObject.FindProperty("MapLineGUISwitch");
+            mMaAreaGridGUISwitchProperty ??= serializedObject.FindProperty("MaAreaGridGUISwitch");            
             mMapAreaGUISwitchProperty ??= serializedObject.FindProperty("MapAreaGUISwitch");
             mMapObjectSceneGUISwitchProperty ??= serializedObject.FindProperty("MapObjectSceneGUISwitch");
             mMapDataSceneGUISwitchProperty ??= serializedObject.FindProperty("MapDataSceneGUISwitch");
@@ -671,7 +673,38 @@ namespace MapEditor
             var mapWidth = mMapWidthProperty.intValue;
             var mapHeight = mMapHeightProperty.intValue;
             var startPos = mMapStartPosProperty.vector3Value;
-            var mapStartGridXZ = MapEditorUtilities.
+            var mapStartGridXZ = MapEditorUtilities.GetGridXZByPosition(startPos, gridSize);
+            var maxMapPos = startPos;
+            maxMapPos.x = maxMapPos.x + mapWidth;
+            maxMapPos.z = maxMapPos.z + mapHeight;
+            var mapMaxGridXZ = MapEditorUtilities.GetGridXZByPosition(maxMapPos, gridSize);
+            var gridMinX = mapStartGridXZ.Key;
+            var gridMinZ = mapStartGridXZ.Value;
+            var gridMaxX = mapMaxGridXZ.Key;
+            var gridMaxZ = mapMaxGridXZ.Value;
+            for(int i = 0; i < mMapObjectDataListProperty.arraySize; i++)
+            {
+                var mapObjectDataProperty = mMapObjectDataListProperty.GetArrayElementAtIndex(i);
+                var positionProperty = mapObjectDataProperty.FindPropertyRelative("Position");
+                var position = positionProperty.vector3Value;
+                var gridXZ = MapEditorUtilities.GetGridXZByPosition(position, gridSize);
+                gridMinX = Mathf.Min(gridMinX, gridXZ.Key);
+                gridMinZ = Mathf.Min(gridMinZ, gridXZ.Value);
+                gridMaxX = Mathf.Min(gridMaxX, gridMaxZ.Key);
+                gridMaxZ = Mathf.Min(gridMaxZ, gridMaxZ.Value);
+            }
+            var gridVector3Size = new Vector3(gridSize, 0, gridSize);
+            var halfGridVector3Size = gridVector3Size / 2;
+            for(int gridX = gridMinX; gridX <= gridMaxX; gridX++)
+            {
+                for(int gridZ = gridMinZ; gridZ <= gridMaxZ; gridZ++)
+                {
+                    var gridCenterData = new Vector3(gridX * gridSize + halfGridVector3Size.x, 0, gridZ * gridSize + halfGridVector3Size.z);
+                    var gridUID = MapEditorUtilities.GetGridUID(gridX, gridZ);
+                    var gridData = new KeyValuePair<Vector3, int>(gridCenterData, gridUID);
+                    mGridDataList.Add(gridData);
+                }
+            }
         }
 
         /// <summary>
@@ -2130,9 +2163,13 @@ namespace MapEditor
                 var currentEvent = Event.current;
                 if (currentEvent.type == EventType.Repaint)
                 {
-                    if(mMapLineGUISwitchProperty.boolValue)
+                    if (mMapLineGUISwitchProperty.boolValue)
                     {
                         DrawMapLines();
+                    }
+                    if (mMapAreaGUISwitchProperty.boolValue)
+                    {
+                        DrawMapGridRects();
                     }
                     if (mMapObjectSceneGUISwitchProperty != null && mMapObjectSceneGUISwitchProperty.boolValue)
                     {
@@ -2213,6 +2250,23 @@ namespace MapEditor
             {
                 Handles.DrawLine(verticalLineData.Key, verticalLineData.Value, 2f);
             }
+        }
+
+        /// <summary>
+        /// 绘制九宫格Rect
+        /// </summary>
+        private void DrawMapGridRects()
+        {
+            var preHandlesColor = Handles.color;
+            Handles.color = Color.yellow;
+            var gridSize = mGridSizeProperty.floatValue;
+            var gridVector3Size = new Vector3(gridSize, 0, gridSize);
+            for(int i = 0; i < mGridDataList.Count; i++)
+            {
+                Handles.DrawWireCube(mGridDataList[i].Key, gridVector3Size);
+                Handles.Label(mGridDataList[i].Key, $"区域{mGridDataList[i].Value}");
+            }
+            Handles.color = preHandlesColor;
         }
 
         /// <summary>

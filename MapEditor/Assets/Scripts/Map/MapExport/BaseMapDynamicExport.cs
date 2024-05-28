@@ -36,12 +36,18 @@ namespace MapEditor
         /// </summary>
         public Vector3 Rotation;
 
-        public BaseMapDynamicExport(MapObjectType mapObjectType, int confId, Vector3 position, Vector3 rotation)
+        /// <summary>
+        /// 所属九宫格UID列表
+        /// </summary>
+        public List<int> OwnerGridUIDs;
+
+        public BaseMapDynamicExport(MapObjectType mapObjectType, int confId, Vector3 position, Vector3 rotation, List<int> ownerGridUIDs = null) 
         {
             MapObjectType = mapObjectType;
             ConfId = confId;
             Position = position;
             Rotation = rotation;
+            OwnerGridUIDs = ownerGridUIDs;
         }
     }
 }
