@@ -26,19 +26,12 @@ namespace MapEditor
         /// </summary>
         public Vector3 ColliderSize;
 
-        /// <summary>
-        /// 碰撞体半径
-        /// </summary>
-        public float ColliderRiduis;
-
         public ColliderMapDynamicExport(MapObjectType mapObjectType, int confId, Vector3 position,
-                                            Vector3 rotation, List<int> ownerGridUIDs, Vector3 colliderCenter,
-                                                Vector3 colliderSize, float colliderRiduis)
+                                            Vector3 rotation, List<int> ownerGridUIDs, Vector3 colliderCenter, Vector3 colliderSize)
                                                 : base(mapObjectType, confId, position, rotation, ownerGridUIDs)
         {
             ColliderCenter = colliderCenter;
             ColliderSize = colliderSize;
-            ColliderRiduis = colliderRiduis;
         }
     }
 }

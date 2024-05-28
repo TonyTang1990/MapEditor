@@ -962,8 +962,8 @@ namespace MapEditor
                 return null;
             }
             var colliderGridGUIDs = GetGridUIDs(mapObjectData.Position, mapObjectData.Rotation, mapObjectData.ColliderCenter, mapObjectData.ColliderSize, gridSize);
-            return new ColliderMapDynamicExport(mapObjectConfig.ObjectType, mapObjectConfig.ConfId, mapObjectData.Position, mapObjectData.Rotation, colliderGridGUIDs,
-                                                    mapObjectData.ColliderCenter, mapObjectData.ColliderSize, mapObjectData.ColliderRadius);
+            return new ColliderMapDynamicExport(mapObjectConfig.ObjectType, mapObjectConfig.ConfId, mapObjectData.Position,
+                                                mapObjectData.Rotation, colliderGridGUIDs, mapObjectData.ColliderCenter, mapObjectData.ColliderSize);
         }
 
         /// <summary>

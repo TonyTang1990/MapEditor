@@ -442,16 +442,10 @@ namespace MapEditor
                     rotationProperty.vector3Value = mapObjectGO.transform.rotation.eulerAngles;
                     localScaleProperty.vector3Value = mapObjectGO.transform.localScale;
                     var boxCollider = mapObjectGO.GetComponent<BoxCollider>();
-                    var sphereCollider = mapObjectGO.GetComponent<SphereCollider>();
                     if (boxCollider != null)
                     {
                         colliderCenterProperty.vector3Value = boxCollider.center;
                         colliderSizeProperty.vector3Value = boxCollider.size;
-                    }
-                    if(sphereCollider != null)
-                    {
-                        colliderCenterProperty.vector3Value = sphereCollider.center;
-                        colliderRadiusProperty.floatValue = sphereCollider.radius;
                     }
                 }
             }

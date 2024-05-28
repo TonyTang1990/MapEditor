@@ -17,12 +17,6 @@ namespace MapEditor
     public class ColliderDataMono : MonoBehaviour
     {
         /// <summary>
-        /// 碰撞器类型
-        /// </summary>
-        [Header("碰撞器类型")]
-        public ColliderType ColliderType = ColliderType.BOX;
-
-        /// <summary>
         /// 碰撞体中心位置
         /// </summary>
         [Header("碰撞体中心位置")]
@@ -50,14 +44,7 @@ namespace MapEditor
             Gizmos.matrix = colliderMatrix;
             var preGizmoColor = Gizmos.color;
             Gizmos.color = Color.green;
-            if(ColliderType == ColliderType.BOX)
-            {
-                Gizmos.DrawWireCube(Center, Size);
-            }
-            else if(ColliderType == ColliderType.SPHERE)
-            {
-                Gizmos.DrawWireSphere(Center, Radius);
-            }
+            Gizmos.DrawWireCube(Center, Size);
             Gizmos.color = preGizmoColor;
             Gizmos.matrix = preGizmosMatrix;
         }
