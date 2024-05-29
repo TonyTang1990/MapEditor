@@ -6,9 +6,11 @@
 
 using System;
 using System.IO;
+using UnityEngine;
+#if UNITY_EDITOR
 using UnityEditor;
 using UnityEditor.SceneManagement;
-using UnityEngine;
+#endif
 
 namespace MapEditor
 {
@@ -50,6 +52,7 @@ namespace MapEditor
 #endif
         }
 
+#if UNITY_EDITOR
         /// <summary>
         /// 获取或创建指定地图GameObject的指定地图对象类型挂在节点
         /// </summary>
@@ -150,7 +153,7 @@ namespace MapEditor
             {
                 return new MonsterMapData(uid, position, rotation);
             }
-            else if(mapDataType == MapDataType.MONSTER_GROUP)
+            else if (mapDataType == MapDataType.MONSTER_GROUP)
             {
                 return new MonsterGroupMapData(uid, position, rotation);
             }
@@ -168,7 +171,7 @@ namespace MapEditor
         /// <returns></returns>
         public static void UpdateColliderByColliderData(GameObject go, Vector3 center, Vector3 size, float radius = 0f)
         {
-            if(go == null)
+            if (go == null)
             {
                 return;
             }
@@ -183,13 +186,13 @@ namespace MapEditor
                 {
                     return;
                 }
-                if(colliderDataMono.ColliderType == ColliderType.BOX)
+                if (colliderDataMono.ColliderType == ColliderType.BOX)
                 {
                     boxCollider = go.AddComponent<BoxCollider>();
                     boxCollider.center = colliderDataMono.Center;
                     boxCollider.size = colliderDataMono.Size;
                 }
-                else if(colliderDataMono.ColliderType == ColliderType.SPHERE)
+                else if (colliderDataMono.ColliderType == ColliderType.SPHERE)
                 {
                     sphereCollider = go.AddComponent<SphereCollider>();
                     sphereCollider.center = colliderDataMono.Center;
@@ -250,22 +253,22 @@ namespace MapEditor
         /// <param name="go"></param>
         public static void UpdateColliderByColliderDataMono(GameObject go)
         {
-            if(go == null)
+            if (go == null)
             {
                 return;
             }
             var colliderDataMono = go.GetComponent<ColliderDataMono>();
-            if(colliderDataMono == null)
+            if (colliderDataMono == null)
             {
                 return;
             }
-            if(colliderDataMono.ColliderType == ColliderType.BOX)
+            if (colliderDataMono.ColliderType == ColliderType.BOX)
             {
                 var boxCollider = go.GetOrAddComponet<BoxCollider>();
                 boxCollider.center = colliderDataMono.Center;
                 boxCollider.size = colliderDataMono.Size;
             }
-            else if(colliderDataMono.ColliderType == ColliderType.SPHERE)
+            else if (colliderDataMono.ColliderType == ColliderType.SPHERE)
             {
                 var sphereCollider = go.GetOrAddComponet<SphereCollider>();
                 sphereCollider.center = colliderDataMono.Center;
@@ -273,7 +276,6 @@ namespace MapEditor
             }
         }
 
-#if UNITY_EDITOR
         /// <summary>
         /// 获取当前脚本GameObject状态
         /// </summary>
@@ -374,6 +376,130 @@ namespace MapEditor
             }
             return true;
         }
+
+        /// <summary>
+        /// 获取或创建指定地图GameObject的寻路组件
+        /// </summary>
+        /// <param name="mapGO"></param>
+        /// <returns></returns>
+        public static NavMeshSurface GetOrCreateNavMeshSurface(GameObject mapGO)
+        {
+            if (mapGO == null)
+            {
+                Debug.LogError($"不允许传空地图GameObject，获取或创建指定地图寻路组件失败！");
+                return null;
+            }
+            var navMeshSurface = mapGO.GetComponent<NavMeshSurface>();
+            if (navMeshSurface == null)
+            {
+                navMeshSurface = mapGO.AddComponent<NavMeshSurface>();
+            }
+            navMeshSurface.collectObjects = CollectObjects.Children;
+            navMeshSurface.useGeometry = NavMeshCollectGeometry.PhysicsColliders;
+            return navMeshSurface;
+        }
+
+        /// <summary>
+        /// 烘焙寻路任务
+        /// </summary>
+        /// <param name="navMeshSurface"></param>
+        /// <returns></returns>
+        public static async Task<bool> BakePathTask(NavMeshSurface navMeshSurface)
+        {
+            var navMeshSurfaces = new UnityEngine.Object[] { navMeshSurface };
+            var navMeshDataAssetPath = navMeshSurface.navMeshData != null ? AssetDatabase.GetAssetPath(navMeshSurface.navMeshData) : null;
+            if (!string.IsNullOrEmpty(navMeshDataAssetPath))
+            {
+                NavMeshAssetManager.instance.ClearSurfaces(navMeshSurfaces);
+                AssetDatabase.DeleteAsset(navMeshDataAssetPath);
+                // 确保删除成功
+                while (AssetDatabase.LoadAssetAtPath<NavMeshData>(navMeshDataAssetPath) != null)
+                {
+                    await Task.Delay(1);
+                }
+            }
+            NavMeshAssetManager.instance.StartBakingSurfaces(navMeshSurfaces);
+            while (NavMeshAssetManager.instance.IsSurfaceBaking(navMeshSurface))
+            {
+                await Task.Delay(1);
+            }
+            AssetDatabase.SaveAssets();
+            return true;
+        }
+
+        /// <summary>
+        /// 拷贝寻路数据Asset
+        /// </summary>
+        /// <param name="gameObject"></param>
+        /// <returns></returns>
+        public static async Task<bool> CopyNavMeshAsset(GameObject gameObject)
+        {
+            var navMeshSurface = mTarget.GetComponent<NavMeshSurface>();
+            if (navMeshSurface == null)
+            {
+                Debug.LogError($"地图:{gameObject.name}找不到寻路NavMeshSurface组件，拷贝寻路数据Asset失败！");
+                return false;
+            }
+            var mapAssetPath = GetMapAssetPath(gameObject);
+            if (string.IsNullOrEmpty(mapAssetPath))
+            {
+                Debug.LogError($"地图:{gameObject.name}未保存成任何本地Asset，复制寻路数据Asset失败！");
+                return false;
+            }
+            var navMeshAssetPath = AssetDatabase.GetAssetPath(navMeshSurface.navMeshData);
+            if (navMeshSurface.navMeshData == null || string.IsNullOrEmpty(navMeshAssetPath))
+            {
+                Debug.LogError($"地图:{gameObject.name}未烘焙任何有效寻路数据Asset，复制寻路数据Asset失败！");
+                return false;
+            }
+            navMeshAssetPath = PathUtilities.GetRegularPath(navMeshAssetPath);
+            var targetAssetFolderPath = Path.GetDirectoryName(mapAssetPath);
+            var navMeshAssetName = Path.GetFileName(navMeshAssetPath);
+            var newNavMeshAssetPath = Path.Combine(targetAssetFolderPath, navMeshAssetName);
+            newNavMeshAssetPath = PathUtilities.GetRegularPath(newNavMeshAssetPath);
+            if (!string.Equals(navMeshAssetPath, newNavMeshAssetPath))
+            {
+                AssetDatabase.MoveAsset(navMeshAssetPath, newNavMeshAssetPath);
+                Debug.Log($"移动寻路数据Asset:{navMeshAssetPath}到{newNavMeshAssetPath}成功！");
+            }
+            else
+            {
+                Debug.Log($"移动寻路数据Asset:{navMeshAssetPath}已经在目标位置，不需要移动！");
+            }
+            return true;
+        }
+
+        /// <summary>
+        /// 获取当前脚本GameObject对应Asset
+        /// Note:
+        /// 未存储到本地Asset返回null
+        /// </summary>
+        /// <returns></returns>
+        public static string GetMapAssetPath(GameObject gameObject)
+        {
+            string assetPath = null;
+            var gameObjectStatus = MapUtilities.GetGameObjectStatus(gameObject);
+            if (gameObjectStatus == GameObjectStatus.Normal)
+            {
+                return null;
+            }
+            else if (gameObjectStatus == GameObjectStatus.PrefabInstance)
+            {
+                var asset = PrefabUtility.GetCorrespondingObjectFromSource(gameObject);
+                assetPath = AssetDatabase.GetAssetPath(asset);
+            }
+            else if (gameObjectStatus == GameObjectStatus.Asset)
+            {
+                assetPath = AssetDatabase.GetAssetPath(gameObject);
+            }
+            else if (gameObjectStatus == GameObjectStatus.PrefabContent)
+            {
+                var prefabStage = PrefabStageUtility.GetPrefabStage(gameObject);
+                assetPath = prefabStage != null ? prefabStage.assetPath : null;
+            }
+            return assetPath;
+        }
+
 #endif
     }
 }

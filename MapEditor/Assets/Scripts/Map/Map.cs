@@ -7,8 +7,10 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using UnityEditor;
 using UnityEngine;
+#if UNITY_EDITOR
+using UnityEditor;
+#endif
 
 namespace MapEditor
 {
@@ -368,6 +370,17 @@ namespace MapEditor
         }
 
         /// <summary>
+        /// 清除所有地图埋点批量选择
+        /// </summary>
+        public void ClearAllMapDataBatchOperation()
+        {
+            for (int i = 0, length = MapDataList.Count; i < length; i++)
+            {
+                MapDataList[i].BatchOperationSwitch = false;
+            }
+        }
+
+        /// <summary>
         /// 创建之地给你地图对象UID配置的实体对象(未配置Asset返回null)
         /// </summary>
         /// <param name="uid"></param>
@@ -405,13 +418,236 @@ namespace MapEditor
         }
 
         /// <summary>
-        /// 清除所有地图埋点批量选择
+        /// 一键烘焙和导出地图数据
         /// </summary>
-        public void ClearAllMapDataBatchOperation()
+        /// <returns></returns>
+        public async Task<bool> OneKeyBakeAndExport()
         {
-            for(int i = 0, length = MapDataList.Count; i < length; i++)
+            if(!MapUtilities.CheckOperationAvalible(gameObject))
             {
-                MapDataList[i].BatchOperationSwitch = false;
+                return false;
+            }
+            if(!RecoverDynamicMapDatas())
+            {
+                return false;
+            }
+            var navMeshSurface = MapUtilities.GetOrCreateNavMeshSurface(gameObject);
+            var bakePathTask = MapUtilities.BakePathTask(navMeshSurface);
+            var bakePathResult = await bakePathTask;
+            if(!bakePathResult)
+            {
+                return false;
+            }
+            var copyNavMeshAssetResult = await MapUtilities.CopyNavMeshAsset(gameObject);
+            if(!copyNavMeshAssetResult)
+            {
+                return false;
+            }
+            if(!CleanDynamicMapDatas())
+            {
+                return false;
+            }
+            ExportMapData();
+            AssetDatabase.SaveAsets();
+            Debug.Log($"一键烘焙拷贝导出地图:{gameObject.name}数据完成！");
+            return true;
+        }
+
+        /// <summary>
+        /// 恢复动态地图数据
+        /// </summary>
+        /// <returns></returns>
+        private bool RecoverDynamicMapDatas()
+        {
+            if(!MapUtilities.CheckOperationAvalible(gameObject))
+            {
+                return false;
+            }
+            UpdateMapObjectDataLogicDatas();
+            if(!RecoverDynamicMapObjects())
+            {
+                return false;
+            }
+            return true;
+        }
+
+        /// <summary>
+        /// 更新地图对象数据的逻辑数据(对象存在时才更新记录逻辑数据)
+        /// </summary>
+        private void UpdateMapObjectDataLogicDatas()
+        {
+            // 地图对象可能删除还原，所以需要逻辑层面记录数据
+            for (int i = 0; i < MapObjectDataList.Count; i++)
+            {
+                var mapObjectData = MapObjectDataList[i];
+                var mapObjectConfig = MapSetting.GetEditorInstance().ObjectSetting.GetMapObjectConfigByUID(mapObjectData.UID);
+                if (mapObjectConfig == null)
+                {
+                    continue;
+                }
+                if (mapObjectData.Go != null)
+                {
+                    var positionProperty = mapObjectData.FindPropertyRelative("Position");
+                    var rotationProperty = mapObjectData.FindPropertyRelative("Rotation");
+                    var localScaleProperty = mapObjectData.FindPropertyRelative("LocalScale");
+                    var colliderCenterProperty = mapObjectData.FindPropertyRelative("ColliderCenter");
+                    var colliderSizeProperty = mapObjectData.FindPropertyRelative("ColliderSize");
+                    var mapObjectGO = mapObjectData.Go;
+                    mapObjectData.Position = mapObjectGO.transform.position;
+                    mapObjectData.Rotation = mapObjectGO.transform.rotation.eulerAngles;
+                    mapObjectData.LocalScale = mapObjectGO.transform.localScale;
+                    var boxCollider = mapObjectGO.GetComponent<BoxCollider>();
+                    if (boxCollider != null)
+                    {
+                        mapObjectData.ColliderCenter = boxCollider.center;
+                        mapObjectData.ColliderSize = boxCollider.size;
+                    }
+                }
+            }
+        }
+
+        /// <summary>
+        /// 恢复动态地图对象
+        /// </summary>
+        /// <returns></returns>
+        private bool RecoverDynamicMapObjects()
+        {
+            if(!MapUtilities.CheckOperationAvalible(gameObject))
+            {
+                Debug.LogError($"地图:{gameObject.name}恢复动态地图对象失败！");
+                return false;
+            }
+            for(int i = 0; i < MapObjectDataList.Count; i++)
+            {
+                var mapObjectData = MapObjectDataList[i];
+                var mapObjectConfig = MapSetting.GetEditorInstance().ObjectSetting.GetMapObjectConfigByUID(mapObjectData.UID);
+                if(mapObjectConfig == null)
+                {
+                    continue;
+                }
+                if(mapObjectConfig.IsDynamic && mapObjectConfig.Go == null)
+                {
+                    RecreateMapObjectGo(mapObjectData);
+                }
+            }
+            return true;
+        }
+
+        /// <summary>
+        /// 恢复指定MapObject属性地图对象
+        /// </summary>
+        /// <param name="mapObjectData"></param>
+        private void RecreateMapObjectGo(MapObjectData mapObjectData)
+        {
+            var mapObjectConfig = MapSetting.GetEditorInstance().ObjectSetting.GetMapObjectConfigByUID(mapObjectData.UID);
+            if (mapObjectConfig == null)
+            {
+                Debug.LogError($"找不到地图对象UID:{mapObjectData.UID}的配置，重创地图对象失败！");
+                return;
+            }
+            if (mapObjectData.Go != null)
+            {
+                GameObject.DestroyImmediate(mapObjectData.Go);
+            }
+            var instanceGo = CreateGameObjectByUID(mapObjectData.UID);
+            if (instanceGo != null)
+            {
+                var positionProperty = mapObjectData.FindPropertyRelative("Position");
+                var rotationProperty = mapObjectData.FindPropertyRelative("Rotation");
+                var localScaleProperty = mapObjectData.FindPropertyRelative("LocalScale");
+                instanceGo.transform.position = mapObjectData.Position;
+                instanceGo.transform.rotation = Quaternion.Euler(mapObjectData.Rotation);
+                instanceGo.transform.localScale = mapObjectData.LocalScale;
+                mapObjectData.Go = instanceGo;
+                // 存的碰撞体数据只用于导出，不用于还原
+                // 是否有碰撞体，碰撞体数据有多少由预制件自身和预制件自身是否挂在ColliderDataMono脚本决定
+                //if(mapObjectConfig.IsDynamic)
+                //{
+                //    var colliderCenterProperty = mapObjectDataProperty.FindPropertyRelative("ColliderCenter");
+                //    var colliderSizeProperty = mapObjectDataProperty.FindPropertyRelative("ColliderSize");
+                //    var colliderRadiusProperty = mapObjectDataProperty.FindPropertyRelative("ColliderRadius");
+                //    MapUtilities.UpdateColliderByColliderData(instanceGo, colliderCenterProperty.vector3Value, colliderSizeProperty.vector3Value, colliderRadiusProperty.floatValue);
+                //}
+            }
+        }
+
+        /// <summary>
+        /// 清除动态地图数据
+        /// </summary>
+        /// <returns></returns>
+        private bool CleanDynamicMapDatas()
+        {
+            if(!MapUtilities.CheckOperationAvalible(gameObject))
+            {
+                Debug.LogError($"地图:{gameObject.name}清除动态地图数据失败！");
+                return false;
+            }
+            UpdateMapObjectDataLogicDatas();
+            if(!CleanDynamicMapObjects())
+            {
+                Debug.LogError($"地图:{gameObject.name}清除动态地图对象失败！")
+                return false;
+            }
+            return true;
+        }
+
+        /// <summary>
+        /// 清除动态地图对象GameObjects
+        /// </summary>
+        private bool CleanDynamicMapObjects()
+        {
+            if (!MapUtilities.CheckOperationAvalible(gameObject))
+            {
+                Debug.LogError($"地图:{mTarget?.gameObject.name}清除动态地图对象失败！");
+                return false;
+            }
+            for (int i = 0; i < MapObjectDataList.Count; i++)
+            {
+                var mapObjectData = MapObjectDataList[i];
+                var mapObjectConfig = MapSetting.GetEditorInstance().ObjectSetting.GetMapObjectConfigByUID(mapObjectData.UID);
+                if (mapObjectConfig == null)
+                {
+                    continue;
+                }
+                if (mapObjectConfig.IsDynamic && mapObjectData.Go != null)
+                {
+                    GameObject.DestroyImmediate(mapObjectData.Go);
+                    mapObjectData.Go = null;
+                }
+            }
+            return true;
+        }
+
+        /// <summary>
+        /// 导出地图数据
+        /// </summary>
+        private void ExportMapData()
+        {
+            if (!MapEditorUtilities.CheckIsGameMapAvalibleExport(this))
+            {
+                Debug.LogError($"地图:{gameObject.name}场景数据有问题，不满足导出条件，导出场景数据失败！");
+                return;
+            }
+            // 流程上说场景给客户端使用一定会经历导出流程
+            // 在导出时确保MapObjectDataMono和地图对象配置数据一致
+            // 从而确保场景资源被使用时挂在数据和配置匹配
+            UpdateAllMapObjectDataMonos();
+            MapExportUtilities.ExportGameMapData(this);
+        }
+
+        /// <summary>
+        /// 更新所有地图对象的MapObjectDataMono数据到最新
+        /// </summary>
+        private void UpdateAllMapObjectDataMonos()
+        {
+            for (int i = 0; i < MapObjectDataList.Count; i++)
+            {
+                var mapObjectData = MapObjectDataList[i];
+                if (mapObjectData.Go == null)
+                {
+                    continue;
+                }
+                MapUtilities.AddOrUpdateMapObjectDataMono(mapObjectData.Go, mapObjectData.UID);
             }
         }
 

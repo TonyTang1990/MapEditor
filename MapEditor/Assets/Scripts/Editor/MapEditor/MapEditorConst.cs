@@ -25,6 +25,11 @@ namespace MapEditor
         public const string MapExportRelativePath = "Assets/Resources/MapExport";
 
         /// <summary>
+        /// 地图预制件相对目录
+        /// </summary>
+        public const string MapPrefabFolderRelativePath = "Assets/Resources/Maps";
+
+        /// <summary>
         /// 地图对象UID UI显示宽度
         /// </summary>
         public const float MapObjectUIDUIWidth = 50f;

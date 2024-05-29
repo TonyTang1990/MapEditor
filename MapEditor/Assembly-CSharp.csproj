@@ -8,7 +8,8 @@
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProductVersion>10.0.20506</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
-    <RootNamespace></RootNamespace>
+    <RootNamespace>
+    </RootNamespace>
     <ProjectGuid>{8FDB5A40-4C78-576C-FBF9-6CA5ED291819}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
@@ -59,6 +60,7 @@
     <Compile Include="Assets\Scripts\Map\MapData\MapDataConfig.cs" />
     <Compile Include="Assets\Scripts\Map\MapData\MonsterMapData.cs" />
     <Compile Include="Assets\Scripts\Core\Collision\Collision2D\Circle2D.cs" />
+    <Compile Include="Assets\Scripts\Map\MapExportUtilities.cs" />
     <Compile Include="Assets\Scripts\Map\MapObject\MapObjectType.cs" />
     <Compile Include="Assets\Scripts\Core\Collision\Collision3D\Collision3DUtilities.cs" />
     <Compile Include="Assets\Scripts\Map\MapData\MonsterGroupMapData.cs" />
@@ -69,6 +71,7 @@
     <Compile Include="Assets\Scripts\Core\Collision\Collision2D\VisibleDraw\Polygon2DVisible.cs" />
     <Compile Include="Assets\Scripts\Core\Collision\Collision3D\VisibleDraw\Sphere3DVisible.cs" />
     <Compile Include="Assets\Scripts\Core\Extension\StringExt.cs" />
+    <Compile Include="Assets\Scripts\Utilities\FolderUtilities.cs" />
     <Compile Include="Assets\Scripts\Utilities\Vector3Utilities.cs" />
     <Compile Include="Assets\Scripts\Core\Collision\Collision2D\VisibleDraw\Sector2DVisible.cs" />
     <Compile Include="Assets\Scripts\Map\MapObject\MapObjectConfig.cs" />

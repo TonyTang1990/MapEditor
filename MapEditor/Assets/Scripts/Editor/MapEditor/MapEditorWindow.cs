@@ -219,6 +219,61 @@ namespace MapEditor
                 Selection.SetActiveObjectWithContext(prefabRootContent, prefabRootContent);
             }
         }
+        
+        /// <summary>
+        /// 一键导出所有关卡地图数据
+        /// </summary>
+        private void DoExportAllMapDatas()
+        {
+            var allMapAssetPath = MapEditorUtilities.GetAllMapAssetPath();
+            foreach(var prefabAssetPath in allMapAssetPath)
+            {
+                var prefab = AssetDatabase.LoadAssetAtPath<GameObject>(prefabAssetPath);
+                if(prefab == null)
+                {
+                    continue;
+                }
+                var map = prefab.GetComponent<Map>();
+                if(map == null)
+                {
+                    continue;
+                }
+                MapExportUtilities.ExportGameMapData(map);
+                Debug.Log($"地图预制件:{prefab.name}地图数据导出完成！");
+            }
+        }
+   
+        /// <summary>
+        /// 一键烘焙和导出所有地图数据
+        /// </summary>
+        private async void DoBakeAndExportAllMapDatas()
+        {
+            EditorUtility.ClearProgressBar();
+            StageUtility.GoToMainStage();
+            var allMapAssetPath = MapEditorUtilities.GetAllMapAssetPath();
+            for(int i = 0, length = allMapAssetPath.Count; i < length; i++)
+            {
+                var mapAssetPath = allMapAssetPath[i];
+                EditorUtility.DisplayCancelableProgressBar("一键拷贝和导出地图数据中", $"当前处理:{mapAssetPath}", i / length);
+                var prefab = AssetDatabase.LoadAssetAtPath<GameObject>(mapAssetPath);
+                if (prefab == null)
+                {
+                    continue;
+                }
+                var prefabStage = PrefabStageUtility.OpenPrefab(mapAssetPath);
+                var prefabContentRoot = prefabStage.prefabContentRoot;
+                var map = prefabContentRoot.GetComponent<Map>();
+                if(map == null)
+                {
+                    StageUtility.GoToMainStage();
+                    continue;
+                }
+                await map.OneKeyBakeAndExport();
+                StageUtility.GoToMainStage();
+            }
+            EditorUtility.ClearProgressBar();
+            Debug.Log($"一键烘焙和导出所有地图数据完成！");
+        }
 
         private void OnGUI()
         {
@@ -246,6 +301,14 @@ namespace MapEditor
             if (GUILayout.Button("快速选中地编对象", GUILayout.Width(150f)))
             {
                 DoQuickSelectGameMapInScene();
+            }
+            if (GUILayout.Button("一键导出所有地图", GUILayout.Width(150f)))
+            {
+                DoExportAllMapDatas();
+            }
+            if (GUILayout.Button("一键烘焙导出所有地图", GUILayout.Width(150f)))
+            {
+                DoBakeAndExportAllMapDatas();
             }
             EditorGUILayout.EndHorizontal();
             EditorGUILayout.EndVertical();
