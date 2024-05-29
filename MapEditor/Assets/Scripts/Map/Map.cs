@@ -204,6 +204,7 @@ namespace MapEditor
             var newMapObjectData = new MapObjectData(uid, instanceGo);
             MapObjectDataList.Insert(insertPos, newMapObjectData);
             Debug.Log($"插入地图对象UID:{uid}索引:{insertPos}");
+            UpdateMapObjectDataLogicDatas();
             return newMapObjectData;
         }
 
@@ -269,6 +270,7 @@ namespace MapEditor
                 GameObject.DestroyImmediate(mapObjectData.Go);
             }
             MapObjectDataList.RemoveAt(index);
+            UpdateMapObjectDataLogicDatas();
             return true;
         }
 
@@ -457,7 +459,7 @@ namespace MapEditor
         /// 恢复动态地图数据
         /// </summary>
         /// <returns></returns>
-        private bool RecoverDynamicMapDatas()
+        public bool RecoverDynamicMapDatas()
         {
             if(!MapUtilities.CheckOperationAvalible(gameObject))
             {
@@ -575,7 +577,7 @@ namespace MapEditor
         /// 清除动态地图数据
         /// </summary>
         /// <returns></returns>
-        private bool CleanDynamicMapDatas()
+        public bool CleanDynamicMapDatas()
         {
             if(!MapUtilities.CheckOperationAvalible(gameObject))
             {
@@ -621,7 +623,7 @@ namespace MapEditor
         /// <summary>
         /// 导出地图数据
         /// </summary>
-        private void ExportMapData()
+        public void ExportMapData()
         {
             if (!MapEditorUtilities.CheckIsGameMapAvalibleExport(this))
             {
@@ -632,6 +634,12 @@ namespace MapEditor
             // 在导出时确保MapObjectDataMono和地图对象配置数据一致
             // 从而确保场景资源被使用时挂在数据和配置匹配
             UpdateAllMapObjectDataMonos();
+            var isPrefabAssetInstance = PrefabUtility.IsPartOfPrefabInstance(gameObject);
+            // 确保数据应用到对应Asset上
+            if (isPrefabAssetInstance)
+            {
+                PrefabUtility.ApplyPrefabInstance(mTarget?.gameObject, InteractionMode.AutomatedAction);
+            }
             MapExportUtilities.ExportGameMapData(this);
         }
 
@@ -649,6 +657,23 @@ namespace MapEditor
                 }
                 MapUtilities.AddOrUpdateMapObjectDataMono(mapObjectData.Go, mapObjectData.UID);
             }
+        }
+
+        /// <summary>
+        /// 一键重创地图对象
+        /// </summary>
+        public void OneKeyRecreateMapObjectGos()
+        {
+            if (!MapUtilities.CheckOperationAvalible(gameObject))
+            {
+                return;
+            }
+            for (int i = 0; i < MapObjectDataList.Count; i++)
+            {
+                var mapObjectData = MapObjectDataList[i];
+                RecreateMapObjectGo(mapObjectData);
+            }
+            AssetDatabase.SaveAssets();
         }
 
         /// <summary>

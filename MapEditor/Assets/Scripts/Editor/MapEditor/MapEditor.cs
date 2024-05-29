@@ -883,6 +883,7 @@ namespace MapEditor
             var newMapObjectDataProperty = mMapObjectDataListProperty.GetArrayElementAtIndex(insertPos);
             newMapObjectDataProperty.managedReferenceValue = newMapObjectData;
             serializedObject.ApplyModifiedProperties();
+            UpdateMapObjectDataLogicDatas();
             return newMapObjectData;
         }
 
@@ -923,6 +924,7 @@ namespace MapEditor
             }
             mMapObjectDataListProperty.DeleteArrayElementAtIndex(index);
             serializedObject.ApplyModifiedProperties();
+            UpdateMapObjectDataLogicDatas();
             return true;
         }
 
@@ -1087,6 +1089,8 @@ namespace MapEditor
         /// </summary>
         private async Task<bool> CleanDynamicMapDatas()
         {
+            return mTarget != null ? mTarget.CleanDynamicMapDatas() : false;
+            /*
             if(!MapUtilities.CheckOperationAvalible(mTarget?.gameObject))
             {
                 return false;
@@ -1097,6 +1101,7 @@ namespace MapEditor
                 return false;
             }
             return true;
+            */
         }
 
         /// <summary>
@@ -1181,8 +1186,10 @@ namespace MapEditor
         /// <summary>
         /// 恢复动态数据
         /// </summary>
-        private async Task<bool> RecoverDynamicDatas()
+        private async Task<bool> RecoverDynamicMapDatas()
         {
+            return mTarget != null ? mTarget.RecoverDynamicMapDatas() : false;
+            /*
             if (!MapUtilities.CheckOperationAvalible(mTarget?.gameObject))
             {
                 return false;
@@ -1193,12 +1200,13 @@ namespace MapEditor
                 return false;
             }
             return true;
+            */
         }
 
         /// <summary>
         /// 恢复动态地图对象GameObjects
         /// </summary>
-        private bool RecoverDynamicMapObjectGos()
+        private bool RecoverDynamicMapObjects()
         {
             if (!MapUtilities.CheckOperationAvalible(mTarget?.gameObject))
             {
@@ -1237,6 +1245,8 @@ namespace MapEditor
         /// </summary>
         private void OneKeyRecreateMapObjectGos()
         {
+            mTarget?.OneKeyRecreateMapObjectGos();
+            /*
             if (!MapUtilities.CheckOperationAvalible(mTarget?.gameObject))
             {
                 return;
@@ -1248,6 +1258,7 @@ namespace MapEditor
             }
             serializedObject.ApplyModifiedProperties();
             AssetDatabase.SaveAssets();
+            */
         }
 
         /// <summary>
@@ -1274,6 +1285,8 @@ namespace MapEditor
         /// </summary>
         private void ExportMapData()
         {
+            mTarget?.ExportMapData();
+            /*
             if(!MapEditorUtilities.CheckIsGameMapAvalibleExport(mTarget))
             {
                 EditorUtility.DisplayDialog("导出地图数据", "场景数据有问题，不满足导出条件，导出场景数据失败！", "确认");
@@ -1292,6 +1305,7 @@ namespace MapEditor
                 PrefabUtility.ApplyPrefabInstance(mTarget?.gameObject, InteractionMode.AutomatedAction);
             }
             MapExportUtilities.ExportGameMapData(mTarget);
+            */
         }
 
         /// <summary>
@@ -1299,11 +1313,14 @@ namespace MapEditor
         /// </summary>
         private async Task<bool> OneKeyBakeAndExport()
         {
+            void oneKeyBakeAndExportResult = await mTarget?.OneKeyBakeAndExport();
+            return oneKeyBakeAndExportResult;
+            /*
             if (!MapUtilities.CheckOperationAvalible(mTarget?.gameObject))
             {
                 return false;
             }
-            if (!RecoverDynamicDatas())
+            if (!RecoverDynamicMapDatas())
             {
                 Debug.LogError($"地图:{mTarget?.gameObject.name}恢复动态地图数据失败，一键烘焙导出地图数据失败！");
                 return false;
@@ -1331,6 +1348,7 @@ namespace MapEditor
             AssetDatabase.SaveAssets();
             Debug.Log($"一键烘焙拷贝导出地图数据完成！");
             return true;
+            */
         }
 
         /// <summary>
@@ -1556,7 +1574,7 @@ namespace MapEditor
             }
             if(GUILayout.Button("恢复动态数据", GUILayout.ExpandWidth(true)))
             {
-                RecoverDynamicDatas();
+                RecoverDynamicMapDatas();
             }
             if(GUILayout.Button("拷贝NavMesh Asset", GUILayout.ExpandWidth(true)))
             {
