@@ -261,7 +261,7 @@ namespace MapEditor
                     continue;
                 }
                 var prefabStage = PrefabStageUtility.OpenPrefab(mapAssetPath);
-                var prefabContentRoot = prefabStage.prefabContentRoot;
+                var prefabContentRoot = prefabStage.prefabContentsRoot;
                 var map = prefabContentRoot.GetComponent<Map>();
                 if(map == null)
                 {

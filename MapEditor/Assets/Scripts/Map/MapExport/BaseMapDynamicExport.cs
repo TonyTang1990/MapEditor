@@ -5,6 +5,7 @@
  */
 
 using System;
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace MapEditor
@@ -37,16 +38,22 @@ namespace MapEditor
         public Vector3 Rotation;
 
         /// <summary>
+        /// 缩放信息
+        /// </summary>
+        public Vector3 LocalScale;
+
+        /// <summary>
         /// 所属九宫格UID列表
         /// </summary>
         public List<int> OwnerGridUIDs;
 
-        public BaseMapDynamicExport(MapObjectType mapObjectType, int confId, Vector3 position, Vector3 rotation, List<int> ownerGridUIDs = null) 
+        public BaseMapDynamicExport(MapObjectType mapObjectType, int confId, Vector3 position, Vector3 rotation, Vector3 localScale, List<int> ownerGridUIDs = null) 
         {
             MapObjectType = mapObjectType;
             ConfId = confId;
             Position = position;
             Rotation = rotation;
+            LocalScale = localScale;
             OwnerGridUIDs = ownerGridUIDs;
         }
     }

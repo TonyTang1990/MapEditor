@@ -8,8 +8,7 @@
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProductVersion>10.0.20506</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
-    <RootNamespace>
-    </RootNamespace>
+    <RootNamespace></RootNamespace>
     <ProjectGuid>{8FDB5A40-4C78-576C-FBF9-6CA5ED291819}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
@@ -57,10 +56,10 @@
     <Analyzer Include="G:\Software\VisualStudio\VS2019\Install\Common7\IDE\Extensions\Microsoft\Visual Studio Tools for Unity\Analyzers\Microsoft.Unity.Analyzers.dll" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Assets\Scripts\Utilities\FolderUtilities.cs" />
     <Compile Include="Assets\Scripts\Map\MapData\MapDataConfig.cs" />
     <Compile Include="Assets\Scripts\Map\MapData\MonsterMapData.cs" />
     <Compile Include="Assets\Scripts\Core\Collision\Collision2D\Circle2D.cs" />
-    <Compile Include="Assets\Scripts\Map\MapExportUtilities.cs" />
     <Compile Include="Assets\Scripts\Map\MapObject\MapObjectType.cs" />
     <Compile Include="Assets\Scripts\Core\Collision\Collision3D\Collision3DUtilities.cs" />
     <Compile Include="Assets\Scripts\Map\MapData\MonsterGroupMapData.cs" />
@@ -71,11 +70,11 @@
     <Compile Include="Assets\Scripts\Core\Collision\Collision2D\VisibleDraw\Polygon2DVisible.cs" />
     <Compile Include="Assets\Scripts\Core\Collision\Collision3D\VisibleDraw\Sphere3DVisible.cs" />
     <Compile Include="Assets\Scripts\Core\Extension\StringExt.cs" />
-    <Compile Include="Assets\Scripts\Utilities\FolderUtilities.cs" />
     <Compile Include="Assets\Scripts\Utilities\Vector3Utilities.cs" />
     <Compile Include="Assets\Scripts\Core\Collision\Collision2D\VisibleDraw\Sector2DVisible.cs" />
     <Compile Include="Assets\Scripts\Map\MapObject\MapObjectConfig.cs" />
     <Compile Include="Assets\Scripts\Utilities\CameraUtilities.cs" />
+    <Compile Include="Assets\Scripts\Map\MapExportUtilities.cs" />
     <Compile Include="Assets\Scripts\Core\Collision\Collision2D\Sector2D.cs" />
     <Compile Include="Assets\Scripts\Map\MapSetting.cs" />
     <Compile Include="Assets\Scripts\Map\MapUtilities.cs" />
@@ -96,7 +95,7 @@
     <Compile Include="Assets\Scripts\Core\Collision\Collision2D\AABB2D.cs" />
     <Compile Include="Assets\Scripts\Core\Collision\Collision2D\VisibleDraw\AABB2DVisible.cs" />
     <Compile Include="Assets\Scripts\Map\MapExport\BaseMapDynamicExport.cs" />
-    <Compile Include="Assets\Scripts\Map\MapObject\ColliderType.cs" />
+    <Compile Include="Assets\Scripts\Map\GameObjectStatus.cs" />
     <Compile Include="Assets\Scripts\Map\Map.cs" />
     <Compile Include="Assets\Scripts\Core\Collision\Collision2D\VisibleDraw\Capsule2DVisible.cs" />
     <Compile Include="Assets\Scripts\Map\MapData\MapDataSetting.cs" />
@@ -108,7 +107,6 @@
     <Compile Include="Assets\Scripts\Core\Collision\Collision2D\Polygon2D.cs" />
     <Compile Include="Assets\Scripts\Core\Collision\Collision2D\Capsule2D.cs" />
     <Compile Include="Assets\Scripts\Map\MapObject\MapObjectData.cs" />
-    <Compile Include="Assets\Scripts\Map\GameObjectStatus.cs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="UnityEngine">

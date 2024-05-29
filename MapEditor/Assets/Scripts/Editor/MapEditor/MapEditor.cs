@@ -265,11 +265,10 @@ namespace MapEditor
         {
             mSceneGUISwitchProperty ??= serializedObject.FindProperty("SceneGUISwitch");
             mMapLineGUISwitchProperty ??= serializedObject.FindProperty("MapLineGUISwitch");
-            mMaAreaGridGUISwitchProperty ??= serializedObject.FindProperty("MaAreaGridGUISwitch");            
             mMapAreaGUISwitchProperty ??= serializedObject.FindProperty("MapAreaGUISwitch");
             mMapObjectSceneGUISwitchProperty ??= serializedObject.FindProperty("MapObjectSceneGUISwitch");
             mMapDataSceneGUISwitchProperty ??= serializedObject.FindProperty("MapDataSceneGUISwitch");
-            mMapObjectAddedAutoFocusProperty ??= serializedObject.FindProperty("MapObjectAddedAutoFocus");            
+            mMapObjectAddedAutoFocusProperty ??= serializedObject.FindProperty("MapObjectAddedAutoFocus");
             mMapWidthProperty ??= serializedObject.FindProperty("MapWidth");
             mMapHeightProperty ??= serializedObject.FindProperty("MapHeight");
             mMapStartPosProperty ??= serializedObject.FindProperty("MapStartPos");
@@ -387,7 +386,7 @@ namespace MapEditor
             {
                 return;
             }
-            MapEditorUtilities.GetOrCreateNavMeshSurface(mTarget?.gameObject);
+            MapUtilities.GetOrCreateNavMeshSurface(mTarget?.gameObject);
         }
 
         /// <summary>
@@ -666,11 +665,11 @@ namespace MapEditor
             var mapWidth = mMapWidthProperty.intValue;
             var mapHeight = mMapHeightProperty.intValue;
             var startPos = mMapStartPosProperty.vector3Value;
-            var mapStartGridXZ = MapEditorUtilities.GetGridXZByPosition(startPos, gridSize);
+            var mapStartGridXZ = MapExportUtilities.GetGridXZByPosition(startPos, gridSize);
             var maxMapPos = startPos;
             maxMapPos.x = maxMapPos.x + mapWidth;
             maxMapPos.z = maxMapPos.z + mapHeight;
-            var mapMaxGridXZ = MapEditorUtilities.GetGridXZByPosition(maxMapPos, gridSize);
+            var mapMaxGridXZ = MapExportUtilities.GetGridXZByPosition(maxMapPos, gridSize);
             var gridMinX = mapStartGridXZ.Key;
             var gridMinZ = mapStartGridXZ.Value;
             var gridMaxX = mapMaxGridXZ.Key;
@@ -680,11 +679,11 @@ namespace MapEditor
                 var mapObjectDataProperty = mMapObjectDataListProperty.GetArrayElementAtIndex(i);
                 var positionProperty = mapObjectDataProperty.FindPropertyRelative("Position");
                 var position = positionProperty.vector3Value;
-                var gridXZ = MapEditorUtilities.GetGridXZByPosition(position, gridSize);
+                var gridXZ = MapExportUtilities.GetGridXZByPosition(position, gridSize);
                 gridMinX = Mathf.Min(gridMinX, gridXZ.Key);
                 gridMinZ = Mathf.Min(gridMinZ, gridXZ.Value);
-                gridMaxX = Mathf.Min(gridMaxX, gridMaxZ.Key);
-                gridMaxZ = Mathf.Min(gridMaxZ, gridMaxZ.Value);
+                gridMaxX = Mathf.Max(gridMaxX, gridXZ.Key);
+                gridMaxZ = Mathf.Max(gridMaxZ, gridXZ.Value);
             }
             var gridVector3Size = new Vector3(gridSize, 0, gridSize);
             var halfGridVector3Size = gridVector3Size / 2;
@@ -693,7 +692,7 @@ namespace MapEditor
                 for(int gridZ = gridMinZ; gridZ <= gridMaxZ; gridZ++)
                 {
                     var gridCenterData = new Vector3(gridX * gridSize + halfGridVector3Size.x, 0, gridZ * gridSize + halfGridVector3Size.z);
-                    var gridUID = MapEditorUtilities.GetGridUID(gridX, gridZ);
+                    var gridUID = MapExportUtilities.GetGridUID(gridX, gridZ);
                     var gridData = new KeyValuePair<Vector3, int>(gridCenterData, gridUID);
                     mGridDataList.Add(gridData);
                 }
@@ -872,7 +871,7 @@ namespace MapEditor
                 var insertMapObjectData = insertMapObjectProperty.managedReferenceValue as MapObjectData;
                 mapObjectPosition = insertMapObjectData.Go != null ? insertMapObjectData.Go.transform.position : insertMapObjectData.Position;
             }
-            var instanceGo = CreateGameObjectByUID(uid);
+            var instanceGo = mTarget?.CreateGameObjectByUID(uid);
             if (instanceGo != null && mMapObjectAddedAutoFocusProperty.boolValue)
             {
                 Selection.SetActiveObjectWithContext(instanceGo, instanceGo);
@@ -1313,7 +1312,7 @@ namespace MapEditor
         /// </summary>
         private async Task<bool> OneKeyBakeAndExport()
         {
-            void oneKeyBakeAndExportResult = await mTarget?.OneKeyBakeAndExport();
+            var oneKeyBakeAndExportResult = await mTarget?.OneKeyBakeAndExport();
             return oneKeyBakeAndExportResult;
             /*
             if (!MapUtilities.CheckOperationAvalible(mTarget?.gameObject))
@@ -1538,7 +1537,7 @@ namespace MapEditor
                 UpdateMapGOPosition();
             }
 
-            EditorGUILayout.BeginChangeCheck();
+            EditorGUI.BeginChangeCheck();
             EditorGUILayout.PropertyField(mGridSizeProperty);
             if(EditorGUI.EndChangeCheck())
             {
@@ -2219,7 +2218,7 @@ namespace MapEditor
         private void DrawMapGridRects()
         {
             var preHandlesColor = Handles.color;
-            Handles.color = Color.yellow;
+            Handles.color = Color.red;
             var gridSize = mGridSizeProperty.floatValue;
             var gridVector3Size = new Vector3(gridSize, 0, gridSize);
             for(int i = 0; i < mGridDataList.Count; i++)
