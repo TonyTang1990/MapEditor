@@ -74,9 +74,13 @@ namespace MapEditor
             EditorGUILayout.PropertyField(mSizeProperty);
             EditorGUILayout.PropertyField(mRadiusProperty);
 
-            if (GUILayout.Button("自动根据Renderer填充", GUILayout.ExpandWidth(true)))
+            if (GUILayout.Button("自动根据Renderer计算", GUILayout.ExpandWidth(true)))
             {
                 DoAutomaticFullfillData();
+            }
+            if (GUILayout.Button("自动填充到BoxCollider", GUILayout.ExpandWidth(true)))
+            {
+                DoAutomaticFullfillBoxCollider();
             }
             EditorGUILayout.EndVertical();
 
@@ -116,6 +120,24 @@ namespace MapEditor
             mCenterProperty.vector3Value = center;
             mSizeProperty.vector3Value = size;
             //Debug.Log($"Center:{center.ToString()} Size:{size.ToString()}");
+        }
+
+        /// <summary>
+        /// 自动填充数据到BoxCollider
+        /// </summary>
+        private void DoAutomaticFullfillBoxCollider()
+        {
+            if(mTarget == null)
+            {
+                return;
+            }
+            var boxCollider = mTarget.gameObject.GetComponent<boxCollider>();
+            if(boxCollider == null)
+            {
+                boxCollider = mTarget.gameObject.AddComppnent<BoxCollider>();
+            }
+            boxCollider.center = mCenterProperty.vector3Value;
+            boxCollider.size = mSizeProperty.vector3Value;
         }
     }
 }
