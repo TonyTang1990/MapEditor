@@ -29,12 +29,6 @@ namespace MapEditor
         public Vector3 Size;
 
         /// <summary>
-        /// 碰撞体半径
-        /// </summary>
-        [Header("碰撞体半径")]
-        public float Radius = 1;
-
-        /// <summary>
         /// Gizmos选中绘制
         /// </summary>
         public void OnDrawGizmosSelected()
