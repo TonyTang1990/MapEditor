@@ -832,7 +832,7 @@ namespace MapEditor
         /// <returns></returns>
         private MapObjectData DoAddMapObjectData(int uid, int insertIndex = -1)
         {
-            if (!MapUtilities.IsOperationAvalible(mTarget?.gameObject))
+            if (!MapUtilities.CheckOperationAvalible(mTarget?.gameObject))
             {
                 return null;
             }
@@ -894,7 +894,7 @@ namespace MapEditor
         /// <returns></returns>
         private bool DoRemoveMapObjectDataByIndex(int index)
         {
-            if (!MapUtilities.IsOperationAvalible(mTarget?.gameObject))
+            if (!MapUtilities.CheckOperationAvalible(mTarget?.gameObject))
             {
                 return false;
             }
@@ -1081,7 +1081,20 @@ namespace MapEditor
         /// </summary>
         private void OneKeySwitchOffMapDataBatchOperation()
         {
-            mTarget?.ClearAllMapDataBatchOperation();
+            ClearAllMapDataBatchOperation();
+        }
+
+        /// <summary>
+        /// 清除所有地图埋点批量选择
+        /// </summary>
+        private void ClearAllMapDataBatchOperation()
+        {
+            for (int i = 0; i < mMapDataListProperty.arraySize; i++)
+            {
+                var mapDataProperty = mMapDataListProperty.GetArrayElementAtIndex(i);
+                var batchOperationSwitchProperty = mapDataProperty.FindPropertyRelative("BatchOperationSwitch");
+                batchOperationSwitchProperty.boolValue = false;
+            }
         }
 
         /// <summary>
@@ -1089,8 +1102,6 @@ namespace MapEditor
         /// </summary>
         private async Task<bool> CleanDynamicMapDatas()
         {
-            return mTarget != null ? mTarget.CleanDynamicMapDatas() : false;
-            /*
             if(!MapUtilities.CheckOperationAvalible(mTarget?.gameObject))
             {
                 return false;
@@ -1101,7 +1112,6 @@ namespace MapEditor
                 return false;
             }
             return true;
-            */
         }
 
         /// <summary>
@@ -1188,8 +1198,6 @@ namespace MapEditor
         /// </summary>
         private async Task<bool> RecoverDynamicMapDatas()
         {
-            return mTarget != null ? mTarget.RecoverDynamicMapDatas() : false;
-            /*
             if (!MapUtilities.CheckOperationAvalible(mTarget?.gameObject))
             {
                 return false;
@@ -1200,7 +1208,6 @@ namespace MapEditor
                 return false;
             }
             return true;
-            */
         }
 
         /// <summary>
@@ -1245,8 +1252,6 @@ namespace MapEditor
         /// </summary>
         private void OneKeyRecreateMapObjectGos()
         {
-            mTarget?.OneKeyRecreateMapObjectGos();
-            /*
             if (!MapUtilities.CheckOperationAvalible(mTarget?.gameObject))
             {
                 return;
@@ -1258,7 +1263,6 @@ namespace MapEditor
             }
             serializedObject.ApplyModifiedProperties();
             AssetDatabase.SaveAssets();
-            */
         }
 
         /// <summary>
@@ -1285,8 +1289,6 @@ namespace MapEditor
         /// </summary>
         private void ExportMapData()
         {
-            mTarget?.ExportMapData();
-            /*
             if(!MapEditorUtilities.CheckIsGameMapAvalibleExport(mTarget))
             {
                 EditorUtility.DisplayDialog("导出地图数据", "场景数据有问题，不满足导出条件，导出场景数据失败！", "确认");
@@ -1305,7 +1307,6 @@ namespace MapEditor
                 PrefabUtility.ApplyPrefabInstance(mTarget?.gameObject, InteractionMode.AutomatedAction);
             }
             MapExportUtilities.ExportGameMapData(mTarget);
-            */
         }
 
         /// <summary>
@@ -1313,9 +1314,6 @@ namespace MapEditor
         /// </summary>
         private async Task<bool> OneKeyBakeAndExport()
         {
-            void oneKeyBakeAndExportResult = await mTarget?.OneKeyBakeAndExport();
-            return oneKeyBakeAndExportResult;
-            /*
             if (!MapUtilities.CheckOperationAvalible(mTarget?.gameObject))
             {
                 return false;
@@ -1348,7 +1346,6 @@ namespace MapEditor
             AssetDatabase.SaveAssets();
             Debug.Log($"一键烘焙拷贝导出地图数据完成！");
             return true;
-            */
         }
 
         /// <summary>
