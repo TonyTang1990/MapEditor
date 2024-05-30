@@ -20,11 +20,6 @@ namespace MapEditor
         public const string MapEditorScenePath = "Assets/Resources/Scenes/MapEditorScene.unity";
 
         /// <summary>
-        /// 地图导出目录相对路径(相对Asset目录)
-        /// </summary>
-        public const string MapExportRelativePath = "Assets/Resources/MapExport";
-
-        /// <summary>
         /// 地图预制件相对目录
         /// </summary>
         public const string MapPrefabFolderRelativePath = "Assets/Resources/Maps";

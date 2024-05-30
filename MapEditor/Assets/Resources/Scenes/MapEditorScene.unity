@@ -336,25 +336,17 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 0}
     m_Modifications:
-    - target: {fileID: 3704578141945685453, guid: 17e532285d4b3064ab746a7440568961, type: 3}
-      propertyPath: MapLineGUISwitch
+    - target: {fileID: 3704578141515405097, guid: 17e532285d4b3064ab746a7440568961, type: 3}
+      propertyPath: m_IsActive
       value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 3704578141945685453, guid: 17e532285d4b3064ab746a7440568961, type: 3}
-      propertyPath: managedReferences[6165940593996857345].Position.x
-      value: 5.043041
+      propertyPath: GridSize
+      value: 6
       objectReference: {fileID: 0}
     - target: {fileID: 3704578141945685453, guid: 17e532285d4b3064ab746a7440568961, type: 3}
-      propertyPath: managedReferences[6165940593996857349].Position.x
-      value: 4.043041
-      objectReference: {fileID: 0}
-    - target: {fileID: 3704578141945685453, guid: 17e532285d4b3064ab746a7440568961, type: 3}
-      propertyPath: managedReferences[6165940593996857345].BatchOperationSwitch
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 3704578141945685453, guid: 17e532285d4b3064ab746a7440568961, type: 3}
-      propertyPath: managedReferences[6165940593996857349].BatchOperationSwitch
-      value: 1
+      propertyPath: MapAreaGUISwitch
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 3704578141945685454, guid: 17e532285d4b3064ab746a7440568961, type: 3}
       propertyPath: m_Name

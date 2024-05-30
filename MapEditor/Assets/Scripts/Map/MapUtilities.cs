@@ -7,6 +7,10 @@
 using System;
 using System.IO;
 using UnityEngine;
+using Unity.AI.Navigation;
+using System.Threading.Tasks;
+using Unity.AI.Navigation.Editor;
+using UnityEngine.AI;
 #if UNITY_EDITOR
 using UnityEditor;
 using UnityEditor.SceneManagement;
@@ -176,28 +180,18 @@ namespace MapEditor
                 return;
             }
             var boxCollider = go.GetComponent<BoxCollider>();
-            var sphereCollider = go.GetComponent<SphereCollider>();
             // 没有碰撞体有ColliderDataMono则根据对应信息更新碰撞器数据
             // 反之则根据传入的碰撞体数据初始化碰撞体数据
-            if (boxCollider == null && sphereCollider == null)
+            if (boxCollider == null)
             {
                 var colliderDataMono = go.GetComponent<ColliderDataMono>();
                 if (colliderDataMono == null)
                 {
                     return;
                 }
-                if (colliderDataMono.ColliderType == ColliderType.BOX)
-                {
-                    boxCollider = go.AddComponent<BoxCollider>();
-                    boxCollider.center = colliderDataMono.Center;
-                    boxCollider.size = colliderDataMono.Size;
-                }
-                else if (colliderDataMono.ColliderType == ColliderType.SPHERE)
-                {
-                    sphereCollider = go.AddComponent<SphereCollider>();
-                    sphereCollider.center = colliderDataMono.Center;
-                    sphereCollider.radius = colliderDataMono.Radius;
-                }
+                boxCollider = go.AddComponent<BoxCollider>();
+                boxCollider.center = colliderDataMono.Center;
+                boxCollider.size = colliderDataMono.Size;
             }
             else
             {
@@ -205,11 +199,6 @@ namespace MapEditor
                 {
                     boxCollider.center = center;
                     boxCollider.size = size;
-                }
-                if (sphereCollider != null)
-                {
-                    sphereCollider.center = center;
-                    sphereCollider.radius = radius;
                 }
             }
         }
@@ -232,18 +221,9 @@ namespace MapEditor
             }
             else
             {
-                if (colliderDataMono.ColliderType == ColliderType.BOX)
-                {
-                    var boxCollider = go.GetOrAddComponet<BoxCollider>();
-                    boxCollider.center = colliderDataMono.Center;
-                    boxCollider.size = colliderDataMono.Size;
-                }
-                else if (colliderDataMono.ColliderType == ColliderType.SPHERE)
-                {
-                    var sphereCollider = go.GetOrAddComponet<SphereCollider>();
-                    sphereCollider.center = colliderDataMono.Center;
-                    sphereCollider.radius = colliderDataMono.Radius;
-                }
+                var boxCollider = go.GetOrAddComponet<BoxCollider>();
+                boxCollider.center = colliderDataMono.Center;
+                boxCollider.size = colliderDataMono.Size;
             }
         }
 
@@ -262,18 +242,9 @@ namespace MapEditor
             {
                 return;
             }
-            if (colliderDataMono.ColliderType == ColliderType.BOX)
-            {
-                var boxCollider = go.GetOrAddComponet<BoxCollider>();
-                boxCollider.center = colliderDataMono.Center;
-                boxCollider.size = colliderDataMono.Size;
-            }
-            else if (colliderDataMono.ColliderType == ColliderType.SPHERE)
-            {
-                var sphereCollider = go.GetOrAddComponet<SphereCollider>();
-                sphereCollider.center = colliderDataMono.Center;
-                sphereCollider.radius = colliderDataMono.Radius;
-            }
+            var boxCollider = go.GetOrAddComponet<BoxCollider>();
+            boxCollider.center = colliderDataMono.Center;
+            boxCollider.size = colliderDataMono.Size;
         }
 
         /// <summary>
@@ -434,7 +405,7 @@ namespace MapEditor
         /// <returns></returns>
         public static async Task<bool> CopyNavMeshAsset(GameObject gameObject)
         {
-            var navMeshSurface = mTarget.GetComponent<NavMeshSurface>();
+            var navMeshSurface = gameObject.GetComponent<NavMeshSurface>();
             if (navMeshSurface == null)
             {
                 Debug.LogError($"地图:{gameObject.name}找不到寻路NavMeshSurface组件，拷贝寻路数据Asset失败！");
@@ -500,6 +471,76 @@ namespace MapEditor
             return assetPath;
         }
 
+        /// <summary>
+        /// 检查指定Map脚本是否满足导出条件
+        /// </summary>
+        /// <param name="map"></param>
+        /// <returns></returns>
+        public static bool CheckIsGameMapAvalibleExport(Map map)
+        {
+            if (map == null)
+            {
+                Debug.LogError($"空Map脚本不符合导出条件!");
+                return false;
+            }
+            if (CheckHasInvalideMapDataUID(map))
+            {
+                return false;
+            }
+            if (CheckHasInvalideMapObjectUID(map))
+            {
+                return false;
+            }
+            return true;
+        }
+
+        /// <summary>
+        /// 检查Map脚本是否有无效埋点类型数据
+        /// </summary>
+        /// <param name="map"></param>
+        /// <returns></returns>
+        private static bool CheckHasInvalideMapDataUID(Map map)
+        {
+            if (map == null)
+            {
+                return false;
+            }
+            MapDataConfig mapDataConfig;
+            foreach (var mapData in map.MapDataList)
+            {
+                mapDataConfig = MapSetting.GetEditorInstance().DataSetting.GetMapDataConfigByUID(mapData.UID);
+                if (mapDataConfig == null)
+                {
+                    Debug.LogError($"地图埋点数据有配置不支持的地图埋点UID:{mapData.UID}");
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        /// <summary>
+        /// 检查Map脚本是否有无效地图对象UID数据
+        /// </summary>
+        /// <param name="map"></param>
+        /// <returns></returns>
+        private static bool CheckHasInvalideMapObjectUID(Map map)
+        {
+            if (map == null)
+            {
+                return false;
+            }
+            MapObjectConfig mapObjectConfig;
+            foreach (var mapObjectData in map.MapObjectDataList)
+            {
+                mapObjectConfig = MapSetting.GetEditorInstance().ObjectSetting.GetMapObjectConfigByUID(mapObjectData.UID);
+                if (mapObjectConfig == null)
+                {
+                    Debug.LogError($"地图对象数据有配置不支持的地图对象UID:{mapObjectData.UID}");
+                    return true;
+                }
+            }
+            return false;
+        }
 #endif
     }
 }

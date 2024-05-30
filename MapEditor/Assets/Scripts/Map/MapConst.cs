@@ -20,6 +20,11 @@ namespace MapEditor
         public const string MapSettingSavePath = "Assets/Map/MapSetting.asset";
 
         /// <summary>
+        /// 地图导出目录相对路径(相对Asset目录)
+        /// </summary>
+        public const string MapExportRelativePath = "Assets/Resources/MapExport";
+
+        /// <summary>
         /// 地图横向默认大小
         /// </summary>
         public const int DefaultMapWidth = 6;

@@ -8,6 +8,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using System.Threading.Tasks;
 #if UNITY_EDITOR
 using UnityEditor;
 #endif
@@ -36,12 +37,6 @@ namespace MapEditor
         /// 区域GUI开关
         /// </summary>
         [Header("区域GUI开关")]
-        public bool MapAreaGUISwitch = false;
-
-        /// <summary>
-        /// 地图区域GUI开关
-        /// </summary>
-        [Header("地图区域GUI开关")]
         public bool MapAreaGUISwitch = false;
 
         /// <summary>
@@ -450,7 +445,7 @@ namespace MapEditor
                 return false;
             }
             ExportMapData();
-            AssetDatabase.SaveAsets();
+            AssetDatabase.SaveAssets();
             Debug.Log($"一键烘焙拷贝导出地图:{gameObject.name}数据完成！");
             return true;
         }
@@ -489,11 +484,6 @@ namespace MapEditor
                 }
                 if (mapObjectData.Go != null)
                 {
-                    var positionProperty = mapObjectData.FindPropertyRelative("Position");
-                    var rotationProperty = mapObjectData.FindPropertyRelative("Rotation");
-                    var localScaleProperty = mapObjectData.FindPropertyRelative("LocalScale");
-                    var colliderCenterProperty = mapObjectData.FindPropertyRelative("ColliderCenter");
-                    var colliderSizeProperty = mapObjectData.FindPropertyRelative("ColliderSize");
                     var mapObjectGO = mapObjectData.Go;
                     mapObjectData.Position = mapObjectGO.transform.position;
                     mapObjectData.Rotation = mapObjectGO.transform.rotation.eulerAngles;
@@ -527,7 +517,7 @@ namespace MapEditor
                 {
                     continue;
                 }
-                if(mapObjectConfig.IsDynamic && mapObjectConfig.Go == null)
+                if(mapObjectConfig.IsDynamic && mapObjectData.Go == null)
                 {
                     RecreateMapObjectGo(mapObjectData);
                 }
@@ -554,9 +544,6 @@ namespace MapEditor
             var instanceGo = CreateGameObjectByUID(mapObjectData.UID);
             if (instanceGo != null)
             {
-                var positionProperty = mapObjectData.FindPropertyRelative("Position");
-                var rotationProperty = mapObjectData.FindPropertyRelative("Rotation");
-                var localScaleProperty = mapObjectData.FindPropertyRelative("LocalScale");
                 instanceGo.transform.position = mapObjectData.Position;
                 instanceGo.transform.rotation = Quaternion.Euler(mapObjectData.Rotation);
                 instanceGo.transform.localScale = mapObjectData.LocalScale;
@@ -587,7 +574,7 @@ namespace MapEditor
             UpdateMapObjectDataLogicDatas();
             if(!CleanDynamicMapObjects())
             {
-                Debug.LogError($"地图:{gameObject.name}清除动态地图对象失败！")
+                Debug.LogError($"地图:{gameObject.name}清除动态地图对象失败！");
                 return false;
             }
             return true;
@@ -600,7 +587,7 @@ namespace MapEditor
         {
             if (!MapUtilities.CheckOperationAvalible(gameObject))
             {
-                Debug.LogError($"地图:{mTarget?.gameObject.name}清除动态地图对象失败！");
+                Debug.LogError($"地图:{gameObject.name}清除动态地图对象失败！");
                 return false;
             }
             for (int i = 0; i < MapObjectDataList.Count; i++)
@@ -625,7 +612,7 @@ namespace MapEditor
         /// </summary>
         public void ExportMapData()
         {
-            if (!MapEditorUtilities.CheckIsGameMapAvalibleExport(this))
+            if (!MapUtilities.CheckIsGameMapAvalibleExport(this))
             {
                 Debug.LogError($"地图:{gameObject.name}场景数据有问题，不满足导出条件，导出场景数据失败！");
                 return;
@@ -638,7 +625,7 @@ namespace MapEditor
             // 确保数据应用到对应Asset上
             if (isPrefabAssetInstance)
             {
-                PrefabUtility.ApplyPrefabInstance(mTarget?.gameObject, InteractionMode.AutomatedAction);
+                PrefabUtility.ApplyPrefabInstance(gameObject, InteractionMode.AutomatedAction);
             }
             MapExportUtilities.ExportGameMapData(this);
         }

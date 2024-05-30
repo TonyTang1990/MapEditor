@@ -6,9 +6,11 @@
 
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using UnityEngine;
 
 namespace MapEditor
 {
@@ -25,7 +27,7 @@ namespace MapEditor
         /// <returns></returns>
         public static string GetGameMapExportFolderFullPath(ExportType exportType)
         {
-            var gameMapExportFolderFullPath = PathUtilities.GetAssetFullPath(MapEditorConst.MapExportRelativePath);
+            var gameMapExportFolderFullPath = PathUtilities.GetAssetFullPath(MapConst.MapExportRelativePath);
             var folderName = exportType.ToString();
             gameMapExportFolderFullPath = Path.Combine(gameMapExportFolderFullPath, folderName);
             return gameMapExportFolderFullPath;
@@ -212,7 +214,7 @@ namespace MapEditor
                 var mapObjectConfig = MapSetting.GetEditorInstance().ObjectSetting.GetMapObjectConfigByUID(mapObjectUID);
                 if (mapObjectConfig.IsDynamic)
                 {
-                    var mapDataExport = GetColliderMapDynamicExport(mapObjectData);
+                    var mapDataExport = GetColliderMapDynamicExport(mapObjectData, map.GridSize);
                     mapExport.AllColliderMapDynamicExportDatas.Add(mapDataExport);
                 }
                 else
@@ -327,7 +329,7 @@ namespace MapEditor
             }
             var colliderGridGUIDs = GetGridUIDs(mapObjectData.Position, mapObjectData.Rotation, mapObjectData.ColliderCenter, mapObjectData.ColliderSize, gridSize);
             return new ColliderMapDynamicExport(mapObjectConfig.ObjectType, mapObjectConfig.ConfId, mapObjectData.Position,
-                                                mapObjectData.Rotation, colliderGridGUIDs, mapObjectData.ColliderCenter, mapObjectData.ColliderSize);
+                                                mapObjectData.Rotation, mapObjectData.LocalScale, colliderGridGUIDs, mapObjectData.ColliderCenter, mapObjectData.ColliderSize);
         }
 
         /// <summary>
@@ -349,7 +351,7 @@ namespace MapEditor
                 Debug.LogError($"找不到地图对象UID:{mapObjectUID}的配置，获取地图动态对象数据基础导出数据失败！");
                 return null;
             }
-            return new BaseMapDynamicExport(mapObjectConfig.ObjectType, mapObjectConfig.ConfId, mapObjectData.Position, mapObjectData.Rotation);
+            return new BaseMapDynamicExport(mapObjectConfig.ObjectType, mapObjectConfig.ConfId, mapObjectData.Position, mapObjectData.Rotation, mapObjectData.LocalScale);
         }
 
         /// <summary>
@@ -419,28 +421,6 @@ namespace MapEditor
                 return null;
             }
             return new BaseMapDataExport(mapDataConfig.DataType, mapDataConfig.ConfId, mapData.Position, mapData.Rotation);
-        }
-
-        /// <summary>
-        /// 指定目标int值是否在指定值数组范围内
-        /// </summary>
-        /// <param name="targetValue"></param>
-        /// <param name="values"></param>
-        /// <returns></returns>
-        public static bool IsIntValueInArrays(int targetValue, int[] values)
-        {
-            if (values == null || values.Length == 0)
-            {
-                return false;
-            }
-            foreach (var value in values)
-            {
-                if (targetValue == value)
-                {
-                    return true;
-                }
-            }
-            return false;
         }
 
         /// <summary>

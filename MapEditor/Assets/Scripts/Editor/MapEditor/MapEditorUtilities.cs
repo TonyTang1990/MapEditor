@@ -580,70 +580,21 @@ namespace MapEditor
         }
 
         /// <summary>
-        /// 检查指定Map脚本是否满足导出条件
+        /// 指定目标int值是否在指定值数组范围内
         /// </summary>
-        /// <param name="map"></param>
+        /// <param name="targetValue"></param>
+        /// <param name="values"></param>
         /// <returns></returns>
-        public static bool CheckIsGameMapAvalibleExport(Map map)
+        public static bool IsIntValueInArrays(int targetValue, int[] values)
         {
-            if(map == null)
-            {
-                Debug.LogError($"空Map脚本不符合导出条件!");
-                return false;
-            }
-            if(CheckHasInvalideMapDataUID(map))
+            if (values == null || values.Length == 0)
             {
                 return false;
             }
-            if(CheckHasInvalideMapObjectUID(map))
+            foreach (var value in values)
             {
-                return false;
-            }
-            return true;
-        }
-
-        /// <summary>
-        /// 检查Map脚本是否有无效埋点类型数据
-        /// </summary>
-        /// <param name="map"></param>
-        /// <returns></returns>
-        private static bool CheckHasInvalideMapDataUID(Map map)
-        {
-            if(map == null)
-            {
-                return false;
-            }
-            MapDataConfig mapDataConfig;
-            foreach(var mapData in map.MapDataList)
-            {
-                mapDataConfig = MapSetting.GetEditorInstance().DataSetting.GetMapDataConfigByUID(mapData.UID);
-                if(mapDataConfig == null)
+                if (targetValue == value)
                 {
-                    Debug.LogError($"地图埋点数据有配置不支持的地图埋点UID:{mapData.UID}");
-                    return true;
-                }
-            }
-            return false;
-        }
-
-        /// <summary>
-        /// 检查Map脚本是否有无效地图对象UID数据
-        /// </summary>
-        /// <param name="map"></param>
-        /// <returns></returns>
-        private static bool CheckHasInvalideMapObjectUID(Map map)
-        {
-            if(map == null)
-            {
-                return false;
-            }
-            MapObjectConfig mapObjectConfig;
-            foreach(var mapObjectData in map.MapObjectDataList)
-            {
-                mapObjectConfig = MapSetting.GetEditorInstance().ObjectSetting.GetMapObjectConfigByUID(mapObjectData.UID);
-                if(mapObjectConfig == null)
-                {
-                    Debug.LogError($"地图对象数据有配置不支持的地图对象UID:{mapObjectData.UID}");
                     return true;
                 }
             }

@@ -5,6 +5,7 @@
  */
 
 using System;
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace MapEditor
@@ -27,8 +28,8 @@ namespace MapEditor
         public Vector3 ColliderSize;
 
         public ColliderMapDynamicExport(MapObjectType mapObjectType, int confId, Vector3 position,
-                                            Vector3 rotation, List<int> ownerGridUIDs, Vector3 colliderCenter, Vector3 colliderSize)
-                                                : base(mapObjectType, confId, position, rotation, ownerGridUIDs)
+                                            Vector3 rotation, Vector3 localScale, List<int> ownerGridUIDs, Vector3 colliderCenter, Vector3 colliderSize)
+                                                : base(mapObjectType, confId, position, rotation, localScale, ownerGridUIDs)
         {
             ColliderCenter = colliderCenter;
             ColliderSize = colliderSize;
