@@ -138,6 +138,7 @@ namespace MapEditor
             }
             boxCollider.center = mCenterProperty.vector3Value;
             boxCollider.size = mSizeProperty.vector3Value;
+            EditorUtility.SetDirty(mTarget);
         }
     }
 }
