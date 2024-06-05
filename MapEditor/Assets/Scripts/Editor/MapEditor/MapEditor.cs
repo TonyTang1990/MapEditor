@@ -1076,23 +1076,25 @@ namespace MapEditor
         }
 
         /// <summary>
-        /// 一键清除地图埋点批量勾选
+        /// 一键操作地图埋点批量勾选
         /// </summary>
-        private void OneKeySwitchOffMapDataBatchOperation()
+        /// <param name="isOn"></param>
+        private void OneKeySwitchMapDataBatchOperation(bool isOn)
         {
-            ClearAllMapDataBatchOperation();
+            UpdateAllMapDataBatchOperation(isOn);
         }
 
         /// <summary>
-        /// 清除所有地图埋点批量选择
+        /// 更新所有地图埋点批量选择
         /// </summary>
-        private void ClearAllMapDataBatchOperation()
+        /// <param name="isOn"></param>
+        private void UpdateAllMapDataBatchOperation(bool isOn)
         {
             for (int i = 0; i < mMapDataListProperty.arraySize; i++)
             {
                 var mapDataProperty = mMapDataListProperty.GetArrayElementAtIndex(i);
                 var batchOperationSwitchProperty = mapDataProperty.FindPropertyRelative("BatchOperationSwitch");
-                batchOperationSwitchProperty.boolValue = false;
+                batchOperationSwitchProperty.boolValue = isOn;
             }
         }
 
@@ -1821,9 +1823,13 @@ namespace MapEditor
                     DoAddMapData(addMapDataValue);
                 }
                 EditorGUILayout.EndHorizontal();
-                if(GUILayout.Button("一键清除批量勾选", GUILayout.ExpandWidth(true)))
+                if (GUILayout.Button("一键勾选批量", GUILayout.ExpandWidth(true)))
                 {
-                    OneKeySwitchOffMapDataBatchOperation();
+                    OneKeySwitchMapDataBatchOperation(true);
+                }
+                if (GUILayout.Button("一键清除批量勾选", GUILayout.ExpandWidth(true)))
+                {
+                    OneKeySwitchMapDataBatchOperation(false);
                 }
             }
             else

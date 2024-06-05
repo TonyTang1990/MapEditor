@@ -367,13 +367,14 @@ namespace MapEditor
         }
 
         /// <summary>
-        /// 清除所有地图埋点批量选择
+        /// 更新所有地图埋点批量选择
         /// </summary>
-        public void ClearAllMapDataBatchOperation()
+        /// <param name="isOn"></param>
+        public void UpdateAllMapDataBatchOperation(bool isOn)
         {
             for (int i = 0, length = MapDataList.Count; i < length; i++)
             {
-                MapDataList[i].BatchOperationSwitch = false;
+                MapDataList[i].BatchOperationSwitch = isOn;
             }
         }
 

@@ -234,10 +234,50 @@ namespace MapEditor
         }
 
         /// <summary>
+        /// 游戏地图埋点选中所有批量选中菜单
+        /// </summary>
+        /// <param name="menuCommand"></param>
+        [MenuItem("GameObject/Map/MapData/SelectAllBatch #&S", false, 0)]
+        static void MapDataSelectAllBatch(MenuCommand menuCommand)
+        {
+            Debug.Log($"MapDataSelectAllBatch()");
+            if (Time.unscaledTime.Equals(LastDumplicateMenuCallTimestamp))
+            {
+                Debug.Log($"同一时刻触发多次MapDataSelectAllBatch()，忽略调用！");
+                return;
+            }
+            var targetGameObjects = Selection.objects;
+            if (targetGameObjects == null || targetGameObjects.Length == 0)
+            {
+                return;
+            }
+            var selectionNum = targetGameObjects.Length;
+            Debug.Log($"选中对象数量:{selectionNum}");
+            LastDumplicateMenuCallTimestamp = Time.unscaledTime;
+            Debug.Log($"LastDumplicateMenuCallTimestamp:{LastDumplicateMenuCallTimestamp}");
+            for (int i = 0; i < targetGameObjects.Length; i++)
+            {
+                UpdateAllBatch(targetGameObjects[i] as GameObject, true);
+            }
+        }
+
+        /// <summary>
+        /// 游戏地图埋点选中所有批量选中菜单验证方法
+        /// </summary>
+        /// <param name="menuCommand"></param>
+        /// <returns></returns>
+        [MenuItem("GameObject/Map/MapData/SelectAllBatch #&S", true, 0)]
+        static bool MapDataSelectAllBatchValidateFunction(MenuCommand menuCommand)
+        {
+            Debug.Log($"MapDataSelectAllBatchValidateFunction()");
+            return CheckSelfHasMapScript(Selection.objects);
+        }
+
+        /// <summary>
         /// 游戏地图埋点移除所有批量选中菜单
         /// </summary>
         /// <param name="menuCommand"></param>
-        [MenuItem("GameObject/Map/MapData/ClearAllBatch #&E", false, 0)]
+        [MenuItem("GameObject/Map/MapData/ClearAllBatch #&C", false, 0)]
         static void MapDataClearAllBatch(MenuCommand menuCommand)
         {
             Debug.Log($"MapDataClearAllBatch()");
@@ -257,7 +297,7 @@ namespace MapEditor
             Debug.Log($"LastDumplicateMenuCallTimestamp:{LastDumplicateMenuCallTimestamp}");
             for (int i = 0; i < targetGameObjects.Length; i++)
             {
-                TryClearAllBatch(targetGameObjects[i] as GameObject);
+                UpdateAllBatch(targetGameObjects[i] as GameObject, false);
             }
         }
 
@@ -266,7 +306,7 @@ namespace MapEditor
         /// </summary>
         /// <param name="menuCommand"></param>
         /// <returns></returns>
-        [MenuItem("GameObject/Map/MapData/ClearAllBatch #&E", true, 0)]
+        [MenuItem("GameObject/Map/MapData/ClearAllBatch #&C", true, 0)]
         static bool MapDataClearAllBatchValidateFunction(MenuCommand menuCommand)
         {
             Debug.Log($"MapDataClearAllBatchValidateFunction()");
@@ -387,7 +427,7 @@ namespace MapEditor
                     }
                 }
             }
-            map.ClearAllMapDataBatchOperation();
+            map.UpdateAllMapDataBatchOperation(false);
             foreach(var newMapData in dumplicatedMapDatas)
             {
                 newMapData.BatchOperationSwitch = true;
@@ -426,11 +466,12 @@ namespace MapEditor
         }
 
         /// <summary>
-        /// 尝试清除指定对象的批量地图埋点选中数据
+        /// 更新清除指定对象的批量地图埋点选中数据
         /// </summary>
         /// <param name="go"></param>
+        /// <param name="isSelect"></param>
         /// <returns></returns>
-        private static bool TryClearAllBatch(GameObject go)
+        private static bool UpdateAllBatch(GameObject go, bool isSelect = false)
         {
             if (go == null)
             {
@@ -442,7 +483,7 @@ namespace MapEditor
                 Debug.LogError($"当前选中对象:{go.name}没有Map脚本，不应该进入这里，游戏地图埋点移除所有批量选中数据失败！");
                 return false;
             }
-            map.ClearAllMapDataBatchOperation();
+            map.UpdateAllMapDataBatchOperation(isSelect);
             return true;
         }
 
