@@ -416,8 +416,14 @@ namespace MapEditor
         /// </summary>
         private void UpdateMapObjectDataLogicDatas()
         {
+            // 避免选中Asset也会触发逻辑数据更新导致预制件触发变化
+            var gameObjectStatus = MapUtilities.GetGameObjectStatus(mTarget.gameObject);
+            if(gameObjectStatus == GameObjectStatus.INVALIDE || gameObjectStatus == GameObjectStatus.Asset)
+            {
+                return;
+            }
             // 地图对象可能删除还原，所以需要逻辑层面记录数据
-            for(int i = 0; i < mMapObjectDataListProperty.arraySize; i++)
+            for (int i = 0; i < mMapObjectDataListProperty.arraySize; i++)
             {
                 var mapObjectDataProperty = mMapObjectDataListProperty.GetArrayElementAtIndex(i);
                 var uidProperty = mapObjectDataProperty.FindPropertyRelative("UID");
@@ -1107,12 +1113,13 @@ namespace MapEditor
             {
                 return false;
             }
+            bool result = true;
             UpdateMapObjectDataLogicDatas();
             if(!CleanDynamicMapObjects())
             {
-                return false;
+                result = false;
             }
-            return true;
+            return result;
         }
 
         /// <summary>
@@ -1203,12 +1210,13 @@ namespace MapEditor
             {
                 return false;
             }
+            var result = true;
             UpdateMapObjectDataLogicDatas();
             if(!RecoverDynamicMapObjectGos())
             {
-                return false;
+                result = false;
             }
-            return true;
+            return result;
         }
 
         /// <summary>
