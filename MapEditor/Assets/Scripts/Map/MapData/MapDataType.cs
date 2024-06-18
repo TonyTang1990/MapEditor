@@ -12,8 +12,8 @@ namespace MapEditor
     /// </summary>
     public enum MapDataType
     {
-        PLAYER_SPAWN = 0,           // 玩家出生点位置数据
-        MONSTER = 1,                // 怪物数据
-        MONSTER_GROUP = 2,          // 怪物组数据
+        PlayerSpawn = 0,           // 玩家出生点位置数据
+        Monster = 1,               // 怪物数据
+        MonsterGroup = 2,          // 怪物组数据
     }
 }

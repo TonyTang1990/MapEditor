@@ -12,8 +12,8 @@ namespace MapEditor
     /// </summary>
     public enum MapObjectType
     {
-        TREASURE_BOX = 0,           // 宝箱
-        TRAP = 1,                   // 陷阱
-        DOOR = 2,                   // 门
+        TreasureBox = 0,            // 宝箱
+        Trap = 1,                   // 陷阱
+        Door = 2,                   // 门
     }
 }

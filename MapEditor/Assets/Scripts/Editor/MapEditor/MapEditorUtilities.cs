@@ -513,7 +513,7 @@ namespace MapEditor
             }
             var mapDataDes = mapDataConfig.Des;
             var mapDataType = mapDataConfig.DataType;
-            if(mapDataType == MapDataType.MONSTER || mapDataType == MapDataType.MONSTER_GROUP)
+            if(mapDataType == MapDataType.Monster || mapDataType == MapDataType.MonsterGroup)
             {
                 var groupIdProperty = mapDataProperty.FindPropertyRelative("GroupId");
                 return $"[{index}]{mapDataDes}({groupIdProperty.intValue}组)";
@@ -573,9 +573,9 @@ namespace MapEditor
         /// </summary>
         private static Dictionary<MapDataType, Color> MapDataTypeColorMap = new Dictionary<MapDataType, Color>()
         {
-            { MapDataType.PLAYER_SPAWN, Color.yellow },
-            { MapDataType.MONSTER, Color.magenta },
-            { MapDataType.MONSTER_GROUP, Color.red },
+            { MapDataType.PlayerSpawn, Color.yellow },
+            { MapDataType.Monster, Color.magenta },
+            { MapDataType.MonsterGroup, Color.red },
         };
 
         /// <summary>

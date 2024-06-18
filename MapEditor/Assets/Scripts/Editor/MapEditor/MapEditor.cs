@@ -35,6 +35,211 @@ namespace MapEditor
         }
 
         /// <summary>
+        /// 地图折叠类型
+        /// </summary>
+        private enum MapFoldType
+        {
+            MapObjectDataFold = 0,          // 地图对象数据折叠
+            PlayerSpawnMapDataFold = 1,     // 地图玩家出生点数据折叠
+            MonsterMapDataFold = 2,         // 地图怪物数据折叠
+            MonsterGroupMapDataFold = 3,    // 地图怪物组数据折叠
+        }
+
+        /// <summary>
+        /// 地图数据UI类型
+        /// </summary>
+        private enum MapDataUIType
+        {
+            Batch = 0,                              // 批量UI
+            Index = 1,                              // 索引UI
+            UID = 2,                                // UID UI
+            MapDataType = 3,                        // 地图埋点类型UI
+            ConfId = 4,                             // 配置Id UI
+            Position = 5,                           // 位置UI
+            Rotation = 6,                           // 旋转UI
+            Des = 7,                                // 描述UI
+            MoveUp = 8,                             // 上移UI
+            MoveDown = 9,                           // 下移UI
+            Add = 10,                               // 添加UI
+            Remove = 11,                            // 移除UI
+            MonsterGroupId = 12,                    // 怪物组Id
+            MonsterCreateRadius = 13,               // 怪物创建半径UI
+            MonsterActiveRadius = 14,               // 怪物警戒半径UI
+            MonsterGroupGUISwitchOff = 15,          // 怪物组GUI关闭开关UI
+        }
+
+        /// <summary>
+        /// 地图埋点类型和折叠类型映射
+        /// </summary>
+        private static Dictionary<MapDataType, MapFoldType> MapDataTypeFoldTypeMap = new Dictionary<MapDataType, MapFoldType>()
+        {
+            {MapDataType.PlayerSpawn, MapFoldType.PlayerSpawnMapDataFold},
+            {MapDataType.Monster, MapFoldType.MonsterMapDataFold},
+            {MapDataType.MonsterGroup, MapFoldType.MonsterGroupMapDataFold},
+        };
+
+        /// <summary>
+        /// 地图折叠类型和一键折叠标题Map<地图折叠类型，一键折叠标题>
+        /// </summary>
+        private static Dictionary<MapFoldType, string> MapOneKeyFoldTitleMap = new Dictionary<MapFoldType, string>()
+        {
+            {MapFoldType.MapObjectDataFold, "一键折叠所有(通用对象数据)"},
+            {MapFoldType.PlayerSpawnMapDataFold, "一键折叠所有(玩家出生点埋点数据)"},
+            {MapFoldType.MonsterMapDataFold, "一键折叠所有(怪物埋点数据)"},
+            {MapFoldType.MonsterGroupMapDataFold, "一键折叠所有(怪物组埋点数据)"},
+        };
+
+        /// <summary>
+        /// 地图折叠类型和一键展开标题Map<地图折叠类型，一键展开标题>
+        /// </summary>
+        private static Dictionary<MapFoldType, string> MapOneKeyUnfoldTitleMap = new Dictionary<MapFoldType, string>()
+        {
+            {MapFoldType.MapObjectDataFold, "一键展开所有(通用对象数据)"},
+            {MapFoldType.PlayerSpawnMapDataFold, "一键展开所有(玩家出生点埋点数据)"},
+            {MapFoldType.MonsterMapDataFold, "一键展开所有(怪物埋点数据)"},
+            {MapFoldType.MonsterGroupMapDataFold, "一键展开所有(怪物组埋点数据)"},
+        };
+
+        /// <summary>
+        /// 地图埋点类型和UI显示类型Map<地图埋点类型，<地图UI显示类型，是否显示>>
+        /// </summary>
+        private static Dictionary<MapDataType, Dictionary<MapDataUIType, bool>> MapDataFoldAndUITypeMap = new Dictionary<MapDataType, Dictionary<MapDataUIType, bool>>()
+        {
+            {
+                MapDataType.PlayerSpawn, new Dictionary<MapDataUIType, bool>()
+                {
+                    {MapDataUIType.Batch, true},
+                    {MapDataUIType.Index, true},
+                    {MapDataUIType.UID, true},
+                    {MapDataUIType.MapDataType, true},
+                    {MapDataUIType.ConfId, true},
+                    {MapDataUIType.Position, true},
+                    {MapDataUIType.Rotation, true},
+                    {MapDataUIType.Des, true},
+                    {MapDataUIType.MoveUp, true},
+                    {MapDataUIType.MoveDown, true},
+                    {MapDataUIType.Add, true},
+                    {MapDataUIType.Remove, true},
+                }
+            },
+            {
+                MapDataType.Monster, new Dictionary<MapDataUIType, bool>()
+                {
+                    {MapDataUIType.Batch, true},
+                    {MapDataUIType.Index, true},
+                    {MapDataUIType.UID, true},
+                    {MapDataUIType.MapDataType, true},
+                    {MapDataUIType.ConfId, true},
+                    {MapDataUIType.MonsterGroupId, true},
+                    {MapDataUIType.Position, true},
+                    {MapDataUIType.Rotation, true},
+                    {MapDataUIType.Des, true},
+                    {MapDataUIType.MoveUp, true},
+                    {MapDataUIType.MoveDown, true},
+                    {MapDataUIType.Add, true},
+                    {MapDataUIType.Remove, true},
+                }
+            },
+            {
+                MapDataType.MonsterGroup, new Dictionary<MapDataUIType, bool>()
+                {
+                    {MapDataUIType.Batch, true},
+                    {MapDataUIType.Index, true},
+                    {MapDataUIType.UID, true},
+                    {MapDataUIType.MapDataType, true},
+                    {MapDataUIType.ConfId, true},
+                    {MapDataUIType.MonsterGroupId, true},
+                    {MapDataUIType.MonsterCreateRadius, true},
+                    {MapDataUIType.MonsterActiveRadius, true},
+                    {MapDataUIType.MonsterGroupGUISwitchOff, true},
+                    {MapDataUIType.Position, true},
+                    {MapDataUIType.Rotation, true},
+                    {MapDataUIType.Des, true},
+                    {MapDataUIType.MoveUp, true},
+                    {MapDataUIType.MoveDown, true},
+                    {MapDataUIType.Add, true},
+                    {MapDataUIType.Remove, true},
+                }
+            },
+        };
+
+        /// <summary>
+        /// 获取制定地图埋点类型的折叠类型
+        /// </summary>
+        /// <param name="mapDataType"></param>
+        /// <returns></returns>
+        private static MapFoldType GetMapDataFoldType(MapDataType mapDataType)
+        {
+            MapFoldType mapFoldType = MapFoldType.PlayerSpawnMapDataFold;
+            if (!MapDataTypeFoldTypeMap.TryGetValue(mapDataType, out mapFoldType))
+            {
+                Debug.LogError($"找不到地图埋点类型:{mapDataType}的对应折叠类型！");
+            }
+            return mapFoldType;
+        }
+
+        /// <summary>
+        /// 获取指定地图折叠类型的一键折叠标题
+        /// </summary>
+        /// <param name="mapFoldType"></param>
+        /// <returns></returns>
+        private static string GetMapOneKeyFoldTitle(MapFoldType mapFoldType)
+        {
+            string title = "未定义";
+            if (MapOneKeyFoldTitleMap.TryGetValue(mapFoldType, out title))
+            {
+
+            }
+            return title;
+        }
+
+        /// <summary>
+        /// 获取指定地图折叠类型的一键展开标题
+        /// </summary>
+        /// <param name="mapFoldType"></param>
+        /// <returns></returns>
+        private static string GetMapOneKeyUnfoldTitle(MapFoldType mapFoldType)
+        {
+            string title = "未定义";
+            if (MapOneKeyUnfoldTitleMap.TryGetValue(mapFoldType, out title))
+            {
+
+            }
+            return title;
+        }
+
+        /// <summary>
+        /// 是否显示指定数据埋点类型的地图数据
+        /// </summary>
+        /// <param name="mapDataType"></param>
+        /// <returns></returns>
+        private static bool IsShowMapDataFoldType(MapDataType mapDataType)
+        {
+            return MapDataFoldAndUITypeMap.ContainsKey(mapDataType);
+        }
+
+        /// <summary>
+        /// 是否显示指定数据埋点类型和地图UI类型的UI
+        /// </summary>
+        /// <param name="mapDataType"></param>
+        /// <param name="mapDataUIType"></param>
+        /// <returns></returns>
+        private static bool IsShowMapUI(MapDataType mapDataType, MapDataUIType mapDataUIType)
+        {
+            Dictionary<MapDataUIType, bool> mapFoldTypeUIMap;
+            if (!MapDataFoldAndUITypeMap.TryGetValue(mapDataType, out mapFoldTypeUIMap))
+            {
+                return false;
+            }
+            bool isShowMapUI;
+            if (!mapFoldTypeUIMap.TryGetValue(mapDataUIType, out isShowMapUI))
+            {
+                return false;
+            }
+            return isShowMapUI;
+        }
+
+        /// <summary>
         /// 目标组件
         /// </summary>
         private Map mTarget;
@@ -130,6 +335,36 @@ namespace MapEditor
         private SerializedProperty mExportTypeProperty;
 
         /// <summary>
+        /// MapObjectDataUnfoldData属性
+        /// </summary>
+        private SerializedProperty mMapObjectDataUnfoldDataProperty;
+
+        /// <summary>
+        /// MapObjectDataGroupUnfoldDataList属性
+        /// </summary>
+        private SerializedProperty mMapObjectDataGroupUnfoldDataListProperty;
+
+        /// <summary>
+        /// MapDataUnfoldData属性
+        /// </summary>
+        private SerializedProperty mMapDataUnfoldDataProperty;
+
+        /// <summary>
+        /// PlayerSpawnMapGroupUnfoldDataList属性
+        /// </summary>
+        private SerializedProperty mPlayerSpawnMapGroupUnfoldDataListProperty;
+
+        /// <summary>
+        /// MonsterMapGroupUnfoldDataList属性
+        /// </summary>
+        private SerializedProperty mMonsterMapGroupUnfoldDataListProperty;
+
+        /// <summary>
+        /// MonsterGroupMapGroupUnfoldDataList属性
+        /// </summary>
+        private SerializedProperty mMonsterGroupMapGroupUnfoldDataListProperty;
+
+        /// <summary>
         /// 红色Label显示GUIStyle
         /// </summary>
         private GUIStyle mRedLabelGUIStyle;
@@ -170,16 +405,6 @@ namespace MapEditor
         private MapTabType mSelectedTabType = MapTabType.MapBuild;
 
         /// <summary>
-        /// 地图对象操作区域是否展开显示
-        /// </summary>
-        private bool mMapObjectOperationUnfold = true;
-
-        /// <summary>
-        /// 地图对象数据是否展开显示
-        /// </summary>
-        private bool mMapObjectDataAreaUnfold = true;
-
-        /// <summary>
         /// 当前选中需要增加的地图对象预览Asset
         /// </summary>
         private Texture2D mAddMapObjectPreviewAsset;
@@ -195,17 +420,12 @@ namespace MapEditor
         private Dictionary<MapObjectType, int[]> mMapObjectDataChoiceValuesMap = new Dictionary<MapObjectType, int[]>();
 
         /// <summary>
-        /// 地图埋点数据区域是否展开显示
-        /// </summary>
-        private bool mMapDataAreaUnfold = true;
-
-        /// <summary>
         /// 地图自定义数据区域是否展开显示<地图埋点类型， 是否展开显示>
         /// </summary>
         private Dictionary<MapDataType, bool> mMapCustomDataAreaUnfoldMap = new Dictionary<MapDataType, bool>()
         {
-            { MapDataType.MONSTER, true },
-            { MapDataType.MONSTER_GROUP, true},
+            { MapDataType.Monster, true },
+            { MapDataType.MonsterGroup, true},
         };
 
         /// <summary>
@@ -228,6 +448,23 @@ namespace MapEditor
         /// </summary>
         private Dictionary<KeyCode, bool> mKeyCodeDownMap = new Dictionary<KeyCode, bool>();
 
+        /// <summary>
+        /// 埋点数据属性缓存Map<索引, 属性>
+        /// Note:
+        /// 经测试无论是GetArrayElementAtIndex()还是FindPropertyRelative()这些API调用都很耗时
+        /// 这里缓存埋点数据SerializedProperty用于解决每帧重复获取相同索引的埋点数据GetArrayElementAtIndex()调用问题
+        /// </summary>
+        private Dictionary<int, SerializedProperty> mMapDataProeprtyMapCache = new Dictionary<int, SerializedProperty>();
+
+        /// <summary>
+        /// 地图埋点类型和相关数据索引列表缓存Map<地图埋点类型， 对应地图埋点索引列表>
+        /// Note:
+        /// 经测试无论是GetArrayElementAtIndex()还是FindPropertyRelative()这些API调用都很耗时
+        /// 所以在绘制不同地图埋点数据时，这里采用每次使用缓存的地图埋点类型和索引列表数据避免每个类型都全量遍历mMapDataListProperty问题
+        /// 从而优化API调用耗时问题
+        /// </summary>
+        private Dictionary<MapDataType, List<int>> mMapDataTypeIndexsMapCache = new Dictionary<MapDataType, List<int>>();
+
         private void Awake()
         {
             InitTarget();
@@ -236,6 +473,7 @@ namespace MapEditor
             mMapWidthProperty.intValue = mMapWidthProperty.intValue == 0 ? MapSetting.GetEditorInstance().DefaultMapWidth : mMapWidthProperty.intValue;
             mMapHeightProperty.intValue = mMapHeightProperty.intValue == 0 ? MapSetting.GetEditorInstance().DefaultMapHeight : mMapHeightProperty.intValue;
             mGridSizeProperty.floatValue = Mathf.Approximately(mGridSizeProperty.floatValue, 0f) ? MapSetting.GetEditorInstance().DefaultGridSize : mGridSizeProperty.floatValue;
+            UpdateMapDataTypeIndexDatas();
             CreateAllNodes();
             UpdateMapObjectDataChoiceDatas();
             UpdateMapDataChoiceDatas();
@@ -281,6 +519,12 @@ namespace MapEditor
             mAddMapDataTypeProperty ??= serializedObject.FindProperty("AddMapDataType");
             mAddMapDataIndexProperty ??= serializedObject.FindProperty("AddMapDataIndex");
             mExportTypeProperty ??= serializedObject.FindProperty("ExportType");
+            mMapObjectDataUnfoldDataProperty ??= serializedObject.FindProperty("MapObjectDataUnfoldData");
+            mMapObjectDataGroupUnfoldDataListProperty ??= serializedObject.FindProperty("MapObjectDataGroupUnfoldDataList");
+            mMapDataUnfoldDataProperty ??= serializedObject.FindProperty("MapDataUnfoldData");
+            mPlayerSpawnMapGroupUnfoldDataListProperty ??= serializedObject.FindProperty("PlayerSpawnMapGroupUnfoldDataList");
+            mMonsterMapGroupUnfoldDataListProperty ??= serializedObject.FindProperty("MonsterMapGroupUnfoldDataList");
+            mMonsterGroupMapGroupUnfoldDataListProperty ??= serializedObject.FindProperty("MonsterGroupMapGroupUnfoldDataList");
         }
 
         /// <summary>
@@ -288,7 +532,7 @@ namespace MapEditor
         /// </summary>
         private void InitGUIStyles()
         {
-            if(mRedLabelGUIStyle == null)
+            if (mRedLabelGUIStyle == null)
             {
                 mRedLabelGUIStyle = new GUIStyle();
                 mRedLabelGUIStyle.fontSize = 15;
@@ -305,11 +549,53 @@ namespace MapEditor
         }
 
         /// <summary>
+        /// 更新地图埋点类型和索引列表数据
+        /// </summary>
+        private void UpdateMapDataTypeIndexDatas()
+        {
+            mMapDataTypeIndexsMapCache.Clear();
+            List<int> mapDataTypeIndexs;
+            for (int i = 0, length = mMapDataListProperty.arraySize; i < length; i++)
+            {
+                var mapDataProperty = GetMapDataSerializedPropertyByIndex(i);
+                if(mapDataProperty == null)
+                {
+                    continue;
+                }
+                var uidProperty = mapDataProperty.FindPropertyRelative("UID");
+                var uid = uidProperty.intValue;
+                var mapDataConfig = MapSetting.GetEditorInstance().DataSetting.GetMapDataConfigByUID(uid);
+                mapDataTypeIndexs = GetMapDataTypeIndexs(mapDataConfig.DataType);
+                if(mapDataTypeIndexs == null)
+                {
+                    mapDataTypeIndexs = new List<int>();
+                    mMapDataTypeIndexsMapCache.Add(mapDataConfig.DataType, mapDataTypeIndexs);
+                }
+                mapDataTypeIndexs.Add(i);
+            }
+        }
+
+        /// <summary>
+        /// 获取指定地图埋点类型的所有数据索引列表
+        /// </summary>
+        /// <param name="mapDataType"></param>
+        /// <returns></returns>
+        private List<int> GetMapDataTypeIndexs(MapDataType mapDataType)
+        {
+            List<int> mapDataTypeIndexs;
+            if(!mMapDataTypeIndexsMapCache.TryGetValue(mapDataType, out mapDataTypeIndexs))
+            {
+
+            }
+            return mapDataTypeIndexs;
+        }
+
+        /// <summary>
         /// 创建所有节点
         /// </summary>
         private void CreateAllNodes()
         {
-            if(!MapUtilities.IsOperationAvalible(mTarget?.gameObject))
+            if (!MapUtilities.IsOperationAvalible(mTarget?.gameObject))
             {
                 return;
             }
@@ -328,13 +614,13 @@ namespace MapEditor
                 return;
             }
             var mapObjectParentNode = MapUtilities.GetOrCreateMapObjectParentNode(mTarget?.gameObject);
-            if(mapObjectParentNode != null)
+            if (mapObjectParentNode != null)
             {
                 mapObjectParentNode.transform.localPosition = Vector3.zero;
             }
 
             var mapObjectTypeValues = Enum.GetValues(MapConst.MapObjectType);
-            foreach(var mapObjectTypeValue in mapObjectTypeValues)
+            foreach (var mapObjectTypeValue in mapObjectTypeValues)
             {
                 var mapObjectType = (MapObjectType)mapObjectTypeValue;
                 var mapObjectTypeParentNodeTransform = MapUtilities.GetOrCreateMapObjectTypeParentNode(mTarget?.gameObject, mapObjectType);
@@ -353,7 +639,7 @@ namespace MapEditor
             }
             var customAsset = mMapTerrianAssetProperty.objectReferenceValue as GameObject;
             var mapTerrianTransform = MapEditorUtilities.GetOrCreateMapTerrianNode(mTarget?.gameObject, customAsset);
-            if(mapTerrianTransform != null)
+            if (mapTerrianTransform != null)
             {
                 mapTerrianTransform.localPosition = Vector3.zero;
             }
@@ -369,7 +655,7 @@ namespace MapEditor
                 return;
             }
             var mapTerrianTransform = MapEditorUtilities.GetOrCreateMapTerrianNode(mTarget?.gameObject);
-            if(mapTerrianTransform != null)
+            if (mapTerrianTransform != null)
             {
                 GameObject.DestroyImmediate(mapTerrianTransform.gameObject);
             }
@@ -395,7 +681,7 @@ namespace MapEditor
         private void UpdateTerrianSizeAndPos()
         {
             var mapTerrianTransform = MapEditorUtilities.GetOrCreateMapTerrianNode(mTarget?.gameObject);
-            if(mapTerrianTransform == null)
+            if (mapTerrianTransform == null)
             {
                 return;
             }
@@ -405,7 +691,7 @@ namespace MapEditor
             mapTerrianTransform.localScale = new Vector3(0.1f * mapWidth, 1, 0.1f * mapHeight);
             mapTerrianTransform.localPosition = new Vector3(mapWidth / 2, 0, mapHeight / 2);
             var meshRenderer = mapTerrianTransform.GetComponent<MeshRenderer>();
-            if(meshRenderer != null)
+            if (meshRenderer != null)
             {
                 meshRenderer.sharedMaterial.SetTextureScale("_MainTex", new Vector2(mapWidth, mapHeight));
             }
@@ -418,7 +704,7 @@ namespace MapEditor
         {
             // 避免选中Asset也会触发逻辑数据更新导致预制件触发变化
             var gameObjectStatus = MapUtilities.GetGameObjectStatus(mTarget.gameObject);
-            if(gameObjectStatus == GameObjectStatus.INVALIDE || gameObjectStatus == GameObjectStatus.Asset)
+            if (gameObjectStatus == GameObjectStatus.INVALIDE || gameObjectStatus == GameObjectStatus.Asset)
             {
                 return;
             }
@@ -429,12 +715,12 @@ namespace MapEditor
                 var uidProperty = mapObjectDataProperty.FindPropertyRelative("UID");
                 var mapObjectUID = uidProperty.intValue;
                 var mapObjectConfig = MapSetting.GetEditorInstance().ObjectSetting.GetMapObjectConfigByUID(mapObjectUID);
-                if(mapObjectConfig == null)
+                if (mapObjectConfig == null)
                 {
                     continue;
                 }
                 var goProperty = mapObjectDataProperty.FindPropertyRelative("Go");
-                if(goProperty.objectReferenceValue != null)
+                if (goProperty.objectReferenceValue != null)
                 {
                     var positionProperty = mapObjectDataProperty.FindPropertyRelative("Position");
                     var rotationProperty = mapObjectDataProperty.FindPropertyRelative("Rotation");
@@ -461,14 +747,14 @@ namespace MapEditor
         /// </summary>
         private void CorrectAddMapObjectIndexValue()
         {
-            if(mMapObjectDataChoiceOptionsMap == null || mMapObjectDataChoiceOptionsMap.Count == 0)
+            if (mMapObjectDataChoiceOptionsMap == null || mMapObjectDataChoiceOptionsMap.Count == 0)
             {
                 return;
             }
             var addMapObjectType = (MapObjectType)mAddMapObjectTypeProperty.intValue;
             var mapObjectDataValueOptions = mMapObjectDataChoiceValuesMap[addMapObjectType];
             var addMapObjectIndexValue = mAddMapObjectIndexProperty.intValue;
-            if(!MapEditorUtilities.IsIntValueInArrays(addMapObjectIndexValue, mapObjectDataValueOptions))
+            if (!MapEditorUtilities.IsIntValueInArrays(addMapObjectIndexValue, mapObjectDataValueOptions))
             {
                 mAddMapObjectIndexProperty.intValue = mapObjectDataValueOptions[0];
             }
@@ -503,14 +789,14 @@ namespace MapEditor
             var mapObjectTypeValues = Enum.GetValues(MapConst.MapObjectType);
             mMapObjectDataChoiceOptionsMap.Clear();
             mMapObjectDataChoiceValuesMap.Clear();
-            foreach(var mapObjectTypeValue in mapObjectTypeValues)
+            foreach (var mapObjectTypeValue in mapObjectTypeValues)
             {
                 var mapObjectType = (MapObjectType)mapObjectTypeValue;
                 var mapObjectTypeAllConfigs = objectSetting.GetAllMapObjectConfigByType(mapObjectType);
                 var mapObjectTypeConfigNum = mapObjectTypeAllConfigs.Count;
                 string[] allChoiceOptions = new string[mapObjectTypeConfigNum];
                 int[] allValueOptions = new int[mapObjectTypeConfigNum];
-                for(int i = 0; i < mapObjectTypeConfigNum; i++)
+                for (int i = 0; i < mapObjectTypeConfigNum; i++)
                 {
                     var mapObjectTypeAllConfig = mapObjectTypeAllConfigs[i];
                     allChoiceOptions[i] = mapObjectTypeAllConfig.GetOptionName();
@@ -586,7 +872,7 @@ namespace MapEditor
         private string[] GetMapDataChoiceOptionsByType(MapDataType mapDataType)
         {
             string[] mapDataChoiceOptions;
-            if(!mMapDataChoiceOptionsMap.TryGetValue(mapDataType, out mapDataChoiceOptions))
+            if (!mMapDataChoiceOptionsMap.TryGetValue(mapDataType, out mapDataChoiceOptions))
             {
                 mapDataChoiceOptions = new string[0];
             }
@@ -614,11 +900,11 @@ namespace MapEditor
         private void UpdateAddMapObjectDataPreviewAsset()
         {
             var addMapObjectValue = mAddMapObjectIndexProperty.intValue;
-            if(addMapObjectValue != 0)
+            if (addMapObjectValue != 0)
             {
                 var addMapObjectUID = addMapObjectValue;
                 var mapObjectConfig = MapSetting.GetEditorInstance().ObjectSetting.GetMapObjectConfigByUID(addMapObjectUID);
-                if(mapObjectConfig != null && mapObjectConfig.Asset != null)
+                if (mapObjectConfig != null && mapObjectConfig.Asset != null)
                 {
                     mAddMapObjectPreviewAsset = MapEditorUtilities.GetAssetPreview(mapObjectConfig.Asset);
                 }
@@ -642,7 +928,7 @@ namespace MapEditor
             var mapVerticalLineNum = mMapHeightProperty.intValue + 1;
             var totalMapWidth = mMapWidthProperty.intValue;
             var totalMapHeight = mMapHeightProperty.intValue;
-            for(int i = 0; i < mapVerticalLineNum; i++)
+            for (int i = 0; i < mapVerticalLineNum; i++)
             {
                 var fromPos = startPos;
                 fromPos.z = fromPos.z + i;
@@ -680,7 +966,7 @@ namespace MapEditor
             var gridMinZ = mapStartGridXZ.Value;
             var gridMaxX = mapMaxGridXZ.Key;
             var gridMaxZ = mapMaxGridXZ.Value;
-            for(int i = 0; i < mMapObjectDataListProperty.arraySize; i++)
+            for (int i = 0; i < mMapObjectDataListProperty.arraySize; i++)
             {
                 var mapObjectDataProperty = mMapObjectDataListProperty.GetArrayElementAtIndex(i);
                 var positionProperty = mapObjectDataProperty.FindPropertyRelative("Position");
@@ -693,9 +979,9 @@ namespace MapEditor
             }
             var gridVector3Size = new Vector3(gridSize, 0, gridSize);
             var halfGridVector3Size = gridVector3Size / 2;
-            for(int gridX = gridMinX; gridX <= gridMaxX; gridX++)
+            for (int gridX = gridMinX; gridX <= gridMaxX; gridX++)
             {
-                for(int gridZ = gridMinZ; gridZ <= gridMaxZ; gridZ++)
+                for (int gridZ = gridMinZ; gridZ <= gridMaxZ; gridZ++)
                 {
                     var gridCenterData = new Vector3(gridX * gridSize + halfGridVector3Size.x, 0, gridZ * gridSize + halfGridVector3Size.z);
                     var gridUID = MapExportUtilities.GetGridUID(gridX, gridZ);
@@ -710,7 +996,7 @@ namespace MapEditor
         /// </summary>
         private void UpdateMapGOPosition()
         {
-            if(mTarget == null)
+            if (mTarget == null)
             {
                 return;
             }
@@ -726,17 +1012,17 @@ namespace MapEditor
         /// <returns></returns>
         private bool ExchangeMapDataByIndex(SerializedProperty propertyList, int exchangeIndex1, int exchangeIndex2)
         {
-            if(propertyList == null || !propertyList.isArray)
+            if (propertyList == null || !propertyList.isArray)
             {
                 Debug.LogError($"传递的属性对象为空或不是数组属性，交换属性数据位置失败！");
                 return false;
             }
-            if(exchangeIndex1 == exchangeIndex2)
+            if (exchangeIndex1 == exchangeIndex2)
             {
                 return true;
             }
             var dataNum = propertyList.arraySize;
-            if(exchangeIndex1 < 0 || exchangeIndex2 >= dataNum || exchangeIndex2 < 0 || exchangeIndex2 >= dataNum)
+            if (exchangeIndex1 < 0 || exchangeIndex2 >= dataNum || exchangeIndex2 < 0 || exchangeIndex2 >= dataNum)
             {
                 Debug.LogError($"指定交换索引1:{exchangeIndex1}或交换索引2:{exchangeIndex2}不是有效索引范围:0-{dataNum - 1},交换属性数据位置失败！");
                 return false;
@@ -748,6 +1034,7 @@ namespace MapEditor
             mapDataIndex1Property.managedReferenceValue = mapData2;
             mapDataIndex2Property.managedReferenceValue = mapData1;
             //Debug.Log($"交换属性数据索引1:{exchangeIndex1}和索引2:{exchangeIndex2}成功！");
+            UpdateMapDataTypeIndexDatas();
             return true;
         }
 
@@ -759,7 +1046,7 @@ namespace MapEditor
         /// <returns></returns>
         private bool DoMovePropertyDataUpByIndex(SerializedProperty propertyList, int index)
         {
-            if(!MapUtilities.CheckOperationAvalible(mTarget?.gameObject))
+            if (!MapUtilities.CheckOperationAvalible(mTarget?.gameObject))
             {
                 return false;
             }
@@ -780,7 +1067,7 @@ namespace MapEditor
                 return false;
             }
             var mapDataNum = propertyList.arraySize;
-            if(index < 0 || index > mapDataNum)
+            if (index < 0 || index > mapDataNum)
             {
                 Debug.LogError($"指定索引:{index}不是有效索引范围:0-{mapDataNum},向上移动属性数据失败！");
                 return false;
@@ -978,15 +1265,17 @@ namespace MapEditor
             if (mapDataTotalNum != 0)
             {
                 var insertMapDataPos = Math.Clamp(insertPos, 0, maxInsertIndex - 1);
-                var insertMapDataProperty = mMapDataListProperty.GetArrayElementAtIndex(insertMapDataPos);
+                var insertMapDataProperty = GetMapDataSerializedPropertyByIndex(insertMapDataPos);
                 var insertMapData = insertMapDataProperty.managedReferenceValue as MapData;
                 mapDataPosition = insertMapData != null ? insertMapData.Position : mapDataPosition;
             }
             var newMapData = MapUtilities.CreateMapDataByType(mapDataType, uid, mapDataPosition, mapDataConfig.Rotation);
             mMapDataListProperty.InsertArrayElementAtIndex(insertPos);
-            var newMapDataProperty = mMapDataListProperty.GetArrayElementAtIndex(insertPos);
+            var newMapDataProperty = GetMapDataSerializedPropertyByIndex(insertPos);
             newMapDataProperty.managedReferenceValue = newMapData;
             serializedObject.ApplyModifiedProperties();
+            ClearMapDataSerializedPropertyCache();
+            UpdateMapDataTypeIndexDatas();
             return newMapData;
         }
 
@@ -1019,6 +1308,8 @@ namespace MapEditor
             }
             mMapDataListProperty.DeleteArrayElementAtIndex(index);
             serializedObject.ApplyModifiedProperties();
+            ClearMapDataSerializedPropertyCache();
+            UpdateMapDataTypeIndexDatas();
             return true;
         }
 
@@ -1028,7 +1319,7 @@ namespace MapEditor
         /// <param name="keyCode"></param>
         private void MarkKeyDown(KeyCode keyCode)
         {
-            if(!mKeyCodeDownMap.ContainsKey(keyCode))
+            if (!mKeyCodeDownMap.ContainsKey(keyCode))
             {
                 mKeyCodeDownMap.Add(keyCode, true);
             }
@@ -1044,7 +1335,7 @@ namespace MapEditor
         /// <param name="keyCode"></param>
         private void MarkKeyUp(KeyCode keyCode)
         {
-            if(!mKeyCodeDownMap.ContainsKey(keyCode))
+            if (!mKeyCodeDownMap.ContainsKey(keyCode))
             {
                 mKeyCodeDownMap.Add(keyCode, false);
             }
@@ -1059,7 +1350,7 @@ namespace MapEditor
         /// </summary>
         private void UnmarkAllKeyUp()
         {
-            if(mKeyCodeDownMap.Count == 0)
+            if (mKeyCodeDownMap.Count == 0)
             {
                 return;
             }
@@ -1074,11 +1365,57 @@ namespace MapEditor
         private bool IsKeyCodeDown(KeyCode keyCode)
         {
             bool result = false;
-            if(mKeyCodeDownMap.TryGetValue(keyCode, out result))
+            if (mKeyCodeDownMap.TryGetValue(keyCode, out result))
             {
                 return result;
             }
             return false;
+        }
+
+        /// <summary>
+        /// 检查地图埋点数据长度变化
+        /// Note:
+        /// 用于非Editor支持复制数据，Editor这方因为缓存检测不到数据变化导致的显示不及时问题
+        /// </summary>
+        private void CheckMapDataLengthChange()
+        {
+            if (mMapDataProeprtyMapCache.Count == mMapDataListProperty.arraySize)
+            {
+                return;
+            }
+            ClearMapDataSerializedPropertyCache();
+            UpdateMapDataTypeIndexDatas();
+            Debug.Log($"检测到地图埋点数据长度变化，相关缓存数据更新重置！");
+        }
+
+        /// <summary>
+        /// 指定索引的地图埋点数据SerializedProeprty
+        /// </summary>
+        /// <param name="index"></param>
+        /// <returns></returns>
+        private SerializedProperty GetMapDataSerializedPropertyByIndex(int index)
+        {
+            SerializedProperty mapDataProperty;
+            if (!mMapDataProeprtyMapCache.TryGetValue(index, out mapDataProperty))
+            {
+                var mapDataLength = mMapDataListProperty.arraySize;
+                if (index >= mapDataLength)
+                {
+                    return mapDataProperty;
+                }
+                mapDataProperty = GetMapDataSerializedPropertyByIndex(index);
+                mMapDataProeprtyMapCache.Add(index, mapDataProperty);
+            }
+            return mapDataProperty;
+        }
+
+        /// <summary>
+        /// 清除地图埋点数据SerializedProperty缓存
+        /// </summary>
+        private void ClearMapDataSerializedPropertyCache()
+        {
+            mMapDataProeprtyMapCache.Clear();
+            Debug.Log($"清理地图埋点数据SerializedProperty缓存！");
         }
 
         /// <summary>
@@ -1096,9 +1433,9 @@ namespace MapEditor
         /// <param name="isOn"></param>
         private void UpdateAllMapDataBatchOperation(bool isOn)
         {
-            for (int i = 0; i < mMapDataListProperty.arraySize; i++)
+            for (int i = 0, length = mMapDataListProperty.arraySize; i < length; i++)
             {
-                var mapDataProperty = mMapDataListProperty.GetArrayElementAtIndex(i);
+                var mapDataProperty = GetMapDataSerializedPropertyByIndex(i);
                 var batchOperationSwitchProperty = mapDataProperty.FindPropertyRelative("BatchOperationSwitch");
                 batchOperationSwitchProperty.boolValue = isOn;
             }
@@ -1449,7 +1786,7 @@ namespace MapEditor
             {
                 return;
             }
-            var mapDataProperty = mMapDataListProperty.GetArrayElementAtIndex(mapDataIndex);
+            var mapDataProperty = GetMapDataSerializedPropertyByIndex(mapDataIndex);
             var uidProperty = mapDataProperty.FindPropertyRelative("UID");
             uidProperty.intValue = newUID;
             OnMapDataUIDChange(mapDataIndex);
@@ -1471,7 +1808,7 @@ namespace MapEditor
         /// <param name="positionOffset"></param>
         private void OnMapDataPositionMove(int mapDataIndex, Vector3 positionOffset)
         {
-            var mapDataProperty = mMapDataListProperty.GetArrayElementAtIndex(mapDataIndex);
+            var mapDataProperty = GetMapDataSerializedPropertyByIndex(mapDataIndex);
             var positionProperty = mapDataProperty.FindPropertyRelative("Position");
             positionProperty.vector3Value = positionProperty.vector3Value + positionOffset;
             var batchOperationSwitchProperty = mapDataProperty.FindPropertyRelative("BatchOperationSwitch");
@@ -1494,13 +1831,156 @@ namespace MapEditor
                 {
                     continue;
                 }
-                var mapDataProperty = mMapDataListProperty.GetArrayElementAtIndex(i);
+                var mapDataProperty = GetMapDataSerializedPropertyByIndex(i);
                 var batchOperationSwitch = mapDataProperty.FindPropertyRelative("BatchOperationSwitch");
                 if(batchOperationSwitch.boolValue)
                 {
                     var positionProperty = mapDataProperty.FindPropertyRelative("Position");
                     positionProperty.vector3Value = positionProperty.vector3Value + positionOffset;
                 }
+            }
+        }
+
+        /// <summary>
+        /// 获取制定数据索引的折叠数据索引
+        /// Note:
+        /// 默认折叠数据分组和折叠数据索引一致
+        /// </summary>
+        /// <param name="index"></param>
+        /// <returns></returns>
+        private int GetMapFoldIndex(int index)
+        {
+            return index / MapEditorConst.MapFoldNumLimit;
+        }
+
+        /// <summary>
+        /// 获取指定地图折叠类型的展开数据列表属性
+        /// </summary>
+        /// <param name="mapFoldType"></param>
+        /// <returns></returns>
+        private SerializedProperty GetMapUnfoldDataListProperty(MapFoldType mapFoldType)
+        {
+            if (mapFoldType == MapFoldType.MapObjectDataFold)
+            {
+                return mMapObjectDataGroupUnfoldDataListProperty;
+            }
+            else if (mapFoldType == MapFoldType.PlayerSpawnMapDataFold)
+            {
+                return mPlayerSpawnMapGroupUnfoldDataListProperty;
+            }
+            else if (mapFoldType == MapFoldType.MonsterMapDataFold)
+            {
+                return mMonsterMapGroupUnfoldDataListProperty;
+            }
+            else if (mapFoldType == MapFoldType.MonsterGroupMapDataFold)
+            {
+                return mMonsterGroupMapGroupUnfoldDataListProperty;
+            }
+            else
+            {
+                Debug.LogError($"不支持的地图折叠类型:{mapFoldType}，获取展开数据列表属性失败！");
+                return null;
+            }
+        }
+
+        /// <summary>
+        /// 获取指定地图折叠类型和组id是否展开
+        /// </summary>
+        /// <param name="mapFoldType"></param>
+        /// <param name="index"></param>
+        /// <returns></returns>
+        private bool GetMapGroupUnfold(MapFoldType mapFoldType, int index)
+        {
+            if(!ExistMapUnfold(mapFoldType, index))
+            {
+                AddMapGroupUnfoldData(mapFoldType, index);
+            }
+            var groupUnfoldDataListProperty = GetMapUnfoldDataListProperty(mapFoldType);
+            var groupUnfoldDataProperty = groupUnfoldDataListProperty.GetArrayElementAtIndex(index);
+            return groupUnfoldDataProperty.boolValue;
+        }
+
+        /// <summary>
+        /// 获取指定折叠类型和组id的折叠数据
+        /// </summary>
+        /// <param name="mapFoldType"></param>
+        /// <param name="indx"></param>
+        /// <returns></returns>
+        private bool ExistMapUnfold(MapFoldType mapFoldType, int indx)
+        {
+            var groupUnfoldDataListProperty = GetMapUnfoldDataListProperty(mapFoldType);
+            var groupUnfoldDataListSize = groupUnfoldDataListProperty.arraySize;
+            if(groupUnfoldDataListSize == 0)
+            {
+                return false;
+            }
+            return indexer < groupUnfoldDataListSize;
+        }
+
+        /// <summary>
+        /// 添加指定地图折叠类型和组id的展开数据
+        /// </summary>
+        /// <param name="mapFoldType"></param>
+        /// <param name="index"></param>
+        /// <param name="isUnfold"></param>
+        /// <returns></returns>
+        private bool AddMapGroupUnfoldData(MapFoldType mapFoldType, int index, bool isUnfold = false)
+        {
+            if(ExistMapUnfold(mapFoldType, index))
+            {
+                Debug.LogError($"重复添加折叠类型:{mapFoldType}，索引:{index}地图对象数据的展开数据，添加失败！");
+                return false;
+            }
+            var unfoldDataListProperty = GetMapUnfoldDataListProperty(mapFoldType);
+            var groupUnfoldDataNum = unfoldDataListProperty.arraySize;
+            unfoldDataListProperty.InsertArrayElementAtIndex(groupUnfoldDataNum);
+            var unfoldDataProperty = GetMapGroupUnfoldProperty(mapFoldType, index);
+            unfoldDataProperty.boolValue = isUnfold;
+            return true;
+        }
+
+        /// <summary>
+        /// 更新指定地图折叠类型和组id的展开数据
+        /// </summary>
+        /// <param name="mapFoldType"></param>
+        /// <param name="index"></param>
+        /// <param name="isUnfold"></param>
+        /// <returns></returns>
+        private bool UpdateMapGroupUnfoldData(MapFoldType mapFoldType, int index, bool isUnfold = false)
+        {
+            if(!ExistMapUnfold(mapFoldType, index))
+            {
+                Debug.LogError($"折叠类型:{mapFoldType}，索引:{index}地图对象数据的展开数据不存在，更新失败！");
+                return false;
+            }
+            var unfoldDataProperty = GetMapGroupUnfoldProperty(mapFoldType, index);
+            unfoldDataProperty.boolValue = isUnfold;
+            return true;
+        }
+
+        /// <summary>
+        /// 获取指定游戏地图折叠类型指定索引的折叠属性
+        /// </summary>
+        /// <param name="mapFoldType"></param>
+        /// <param name="index"></param>
+        /// <returns></returns>
+        private SerializedProperty GetMapGroupUnfoldProperty(MapFoldType mapFoldType, int index)
+        {
+            var unfoldDataListProperty = GetMapUnfoldDataListProperty(mapFoldType);
+            return unfoldDataListProperty.GetArrayElementAtIndex(index);
+        }
+
+        /// <summary>
+        /// 执行指定折叠类型的一键展开
+        /// </summary>
+        /// <param name="mapFoldType"></param>
+        /// <param name="isUnfold"></param>
+        private void DoOneKeyUnfold(MapFoldType mapFoldType, bool isUnfold)
+        {
+            var mapDataUnfoldDataListProperty = GetMapUnfoldDataListProperty(mapFoldType);
+            for(int groupId = 0, length = mapDataUnfoldDataListProperty.arraySize; groupId < length; groupId++)
+            {
+                UpdateMapGroupUnfoldData(mapFoldType, groupId, isUnfold);
             }
         }
 
@@ -1512,6 +1992,8 @@ namespace MapEditor
             InitTarget();
             InitProperties();
             InitGUIStyles();
+
+            CheckMapDataLengthChange();
 
             // 确保对SerializedObjec和SerializedProperty的数据修改每帧同步
             serializedObject.Update();
@@ -1686,15 +2168,51 @@ namespace MapEditor
         /// </summary>
         private void DrawMapObjectDataListArea()
         {
-            mMapObjectDataAreaUnfold = EditorGUILayout.Foldout(mMapObjectDataAreaUnfold, "地图对象数据列表");
-            if(mMapObjectDataAreaUnfold)
+            mMapObjectDataUnfoldDataProperty.boolValue = EditorGUILayout.Foldout(mMapObjectDataUnfoldDataProperty.boolValue, "地图对象数据列表");
+            if(mMapObjectDataUnfoldDataProperty.boolValue)
             {
+                DrawMapObjectOneKeyFoldArea();
                 DrawMapObjectTitleArea();
-                for(int i = 0; i < mMapObjectDataListProperty.arraySize; i++)
+                for(int i = 0, length = mMapObjectDataListProperty.arraySize; i < length; i++)
                 {
-                    DrawOneMapObjectPropertyByIndex(i);
+                    var mapObjectDataGroupIndex = GetMapFoldIndex(i);
+                    var isUnfold = GetMapGroupUnfold(MapFoldType.MapObjectDataFold, mapObjectDataGroupIndex);
+                    var groupStartIndex = mapObjectDataGroupIndex * MapEditorConst.MapFoldNumLimit;
+                    var groupEndIndex = (mapObjectDataGroupIndex + 1) * MapEditorConst.MapFoldNumLimit;
+                    bool newIsUnfold = isUnfold;
+                    if(i == groupStartIndex)
+                    {
+                        newIsUnfold = EditorGUILayout.Foldout(isUnfold, $"{mapObjectDataGroupIndex}({groupStartIndex}-{groupEndIndex})");
+                        if(isUnfold != newIsUnfold)
+                        {
+                            UpdateMapGroupUnfoldData(MapFoldType.MapObjectDataFold, mapObjectDataGroupIndex, newIsUnfold);
+                        }
+                    }
+                    if(newIsUnfold && i >= groupStartIndex && i < groupEndIndex)
+                    {
+                        DrawOneMapObjectPropertyByIndex(i);
+                    }
                 }
             }
+        }
+
+        /// <summary>
+        /// 绘制地图对象一键折叠Inspector区域
+        /// </summary>
+        private void DrawMapObjectOneKeyFoldArea()
+        {
+            EditorGUILayout.BeginHorizontal("box");
+            var unfoldTitle = GetMapOneKeyUnfoldTitle(MapFoldType.MapObjectDataFold);
+            if (GUILayout.Button($"{unfoldTitle}", GUILayout.ExpandWidth(true)))
+            {
+                DoOneKeyUnfold(MapFoldType.MapObjectDataFold, true);
+            }
+            var foldTitle = GetMapOneKeyFoldTitle(MapFoldType.MapObjectDataFold);
+            if (GUILayout.Button($"{foldTitle}", GUILayout.ExpandWidth(true)))
+            {
+                DoOneKeyUnfold(MapFoldType.MapObjectDataFold, false);
+            }
+            EditorGUILayout.EndHorizontal();
         }
 
         /// <summary>
@@ -1703,18 +2221,18 @@ namespace MapEditor
         private void DrawMapObjectTitleArea()
         {
             EditorGUILayout.BeginHorizontal("box");
-            EditorGUILayout.LabelField("索引", MapStyles.TabMiddleStyle, GUILayout.Width(40f));
-            EditorGUILayout.LabelField("UID", MapStyles.TabMiddleStyle, GUILayout.Width(150f));
-            EditorGUILayout.LabelField("对象类型", MapStyles.TabMiddleStyle, GUILayout.Width(150f));
-            EditorGUILayout.LabelField("是否动态", MapStyles.TabMiddleStyle, GUILayout.Width(60f));
-            EditorGUILayout.LabelField("配置Id", MapStyles.TabMiddleStyle, GUILayout.Width(100f));
-            EditorGUILayout.LabelField("实体对象", MapStyles.TabMiddleStyle, GUILayout.Width(150f));
-            EditorGUILayout.LabelField("位置", MapStyles.TabMiddleStyle, GUILayout.Width(160f));
-            EditorGUILayout.LabelField("描述", MapStyles.TabMiddleStyle, GUILayout.Width(100f));
-            EditorGUILayout.LabelField("上移", MapStyles.TabMiddleStyle, GUILayout.Width(40f));
-            EditorGUILayout.LabelField("下移", MapStyles.TabMiddleStyle, GUILayout.Width(40f));
-            EditorGUILayout.LabelField("添加", MapStyles.TabMiddleStyle, GUILayout.Width(40f));
-            EditorGUILayout.LabelField("删除", MapStyles.TabMiddleStyle, GUILayout.Width(40f));
+            EditorGUILayout.LabelField("索引", MapStyles.TabMiddleStyle, GUILayout.Width(MapEditorConst.InspectorObjectIndexUIWidth));
+            EditorGUILayout.LabelField("UID", MapStyles.TabMiddleStyle, GUILayout.Width(MapEditorConst.InspectorObjectUIDUIWidth));
+            EditorGUILayout.LabelField("对象类型", MapStyles.TabMiddleStyle, GUILayout.Width(MapEditorConst.InspectorObjectTypeUIWidth));
+            EditorGUILayout.LabelField("是否动态", MapStyles.TabMiddleStyle, GUILayout.Width(MapEditorConst.InspectorObjectDynamicUIWidth));
+            EditorGUILayout.LabelField("配置Id", MapStyles.TabMiddleStyle, GUILayout.Width(MapEditorConst.InspectorObjectConfIdUIWidth));
+            EditorGUILayout.LabelField("实体对象", MapStyles.TabMiddleStyle, GUILayout.Width(MapEditorConst.InspectorObjectInstanceUIWidth));
+            EditorGUILayout.LabelField("位置", MapStyles.TabMiddleStyle, GUILayout.Width(MapEditorConst.InspectorObjectPositionUIWidth));
+            //EditorGUILayout.LabelField("描述", MapStyles.TabMiddleStyle, GUILayout.Width(MapEditorConst.InspectorObjectDesUIWidth));
+            EditorGUILayout.LabelField("上移", MapStyles.TabMiddleStyle, GUILayout.Width(MapEditorConst.InspectorObjectMoveUpUIWidth));
+            EditorGUILayout.LabelField("下移", MapStyles.TabMiddleStyle, GUILayout.Width(MapEditorConst.InspectorObjectMoveDownUIWidth));
+            EditorGUILayout.LabelField("添加", MapStyles.TabMiddleStyle, GUILayout.Width(MapEditorConst.InspectorObjectRemoveUIWidth));
+            EditorGUILayout.LabelField("删除", MapStyles.TabMiddleStyle, GUILayout.Width(MapEditorConst.InspectorObjectAddUIWidth));
             EditorGUILayout.EndHorizontal();
         }
 
@@ -1729,60 +2247,61 @@ namespace MapEditor
             var uidProperty = mapObjectDataProperty.FindPropertyRelative("UID");
             var uid = uidProperty.intValue;
             var goProperty = mapObjectDataProperty.FindPropertyRelative("Go");
-            EditorGUILayout.LabelField($"{mapObjectDataIndex}", MapStyles.TabMiddleStyle, GUILayout.Width(40f));
+            EditorGUILayout.LabelField($"{mapObjectDataIndex}", MapStyles.TabMiddleStyle, GUILayout.Width(MapEditorConst.InspectorObjectIndexUIWidth));
             var mapObjectConfig = MapSetting.GetEditorInstance().ObjectSetting.GetMapObjectConfigByUID(uid);
             EditorGUI.BeginChangeCheck();
-            var mapObjectType = mapObjectConfig != null ? mapObjectConfig.ObjectType : MapObjectType.TREASURE_BOX;
+            var mapObjectType = mapObjectConfig != null ? mapObjectConfig.ObjectType : MapObjectType.TreasureBox;
             var mapObjectDataChoiceOptions = GetMapObjectDataChoiceOptionsByType(mapObjectType);
             var mapObjectDataChoiceValues = GetMapObjectDataChoiceValuesByType(mapObjectType);
-            uid = EditorGUILayout.IntPopup(uid, mapObjectDataChoiceOptions, mapObjectDataChoiceValues, GUILayout.Width(150f));
+            uid = EditorGUILayout.IntPopup(uid, mapObjectDataChoiceOptions, mapObjectDataChoiceValues, GUILayout.Width(MapEditorConst.InspectorObjectUIDUIWidth));
             if(EditorGUI.EndChangeCheck())
             {
                 DoChangeMapObjectDataUID(mapObjectDataIndex, uid);
             }
             if(mapObjectConfig != null)
             {
-                EditorGUILayout.LabelField(mapObjectConfig.ObjectType.ToString(), MapStyles.TabMiddleStyle, GUILayout.Width(150f));
+                EditorGUILayout.LabelField(mapObjectConfig.ObjectType.ToString(), MapStyles.TabMiddleStyle, GUILayout.Width(MapEditorConst.InspectorObjectTypeUIWidth));
                 EditorGUILayout.Space(20f, false);
-                EditorGUILayout.Toggle(mapObjectConfig.IsDynamic, GUILayout.Width(40f));
-                EditorGUILayout.IntField(mapObjectConfig.ConfId, MapStyles.TabMiddleStyle, GUILayout.Width(100f));
+                EditorGUILayout.Toggle(mapObjectConfig.IsDynamic, GUILayout.Width(MapEditorConst.InspectorObjectDynamicUIWidth));
+                EditorGUILayout.IntField(mapObjectConfig.ConfId, MapStyles.TabMiddleStyle, GUILayout.Width(MapEditorConst.InspectorObjectConfIdUIWidth));
             }
             else
             {
-                EditorGUILayout.LabelField("找不到对象类型数据", MapStyles.TabMiddleStyle, GUILayout.Width(150f));
-                EditorGUILayout.LabelField("找不到是否动态数据", MapStyles.TabMiddleStyle, GUILayout.Width(60f));
-                EditorGUILayout.LabelField("找不到关联Id数据", MapStyles.TabMiddleStyle, GUILayout.Width(100f));
+                EditorGUILayout.LabelField("找不到对象类型数据", MapStyles.TabMiddleStyle, GUILayout.Width(MapEditorConst.InspectorObjectTypeUIWidth));
+                EditorGUILayout.LabelField("找不到是否动态数据", MapStyles.TabMiddleStyle, GUILayout.Width(MapEditorConst.InspectorObjectDynamicUIWidth));
+                EditorGUILayout.LabelField("找不到关联Id数据", MapStyles.TabMiddleStyle, GUILayout.Width(MapEditorConst.InspectorObjectConfIdUIWidth));
             }
             var gameObject = goProperty.objectReferenceValue as GameObject;
-            EditorGUILayout.ObjectField(goProperty.objectReferenceValue, MapConst.GameObjectType, true, GUILayout.Width(150f));
+            EditorGUILayout.ObjectField(goProperty.objectReferenceValue, MapConst.GameObjectType, true, GUILayout.Width(MapEditorConst.InspectorObjectInstanceUIWidth));
             var newVector3Value = gameObject != null ? gameObject.transform.position : Vector3.zero;
             EditorGUI.BeginChangeCheck();
+            var posWidth = (MapEditorConst.InspectorObjectPositionUIWidth - 33f) / 3;
             EditorGUILayout.LabelField("X", GUILayout.Width(10f));
-            newVector3Value.x = EditorGUILayout.FloatField(newVector3Value.x, GUILayout.Width(39f));
+            newVector3Value.x = EditorGUILayout.FloatField(newVector3Value.x, GUILayout.Width(posWidth));
             EditorGUILayout.LabelField("Y", GUILayout.Width(10f));
-            newVector3Value.y = EditorGUILayout.FloatField(newVector3Value.y, GUILayout.Width(39f));
+            newVector3Value.y = EditorGUILayout.FloatField(newVector3Value.y, GUILayout.Width(posWidth));
             EditorGUILayout.LabelField("Z", GUILayout.Width(10f));
-            newVector3Value.z = EditorGUILayout.FloatField(newVector3Value.z, GUILayout.Width(39f));
+            newVector3Value.z = EditorGUILayout.FloatField(newVector3Value.z, GUILayout.Width(posWidth));
             if (gameObject != null && EditorGUI.EndChangeCheck())
             {
                 gameObject.transform.position = newVector3Value;
             }
-            var des = mapObjectConfig != null ? mapObjectConfig.Des : "";
-            EditorGUILayout.LabelField(des, MapStyles.TabMiddleStyle, GUILayout.Width(100f));
-            if (GUILayout.Button("↑", GUILayout.Width(40f)))
+            //var des = mapObjectConfig != null ? mapObjectConfig.Des : "";
+            //EditorGUILayout.LabelField(des, MapStyles.TabMiddleStyle, GUILayout.Width(MapEditorConst.InspectorObjectDesUIWidth));
+            if (GUILayout.Button("↑", GUILayout.Width(MapEditorConst.InspectorObjectMoveUpUIWidth)))
             {
                 DoMovePropertyDataUpByIndex(mMapObjectDataListProperty, mapObjectDataIndex);
             }
-            if (GUILayout.Button("↓", GUILayout.Width(40f)))
+            if (GUILayout.Button("↓", GUILayout.Width(MapEditorConst.InspectorObjectMoveDownUIWidth)))
             {
                 DoMovePropertyDataDownByIndex(mMapObjectDataListProperty, mapObjectDataIndex);
             }
-            if (GUILayout.Button("+", GUILayout.Width(40f)))
+            if (GUILayout.Button("+", GUILayout.Width(MapEditorConst.InspectorObjectAddUIWidth)))
             {
                 var addMapObjectValue = mAddMapObjectIndexProperty.intValue;
                 DoAddMapObjectData(addMapObjectValue, mapObjectDataIndex);
             }
-            if (GUILayout.Button("-", GUILayout.Width(40f)))
+            if (GUILayout.Button("-", GUILayout.Width(MapEditorConst.InspectorObjectRemoveUIWidth)))
             {
                 DoRemoveMapObjectDataByIndex(mapObjectDataIndex);
             }
@@ -1805,7 +2324,7 @@ namespace MapEditor
         /// </summary>
         private void DrawMapDataOperationArea()
         {
-            if (mMapDataChoiceOptionsMap.Count > 0)
+            if (mMapDataChoiceOptionsMap != null && mMapDataChoiceOptionsMap.Count > 0)
             {
                 EditorGUILayout.BeginHorizontal();
                 EditorGUILayout.LabelField("地图埋点类型:", GUILayout.Width(90f));
@@ -1853,280 +2372,335 @@ namespace MapEditor
         /// </summary>
         private void DrawMapDataArea()
         {
-            DrawMapCommonDataArea();
-            DrawMapCustomDataArea();
-        }
-
-        /// <summary>
-        /// 绘制地图埋点通用数据区域
-        /// </summary>
-        private void DrawMapCommonDataArea()
-        {
-            mMapDataAreaUnfold = EditorGUILayout.Foldout(mMapDataAreaUnfold, "地图埋点数据列表");
-            if(mMapDataAreaUnfold)
+            mMapDataUnfoldDataProperty.boolValue = EditorGUILayout.Foldout(mMapDataUnfoldDataProperty.boolValue, "地图埋点数据列表");
+            if (mMapDataUnfoldDataProperty.boolValue)
             {
-                DrawMapDataTitleArea();
-                for(int i = 0; i < mMapDataListProperty.arraySize; i++)
-                {
-                    DrawOneMapDataPropertyByIndex(i);
-                }
+                DrawMapDataAreaByType(MapDataType.PlayerSpawn);
+                DrawMapDataAreaByType(MapDataType.Monster);
+                DrawMapDataAreaByType(MapDataType.MonsterGroup);
             }
         }
 
         /// <summary>
-        /// 绘制地图埋点数据标题区域
+        /// 绘制指定地图埋点类型数据区域
         /// </summary>
-        private void DrawMapDataTitleArea()
+        /// <param name="mapDataType"></param>
+        private void DrawMapDataAreaByType(MapDataType mapDataType)
+        {
+            if(!IsShowMapDataFoldType(mapDataType))
+            {
+                return;
+            }
+            var mapFoldType = GetMapDataFoldType(mapDataType);
+            DrawMapDataOneKeyFoldAreaByType(mapFoldType);
+            DrawMapDataTitleAreaByType(mapDataType);
+            DrawMapDataDetailByType(mapDataType);
+        }
+
+        /// <summary>
+        /// 绘制指定地图埋点类型的一键折叠区域
+        /// </summary>
+        /// <param name="mapFoldType"></param>
+        private void DrawMapDataOneKeyFoldAreaByType(MapFoldType mapFoldType)
         {
             EditorGUILayout.BeginHorizontal("box");
-            EditorGUILayout.LabelField("批量", MapStyles.TabMiddleStyle, GUILayout.Width(40f));
-            EditorGUILayout.LabelField("索引", MapStyles.TabMiddleStyle, GUILayout.Width(40f));
-            EditorGUILayout.LabelField("UID", MapStyles.TabMiddleStyle, GUILayout.Width(150f));
-            EditorGUILayout.LabelField("埋点类型", MapStyles.TabMiddleStyle, GUILayout.Width(150f));
-            EditorGUILayout.LabelField("配置Id", MapStyles.TabMiddleStyle, GUILayout.Width(100f));
-            EditorGUILayout.LabelField("位置", MapStyles.TabMiddleStyle, GUILayout.Width(160f));
-            EditorGUILayout.LabelField("旋转", MapStyles.TabMiddleStyle, GUILayout.Width(160f));
-            EditorGUILayout.LabelField("描述", MapStyles.TabMiddleStyle, GUILayout.Width(100f));
-            EditorGUILayout.LabelField("上移", MapStyles.TabMiddleStyle, GUILayout.Width(40f));
-            EditorGUILayout.LabelField("下移", MapStyles.TabMiddleStyle, GUILayout.Width(40f));
-            EditorGUILayout.LabelField("添加", MapStyles.TabMiddleStyle, GUILayout.Width(40f));
-            EditorGUILayout.LabelField("删除", MapStyles.TabMiddleStyle, GUILayout.Width(40f));
+            var unfoldTitle = GetMapOneKeyUnfoldTitle(mapFoldType);
+            if (GUILayout.Button($"{unfoldTitle}", GUILayout.ExpandWidth(true)))
+            {
+                DoOneKeyUnfold(mapFoldType, true);
+            }
+            var foldTitle = GetMapOneKeyFoldTitle(mapFoldType);
+            if (GUILayout.Button($"{foldTitle}", GUILayout.ExpandWidth(true)))
+            {
+                DoOneKeyUnfold(mapFoldType, true);
+            }
             EditorGUILayout.EndHorizontal();
         }
 
         /// <summary>
-        /// 绘制指定索引单个MapData属性
+        /// 绘制指定地图埋点类型的埋点数据标题区域
+        /// </summary>
+        /// <param name="mapDataType"></param>
+        private void DrawMapDataTitleAreaByType(MapDataType mapDataType)
+        {
+            EditorGUILayout.BeginHorizontal("box");
+            if(IsShowMapUI(mapDataType, MapDataUIType.Batch))
+            {
+                EditorGUILayout.LabelField("批量", MapStyles.TabMiddleStyle, GUILayout.Width(MapEditorConst.InspectorDataBatchUIWidth));
+            }
+            if (IsShowMapUI(mapDataType, MapDataUIType.Index))
+            {
+                EditorGUILayout.LabelField("索引", MapStyles.TabMiddleStyle, GUILayout.Width(MapEditorConst.InspectorDataIndexUIWidth));
+            }
+            if (IsShowMapUI(mapDataType, MapDataUIType.UID))
+            {
+                EditorGUILayout.LabelField("UID", MapStyles.TabMiddleStyle, GUILayout.Width(MapEditorConst.InspectorDataUIDUIWidth));
+            }
+            //if (IsShowMapUI(mapDataType, MapDataUIType.MapDataType))
+            //{
+            //    EditorGUILayout.LabelField("埋点类型", MapStyles.TabMiddleStyle, GUILayout.Width(MapEditorConst.InspectorDataTypeUIWidth));
+            //}
+            if (IsShowMapUI(mapDataType, MapDataUIType.ConfId))
+            {
+                EditorGUILayout.LabelField("配置Id", MapStyles.TabMiddleStyle, GUILayout.Width(MapEditorConst.InspectorDataConfIdUIWidth));
+            }
+            if (IsShowMapUI(mapDataType, MapDataUIType.MonsterGroupId))
+            {
+                EditorGUILayout.LabelField("组Id", MapStyles.TabMiddleStyle, GUILayout.Width(MapEditorConst.InspectorDataGroupIdUIWidth));
+            }
+            if (IsShowMapUI(mapDataType, MapDataUIType.MonsterCreateRadius))
+            {
+                EditorGUILayout.LabelField("创建半径", MapStyles.TabMiddleStyle, GUILayout.Width(MapEditorConst.InspectorDataMonsterCreateRadiusUIWidth));
+            }
+            if (IsShowMapUI(mapDataType, MapDataUIType.MonsterActiveRadius))
+            {
+                EditorGUILayout.LabelField("警戒半径", MapStyles.TabMiddleStyle, GUILayout.Width(MapEditorConst.InspectorDataMonsterActiveRediusUIWidth));
+            }
+            if (IsShowMapUI(mapDataType, MapDataUIType.MonsterGroupGUISwitchOff))
+            {
+                EditorGUILayout.LabelField("GUI关闭", MapStyles.TabMiddleStyle, GUILayout.Width(MapEditorConst.InspectorDataMonsterGroupGUISwitchOffUIWidth));
+            }
+            if (IsShowMapUI(mapDataType, MapDataUIType.Position))
+            {
+                EditorGUILayout.LabelField("位置", MapStyles.TabMiddleStyle, GUILayout.Width(MapEditorConst.InspectorDataPositionUIWidth));
+            }
+            if (IsShowMapUI(mapDataType, MapDataUIType.Rotation))
+            {
+                EditorGUILayout.LabelField("旋转", MapStyles.TabMiddleStyle, GUILayout.Width(MapEditorConst.InspectorDataRotationUIWidth));
+            }
+            //if (IsShowMapUI(mapDataType, MapDataUIType.Des))
+            //{
+            //    EditorGUILayout.LabelField("描述", MapStyles.TabMiddleStyle, GUILayout.Width(MapEditorConst.InspectorDataDesUIWidth));
+            //}
+            if (IsShowMapUI(mapDataType, MapDataUIType.MoveUp))
+            {
+                EditorGUILayout.LabelField("上移", MapStyles.TabMiddleStyle, GUILayout.Width(MapEditorConst.InspectorDataMoveUpUIWidth));
+            }
+            if (IsShowMapUI(mapDataType, MapDataUIType.MoveDown))
+            {
+                EditorGUILayout.LabelField("下移", MapStyles.TabMiddleStyle, GUILayout.Width(MapEditorConst.InspectorDataMoveDownUIWidth));
+            }
+            if (IsShowMapUI(mapDataType, MapDataUIType.Add))
+            {
+                EditorGUILayout.LabelField("添加", MapStyles.TabMiddleStyle, GUILayout.Width(MapEditorConst.InspectorDataRemoveUIWidth));
+            }
+            if (IsShowMapUI(mapDataType, MapDataUIType.Remove))
+            {
+                EditorGUILayout.LabelField("删除", MapStyles.TabMiddleStyle, GUILayout.Width(MapEditorConst.InspectorDataAddUIWidth));
+            }
+            EditorGUILayout.EndHorizontal();
+        }
+
+        /// <summary>
+        /// 绘制指定地图埋点类型的数据详情区域
+        /// </summary>
+        /// <param name="mapDataType"></param>
+        private void DrawMapDataDetailByType(MapDataType mapDataType)
+        {
+            var mapDataIndexs = GetMapDataTypeIndexs(mapDataType);
+            if(mapDataIndexs == null)
+            {
+                return;
+            }
+            var mapFoldType = GetMapDataFoldType(mapDataType);
+            var mapDataTypeIndex = 0;
+            for(int i = 0, length = mapDataIndexs.Count; i < length; i++)
+            {
+                var mapDataIndex = mapDataIndexs[i];
+                var mapDataProperty = GetMapDataSerializedPropertyByIndex(mapDataIndex);
+                if(mapDataProperty == null)
+                {
+                    continue;
+                }
+                var uidProperty = mapDataProperty.FindPropertyRelative("UID");
+                var uid = uidProperty.intValue;
+                var mapDataConfig = MapSetting.GetEditorInstance().DataSetting.GetMapDataConfigByUID(uid);
+                if(mapDataConfig.DataType != mapDataType)
+                {
+                    continue;
+                }
+                var mapDataGroupIndex = GetMapFoldIndex(mapDataTypeIndex);
+                var isUnfold = GetMapGroupUnfold(mapFoldType, mapDataGroupIndex);
+                var groupStartIndex = mapDataGroupIndex * MapEditorConst.MapFoldNumLimit;
+                var groupEndIndex = (mapDataGroupIndex + 1) * MapEditorConst.MapFoldNumLimit;
+                bool newIsUnfold = isUnfold;
+                if(mapDataTypeIndex== groupStartIndex)
+                {
+                    newIsUnfold = EditorGUILayout.Foldout(isUnfold, $"{mapDataGroupIndex}({groupStartIndex}-{groupEndIndex})");
+                    if(isUnfold != newIsUnfold)
+                    {
+                        UpdateMapGroupUnfoldData(mapFoldType, mapDataGroupIndex, newIsUnfold);
+                    }
+                }
+                if(newIsUnfold && mapDataTypeIndex >= groupStartIndex && mapDataTypeIndex < groupEndIndex)
+                {
+                    DrawOneMapDataPropertyByIndex(mapDataConfig.DataType, mapDataIndex);
+                }
+                mapDataTypeIndex++;
+            }
+        }
+
+        /// <summary>
+        /// 绘制单个指定地图埋点类型和索引的数据
         /// </summary>
         /// <param name="mapDataIndex"></param>
-        private void DrawOneMapDataPropertyByIndex(int mapDataIndex)
+        private void DrawOneMapDataPropertyByIndex(MapDataType mapDataType, int mapDataIndex)
         {
             EditorGUILayout.BeginHorizontal();
-            var mapDataProperty = mMapDataListProperty.GetArrayElementAtIndex(mapDataIndex);
-            var batchOperationSwitchProperty = mapDataProperty.FindPropertyRelative("BatchOperationSwitch");
-            EditorGUILayout.Space(10f, false);
-            batchOperationSwitchProperty.boolValue = EditorGUILayout.Toggle(batchOperationSwitchProperty.boolValue, GUILayout.Width(30f));
-            var uidProperty = mapDataProperty.FindPropertyRelative("UID");
-            var uid = uidProperty.intValue;
-            var positionProperty = mapDataProperty.FindPropertyRelative("Position");
-            EditorGUILayout.LabelField($"{mapDataIndex}", MapStyles.TabMiddleStyle, GUILayout.Width(40f));
-            var mapDataConfig = MapSetting.GetEditorInstance().DataSetting.GetMapDataConfigByUID(uid);
-            EditorGUI.BeginChangeCheck();
-            var mapDataType = mapDataConfig != null ? mapDataConfig.DataType : MapDataType.PLAYER_SPAWN;
-            var mapDataChoiceOptions = GetMapDataChoiceOptionsByType(mapDataType);
-            var mapDataChoiceValues = GetMapDataChoiceValuesByType(mapDataType);
-            uid = EditorGUILayout.IntPopup(uid, mapDataChoiceOptions, mapDataChoiceValues, GUILayout.Width(150f));
-            if (EditorGUI.EndChangeCheck())
+            var mapDataProperty = GetMapDataSerializedPropertyByIndex(mapDataIndex);
+            if(IsShowMapUI(mapDataType, MapDataUIType.Batch))
             {
-                DoChangeMapDataUID(mapDataIndex, uid);
+                var batchOperationSwitchProperty = mapDataProperty.FindPropertyRelative("BatchOperationSwitch");
+                EditorGUILayout.Space(10f, false);
+                batchOperationSwitchProperty.boolValue = EditorGUILayout.Toggle(batchOperationSwitchProperty.boolValue, GUILayout.Width(30f));
             }
-            if (mapDataConfig != null)
+            if (IsShowMapUI(mapDataType, MapDataUIType.Index))
             {
-                EditorGUILayout.LabelField(mapDataConfig.DataType.ToString(), MapStyles.TabMiddleStyle, GUILayout.Width(150f));
-                EditorGUILayout.IntField(mapDataConfig.ConfId, MapStyles.TabMiddleStyle, GUILayout.Width(100f));
+                EditorGUILayout.LabelField($"{mapDataIndex}", MapStyles.TabMiddleStyle, GUILayout.Width(40f));
             }
-            else
+            MapDataConfig mapDataConfig;
+            if(IsShowMapUI(mapDataType, MapDataUIType.UID))
             {
-                EditorGUILayout.LabelField("找不到对象类型数据", MapStyles.TabMiddleStyle, GUILayout.Width(150f));
-                EditorGUILayout.LabelField("找不到关联Id数据", MapStyles.TabMiddleStyle, GUILayout.Width(100f));
-            }
-            var newVector3Value = positionProperty.vector3Value;
-            EditorGUI.BeginChangeCheck();
-            EditorGUILayout.LabelField("X", GUILayout.Width(10f));
-            newVector3Value.x = EditorGUILayout.FloatField(newVector3Value.x, GUILayout.Width(39f));
-            EditorGUILayout.LabelField("Y", GUILayout.Width(10f));
-            newVector3Value.y = EditorGUILayout.FloatField(newVector3Value.y, GUILayout.Width(39f));
-            EditorGUILayout.LabelField("Z", GUILayout.Width(10f));
-            newVector3Value.z = EditorGUILayout.FloatField(newVector3Value.z, GUILayout.Width(39f));
-            if(EditorGUI.EndChangeCheck())
-            {
-                var positionOffset = newVector3Value - positionProperty.vector3Value;
-                OnMapDataPositionMove(mapDataIndex, positionOffset);
-            }
-            var rotationProperty = mapDataProperty.FindPropertyRelative("Rotation");
-            var newRotationVector3Value = rotationProperty.vector3Value;
-            EditorGUI.BeginChangeCheck();
-            EditorGUILayout.LabelField("X", GUILayout.Width(10f));
-            newRotationVector3Value.x = EditorGUILayout.FloatField(newRotationVector3Value.x, GUILayout.Width(39f));
-            EditorGUILayout.LabelField("Y", GUILayout.Width(10f));
-            newRotationVector3Value.y = EditorGUILayout.FloatField(newRotationVector3Value.y, GUILayout.Width(39f));
-            EditorGUILayout.LabelField("Z", GUILayout.Width(10f));
-            newRotationVector3Value.z = EditorGUILayout.FloatField(newRotationVector3Value.z, GUILayout.Width(39f));
-            if (EditorGUI.EndChangeCheck())
-            {
-                rotationProperty.vector3Value = newRotationVector3Value;
-            }
-            var des = mapDataConfig != null ? mapDataConfig.Des : "";
-            EditorGUILayout.LabelField(des, MapStyles.TabMiddleStyle, GUILayout.Width(100f));
-            if (GUILayout.Button("↑", GUILayout.Width(40f)))
-            {
-                DoMovePropertyDataUpByIndex(mMapDataListProperty, mapDataIndex);
-            }
-            if (GUILayout.Button("↓", GUILayout.Width(40f)))
-            {
-                DoMovePropertyDataDownByIndex(mMapDataListProperty, mapDataIndex);
-            }
-            if (GUILayout.Button("+", GUILayout.Width(40f)))
-            {
-                var addMapDataValue = mAddMapDataIndexProperty.intValue;
-                DoAddMapData(addMapDataValue, mapDataIndex);
-            }
-            if (GUILayout.Button("-", GUILayout.Width(40f)))
-            {
-                DoRemoveMapDataByIndex(mapDataIndex);
-            }
-            EditorGUILayout.EndHorizontal();
-        }
-
-        /// <summary>
-        /// 绘制地图埋点自定义数据区域
-        /// </summary>
-        private void DrawMapCustomDataArea()
-        {
-            // 自定义埋点数据暂时采用遍历所有埋点数据匹配类型的方式过滤显示需要的埋点数据，后去卡再想办法优化
-            if(mMapCustomDataTypeList == null)
-            {
-                mMapCustomDataTypeList = mMapCustomDataAreaUnfoldMap.Keys.ToList();
-            }
-            foreach(var mapDataType in mMapCustomDataTypeList)
-            {
-                mMapCustomDataAreaUnfoldMap[mapDataType] = EditorGUILayout.Foldout(mMapCustomDataAreaUnfoldMap[mapDataType], $"地图埋点类型{mapDataType.ToString()}自定义数据列表");
-                if(mMapCustomDataAreaUnfoldMap[mapDataType])
-                {
-                    if(mapDataType == MapDataType.MONSTER)
-                    {
-                        DrawMapMonsterCustomDataArea();
-                    }
-                    else if(mapDataType == MapDataType.MONSTER_GROUP)
-                    {
-                        DrawMapMonsterGroupCustomDataArea();
-                    }
-                }
-            }
-        }
-
-        /// <summary>
-        /// 绘制怪物埋点类型的自定义数据区域
-        /// </summary>
-        private void DrawMapMonsterCustomDataArea()
-        {
-            DrawMapMonsterDataTitleArea();
-            for(int i = 0; i < mMapDataListProperty.arraySize; i++)
-            {
-                var mapDataProperty = mMapDataListProperty.GetArrayElementAtIndex(i);
                 var uidProperty = mapDataProperty.FindPropertyRelative("UID");
                 var uid = uidProperty.intValue;
-                var mapDataConfig = MapSetting.GetEditorInstance().DataSetting.GetMapDataConfigByUID(uid);
-                if(mapDataConfig.DataType != MapDataType.MONSTER)
+                var positionProperty = mapDataProperty.FindPropertyRelative("Position");
+                mapDataConfig = MapSetting.GetEditorInstance().DataSetting.GetMapDataConfigByUID(uid);
+                EditorGUI.BeginChangeCheck();
+                var mapDataType = mapDataConfig != null ? mapDataConfig.DataType : MapDataType.PlayerSpawn;
+                var mapDataChoiceOptions = GetMapDataChoiceOptionsByType(mapDataType);
+                var mapDataChoiceValues = GetMapDataChoiceValuesByType(mapDataType);
+                uid = EditorGUILayout.IntPopup(uid, mapDataChoiceOptions, mapDataChoiceValues, GUILayout.Width(150f));
+                if (EditorGUI.EndChangeCheck())
                 {
-                    continue;
+                    DoChangeMapDataUID(mapDataIndex, uid);
                 }
-                DrawOneMapMonsterDataPropertyIndex(i);
             }
-        }
-
-        /// <summary>
-        /// 绘制怪物埋点自定义数据标题区域
-        /// </summary>
-        private void DrawMapMonsterDataTitleArea()
-        {
-            EditorGUILayout.BeginHorizontal("box");
-            EditorGUILayout.LabelField("索引", MapStyles.TabMiddleStyle, GUILayout.Width(40f));
-            EditorGUILayout.LabelField("UID", MapStyles.TabMiddleStyle, GUILayout.Width(60f));
-            EditorGUILayout.LabelField("组Id", MapStyles.TabMiddleStyle, GUILayout.Width(60f));
-            EditorGUILayout.EndHorizontal();
-        }
-
-        /// <summary>
-        /// 绘制指定属性索引的单个怪物数据埋点属性显示
-        /// </summary>
-        /// <param name="index"></param>
-        private void DrawOneMapMonsterDataPropertyIndex(int index)
-        {
-            var mapDataProperty = mMapDataListProperty.GetArrayElementAtIndex(index);
-            EditorGUILayout.BeginHorizontal();
-            EditorGUILayout.LabelField($"{index}", MapStyles.TabMiddleStyle, GUILayout.Width(40f));
-            var uidProperty = mapDataProperty.FindPropertyRelative("UID");
-            var uid = uidProperty.intValue;
-            EditorGUILayout.LabelField($"{uid}", MapStyles.TabMiddleStyle, GUILayout.Width(60f));
-            var groupIdProperty = mapDataProperty.FindPropertyRelative("GroupId");
-            if(groupIdProperty != null)
+            //if (IsShowMapUI(mapDataType, MapDataUIType.MapDataType))
+            //{
+            //    if (mapDataConfig != null)
+            //    {
+            //        EditorGUILayout.LabelField(mapDataConfig.DataType.ToString(), MapStyles.TabMiddleStyle, GUILayout.Width(150f));
+            //    }
+            //    else
+            //    {
+            //        EditorGUILayout.LabelField("找不到对象类型数据", MapStyles.TabMiddleStyle, GUILayout.Width(150f));
+            //    }
+            //}
+            if (IsShowMapUI(mapDataType, MapDataUIType.ConfId))
             {
-                groupIdProperty.intValue = EditorGUILayout.IntField(groupIdProperty.intValue, GUILayout.Width(60f));
-            }
-            EditorGUILayout.EndHorizontal();
-        }
-
-        /// <summary>
-        /// 绘制怪物组埋点类型的自定义数据区域
-        /// </summary>
-        private void DrawMapMonsterGroupCustomDataArea()
-        {
-            DrawMapMonsterGroupDataTitleArea();
-            for (int i = 0; i < mMapDataListProperty.arraySize; i++)
-            {
-                var mapDataProperty = mMapDataListProperty.GetArrayElementAtIndex(i);
-                var uidProperty = mapDataProperty.FindPropertyRelative("UID");
-                var uid = uidProperty.intValue;
-                var mapDataConfig = MapSetting.GetEditorInstance().DataSetting.GetMapDataConfigByUID(uid);
-                if (mapDataConfig.DataType != MapDataType.MONSTER_GROUP)
+                if (mapDataConfig != null)
                 {
-                    continue;
+                    EditorGUILayout.IntField(mapDataConfig.ConfId, MapStyles.TabMiddleStyle, GUILayout.Width(100f));
                 }
-                DrawOneMapMonsterGroupDataPropertyIndex(i);
+                else
+                {
+                    EditorGUILayout.LabelField("找不到关联Id数据", MapStyles.TabMiddleStyle, GUILayout.Width(100f));
+                }
             }
-        }
-
-        /// <summary>
-        /// 绘制怪物组埋点自定义数据标题区域
-        /// </summary>
-        private void DrawMapMonsterGroupDataTitleArea()
-        {
-            EditorGUILayout.BeginHorizontal("box");
-            EditorGUILayout.LabelField("索引", MapStyles.TabMiddleStyle, GUILayout.Width(40f));
-            EditorGUILayout.LabelField("UID", MapStyles.TabMiddleStyle, GUILayout.Width(60f));
-            EditorGUILayout.LabelField("组Id", MapStyles.TabMiddleStyle, GUILayout.Width(60f));
-            EditorGUILayout.LabelField("怪物创建半径", MapStyles.TabMiddleStyle, GUILayout.Width(100f));
-            EditorGUILayout.LabelField("怪物警戒半径", MapStyles.TabMiddleStyle, GUILayout.Width(100f));
-            EditorGUILayout.LabelField("GUI关闭开关", MapStyles.TabMiddleStyle, GUILayout.Width(100f));
+            if (IsShowMapUI(mapDataType, MapDataUIType.MonsterGroupId))
+            {
+                var groupIdProperty = mapDataProperty.FindPropertyRelative("GroupId");
+                if(groupIdProperty != null)
+                {
+                    groupIdProperty.intValue = EditorGUILayout.IntField(groupIdProperty.intValue, GUILayout.Width(MapEditorConst.InspectorDataGroupIdUIWidth));
+                }
+            }
+            if (IsShowMapUI(mapDataType, MapDataUIType.MonsterCreateRadius))
+            {
+                var monsterCreateRadiusProperty = mapDataProperty.FindPropertyRelative("MonsterCreateRaduis");
+                if (monsterCreateRadiusProperty != null)
+                {
+                    monsterCreateRadiusProperty.floatValue = EditorGUILayout.FloatField(monsterCreateRadiusProperty.floatValue, GUILayout.Width(MapEditorConst.InspectorDataMonsterCreateRadiusUIWidth));
+                }
+            }
+            if (IsShowMapUI(mapDataType, MapDataUIType.MonsterActiveRadius))
+            {
+                var monsterActiveRadiusProperty = mapDataProperty.FindPropertyRelative("MonsterActiveRaduis");
+                if (monsterActiveRadiusProperty != null)
+                {
+                    monsterActiveRadiusProperty.floatValue = EditorGUILayout.FloatField(monsterActiveRadiusProperty.floatValue, GUILayout.Width(MapEditorConst.InspectorDataMonsterActiveRediusUIWidth));
+                }
+            }
+            if (IsShowMapUI(mapDataType, MapDataUIType.MonsterGroupGUISwitchOff))
+            {
+                var guiSwitchOffProperty = mapDataProperty.FindPropertyRelative("GUISwithOff");
+                if (guiSwitchOffProperty != null)
+                {
+                    var space = 20f;
+                    EditorGUILayout.Space(space, true);
+                    guiSwitchOffProperty.boolValue = EditorGUILayout.Toggle(guiSwitchOffProperty.boolValue, GUILayout.Width(MapEditorConst.InspectorDataMonsterGroupGUISwitchOffUIWidth - space));
+                }
+            }
+            if (IsShowMapUI(mapDataType, MapDataUIType.Position))
+            {
+                var newVector3Value = positionProperty.vector3Value;
+                EditorGUI.BeginChangeCheck();
+                var singlePosWidth = (MapEditorConst.InspectorDataPositionUIWidth - 43f) / 3;
+                EditorGUILayout.LabelField("X", GUILayout.Width(10f));
+                newVector3Value.x = EditorGUILayout.FloatField(newVector3Value.x, GUILayout.Width(singlePosWidth));
+                EditorGUILayout.LabelField("Y", GUILayout.Width(10f));
+                newVector3Value.y = EditorGUILayout.FloatField(newVector3Value.y, GUILayout.Width(singlePosWidth));
+                EditorGUILayout.LabelField("Z", GUILayout.Width(10f));
+                newVector3Value.z = EditorGUILayout.FloatField(newVector3Value.z, GUILayout.Width(singlePosWidth));
+                if (EditorGUI.EndChangeCheck())
+                {
+                    var positionOffset = newVector3Value - positionProperty.vector3Value;
+                    OnMapDataPositionMove(mapDataIndex, positionOffset);
+                }
+            }
+            if (IsShowMapUI(mapDataType, MapDataUIType.Rotation))
+            {
+                var rotationProperty = mapDataProperty.FindPropertyRelative("Rotation");
+                var newRotationVector3Value = rotationProperty.vector3Value;
+                EditorGUI.BeginChangeCheck();
+                var singleRotWidth = (MapEditorConst.InspectorDataRotationUIWidth - 43f) / 3;
+                EditorGUILayout.LabelField("X", GUILayout.Width(10f));
+                newRotationVector3Value.x = EditorGUILayout.FloatField(newRotationVector3Value.x, GUILayout.Width(singleRotWidth));
+                EditorGUILayout.LabelField("Y", GUILayout.Width(10f));
+                newRotationVector3Value.y = EditorGUILayout.FloatField(newRotationVector3Value.y, GUILayout.Width(singleRotWidth));
+                EditorGUILayout.LabelField("Z", GUILayout.Width(10f));
+                newRotationVector3Value.z = EditorGUILayout.FloatField(newRotationVector3Value.z, GUILayout.Width(singleRotWidth));
+                if (EditorGUI.EndChangeCheck())
+                {
+                    rotationProperty.vector3Value = newRotationVector3Value;
+                }
+            }
+            //if (IsShowMapUI(mapDataType, MapDataUIType.Des))
+            //{
+            //    var des = mapDataConfig != null ? mapDataConfig.Des : "";
+            //    EditorGUILayout.LabelField(des, MapStyles.TabMiddleStyle, GUILayout.Width(MapEditorConst.InspectorDataDesUIWidth));
+            //}
+            if (IsShowMapUI(mapDataType, MapDataUIType.MoveUp))
+            {
+                if (GUILayout.Button("↑", GUILayout.Width(MapEditorConst.InspectorDataMoveUpUIWidth)))
+                {
+                    DoMovePropertyDataUpByIndex(mMapDataListProperty, mapDataIndex);
+                }
+            }
+            if (IsShowMapUI(mapDataType, MapDataUIType.MoveDown))
+            {
+                if (GUILayout.Button("↓", GUILayout.Width(MapEditorConst.InspectorDataMoveDownUIWidth)))
+                {
+                    DoMovePropertyDataDownByIndex(mMapDataListProperty, mapDataIndex);
+                }
+            }
+            if (IsShowMapUI(mapDataType, MapDataUIType.Add))
+            {
+                if (GUILayout.Button("+", GUILayout.Width(MapEditorConst.InspectorDataRemoveUIWidth)))
+                {
+                    var addMapDataValue = mAddMapDataIndexProperty.intValue;
+                    DoAddMapData(addMapDataValue, mapDataIndex);
+                }
+            }
+            if (IsShowMapUI(mapDataType, MapDataUIType.Remove))
+            {
+                if (GUILayout.Button("-", GUILayout.Width(MapEditorConst.InspectorDataAddUIWidth)))
+                {
+                    DoRemoveMapDataByIndex(mapDataIndex);
+                }
+            }
             EditorGUILayout.EndHorizontal();
         }
-
-        /// <summary>
-        /// 绘制指定属性索引的单个怪物组数据埋点属性显示
-        /// </summary>
-        /// <param name="index"></param>
-        private void DrawOneMapMonsterGroupDataPropertyIndex(int index)
-        {
-            var mapDataProperty = mMapDataListProperty.GetArrayElementAtIndex(index);
-            EditorGUILayout.BeginHorizontal();
-            EditorGUILayout.LabelField($"{index}", MapStyles.TabMiddleStyle, GUILayout.Width(40f));
-            var uidProperty = mapDataProperty.FindPropertyRelative("UID");
-            var uid = uidProperty.intValue;
-            EditorGUILayout.LabelField($"{uid}", MapStyles.TabMiddleStyle, GUILayout.Width(60f));
-            var groupIdProperty = mapDataProperty.FindPropertyRelative("GroupId");
-            if (groupIdProperty != null)
-            {
-                groupIdProperty.intValue = EditorGUILayout.IntField(groupIdProperty.intValue, GUILayout.Width(60f));
-            }
-            var monsterCreateRadiusProperty = mapDataProperty.FindPropertyRelative("MonsterCreateRadius");
-            if (monsterCreateRadiusProperty != null)
-            {
-                monsterCreateRadiusProperty.floatValue = EditorGUILayout.FloatField(monsterCreateRadiusProperty.floatValue, GUILayout.Width(100f));
-            }
-            var monsterActiveRadiusProperty = mapDataProperty.FindPropertyRelative("MonsterActiveRadius");
-            if (monsterActiveRadiusProperty != null)
-            {
-                monsterActiveRadiusProperty.floatValue = EditorGUILayout.FloatField(monsterActiveRadiusProperty.floatValue, GUILayout.Width(100f));
-            }
-            var guiSwitchOffProperty = mapDataProperty.FindPropertyRelative("GUISwitchOff");
-            if (guiSwitchOffProperty != null)
-            {
-                EditorGUILayout.Space(30f, false);
-                guiSwitchOffProperty.boolValue = EditorGUILayout.Toggle(guiSwitchOffProperty.boolValue, GUILayout.Width(70f));
-            }
-            EditorGUILayout.EndHorizontal();
-        }
-
         private void OnSceneGUI()
         {
             if(mSceneGUISwitchProperty != null && mSceneGUISwitchProperty.boolValue)
@@ -2269,9 +2843,9 @@ namespace MapEditor
         /// </summary>
         private void DrawMapDataLabels()
         {
-            for (int i = 0; i < mMapDataListProperty.arraySize; i++)
+            for (int i = 0, length = mMapDataListProperty.arraySize; i < length; i++)
             {
-                var mapDataProperty = mMapDataListProperty.GetArrayElementAtIndex(i);
+                var mapDataProperty = GetMapDataSerializedPropertyByIndex(i);
                 string mapDataLabelName = MapEditorUtilities.GetMapDataPropertyLabelName(mMapDataListProperty, i);
                 var mapDataPositionProperty = mapDataProperty.FindPropertyRelative("Position");
                 var mapDataBatchOperationSwitchProperty = mapDataProperty.FindPropertyRelative("BatchOperationSwitch");
@@ -2286,9 +2860,9 @@ namespace MapEditor
         /// </summary>
         private void DrawMapDataSpheres()
         {
-            for (int i = 0; i < mMapDataListProperty.arraySize; i++)
+            for (int i = 0, length = mMapDataListProperty.arraySize; i < length; i++)
             {
-                var mapDataProperty = mMapDataListProperty.GetArrayElementAtIndex(i);
+                var mapDataProperty = GetMapDataSerializedPropertyByIndex(i);
                 var uidProperty = mapDataProperty.FindPropertyRelative("UID");
                 var mapDataUID = uidProperty.intValue;
                 var mapDataPositionProperty = mapDataProperty.FindPropertyRelative("Position");
@@ -2307,10 +2881,10 @@ namespace MapEditor
         /// </summary>
         private void DrawMapDataPositionHandles()
         {
-            for (int i = 0; i < mMapDataListProperty.arraySize; i++)
+            for (int i = 0, length = mMapDataListProperty.arraySize; i < length; i++)
             {
                 EditorGUI.BeginChangeCheck();
-                var mapDataProperty = mMapDataListProperty.GetArrayElementAtIndex(i);
+                var mapDataProperty = GetMapDataSerializedPropertyByIndex(i);
                 var mapDataPositionProperty = mapDataProperty.FindPropertyRelative("Position");
                 var mapDataRotationProperty = mapDataProperty.FindPropertyRelative("Rotation");
                 var rotationQuaternion = Quaternion.Euler(mapDataRotationProperty.vector3Value);
@@ -2329,10 +2903,10 @@ namespace MapEditor
         /// </summary>
         private void DrawMapDataRotationHandles()
         {
-            for (int i = 0; i < mMapDataListProperty.arraySize; i++)
+            for (int i = 0, length = mMapDataListProperty.arraySize; i < length; i++)
             {
                 EditorGUI.BeginChangeCheck();
-                var mapDataProperty = mMapDataListProperty.GetArrayElementAtIndex(i);
+                var mapDataProperty = GetMapDataSerializedPropertyByIndex(i);
                 var mapDataPositionProperty = mapDataProperty.FindPropertyRelative("Position");
                 var mapDataRotationProperty = mapDataProperty.FindPropertyRelative("Rotation");
                 var rotationQuaternion = Quaternion.Euler(mapDataRotationProperty.vector3Value);

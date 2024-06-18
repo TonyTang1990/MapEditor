@@ -200,7 +200,7 @@ namespace MapEditor
             mapExport.MapData.Height = map.MapHeight;
             mapExport.MapData.StartPos = map.MapStartPos;
             List<MapData> playerSpawnDatas;
-            if (mapDataTypeDatasMap.TryGetValue(MapDataType.PLAYER_SPAWN, out playerSpawnDatas))
+            if (mapDataTypeDatasMap.TryGetValue(MapDataType.PlayerSpawn, out playerSpawnDatas))
             {
                 foreach (var playerSpawnData in playerSpawnDatas)
                 {
@@ -226,7 +226,7 @@ namespace MapEditor
 
             Dictionary<int, MapData> monsterGroupMap = new Dictionary<int, MapData>();
             List<MapData> monsterGroupDatas;
-            if (mapDataTypeDatasMap.TryGetValue(MapDataType.MONSTER_GROUP, out monsterGroupDatas))
+            if (mapDataTypeDatasMap.TryGetValue(MapDataType.MonsterGroup, out monsterGroupDatas))
             {
                 foreach (var mapData in monsterGroupDatas)
                 {
@@ -245,7 +245,7 @@ namespace MapEditor
             Dictionary<int, List<MapData>> monsterMap = new Dictionary<int, List<MapData>>();
             List<MapData> monsterDatas;
             List<MapData> noGroupMonsterDatas = new List<MapData>();
-            if (mapDataTypeDatasMap.TryGetValue(MapDataType.MONSTER, out monsterDatas))
+            if (mapDataTypeDatasMap.TryGetValue(MapDataType.Monster, out monsterDatas))
             {
                 foreach (var mapData in monsterDatas)
                 {
@@ -297,7 +297,7 @@ namespace MapEditor
                 var mapDataUID = mapData.UID;
                 var mapDataConfig = MapSetting.GetEditorInstance().DataSetting.GetMapDataConfigByUID(mapDataUID);
                 var mapDataType = mapDataConfig.DataType;
-                if (mapDataType == MapDataType.PLAYER_SPAWN || mapDataType == MapDataType.MONSTER || mapDataType == MapDataType.MONSTER_GROUP)
+                if (mapDataType == MapDataType.PlayerSpawn || mapDataType == MapDataType.Monster || mapDataType == MapDataType.MonsterGroup)
                 {
                     continue;
                 }

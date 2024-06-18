@@ -108,7 +108,7 @@ namespace MapEditor
         /// 当前选中需要新增的地图对象类型
         /// </summary>
         [HideInInspector]
-        public int AddMapObjectType = (int)MapObjectType.TREASURE_BOX;
+        public int AddMapObjectType = (int)MapObjectType.TreasureBox;
 
         /// <summary>
         /// 当前选中需要新增的地图对象索引
@@ -120,7 +120,7 @@ namespace MapEditor
         /// 当前选中需要新增的地图埋点类型
         /// </summary>
         [HideInInspector]
-        public int AddMapDataType = (int)MapDataType.PLAYER_SPAWN;
+        public int AddMapDataType = (int)MapDataType.PlayerSpawn;
 
         /// <summary>
         /// 当前选中需要新增的地图埋点索引
@@ -133,6 +133,42 @@ namespace MapEditor
         /// </summary>
         [Header("导出类型")]
         public ExportType ExportType;
+
+        /// <summary>
+        /// 地图对象是否展开数据
+        /// </summary>
+        [HideInInspector]
+        public bool MapObjectDataUnfoldData = false;
+
+        /// <summary>
+        /// 地图对象埋点是否组展开数据列表
+        /// </summary>
+        [HideInInspector]
+        public List<bool> MapObjectDataGroupUnfoldDataList = new List<bool>();
+
+        /// <summary>
+        /// 地图埋点是否展开数据
+        /// </summary>
+        [HideInInspector]
+        public bool MapDataUnfoldData = false;
+
+        /// <summary>
+        /// 地图玩家出生点埋点组是否展开数据列表
+        /// </summary>
+        [HideInInspector]
+        public List<bool> PlayerSpawnMapGroupUnfoldDataList = new List<bool>();
+
+        /// <summary>
+        /// 地图怪物埋点组是否展开数据列表
+        /// </summary>
+        [HideInInspector]
+        public List<bool> MonsterMapGroupUnfoldDataList = new List<bool>();
+
+        /// <summary>
+        /// 地图怪物组埋点组是否展开数据列表
+        /// </summary>
+        [HideInInspector]
+        public List<bool> MonsterGroupMapGroupUnfoldDataList = new List<bool>();
 
 #if UNITY_EDITOR
         /// <summary>
@@ -716,7 +752,7 @@ namespace MapEditor
                     continue;
                 }
                 var mapDataType = mapDataConfig.DataType;
-                if(mapDataType == MapDataType.MONSTER_GROUP)
+                if(mapDataType == MapDataType.MonsterGroup)
                 {
                     DrawMapMonsterGroupDataGizmos(mapData);
                 }

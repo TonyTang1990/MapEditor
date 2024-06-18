@@ -153,11 +153,11 @@ namespace MapEditor
         /// <returns></returns>
         public static MapData CreateMapDataByType(MapDataType mapDataType, int uid, Vector3 position, Vector3 rotation)
         {
-            if (mapDataType == MapDataType.MONSTER)
+            if (mapDataType == MapDataType.Monster)
             {
                 return new MonsterMapData(uid, position, rotation);
             }
-            else if (mapDataType == MapDataType.MONSTER_GROUP)
+            else if (mapDataType == MapDataType.MonsterGroup)
             {
                 return new MonsterGroupMapData(uid, position, rotation);
             }
