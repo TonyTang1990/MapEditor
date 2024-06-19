@@ -12,6 +12,7 @@ namespace MapEditor
     /// MonsterGroupMapData.cs
     /// 怪物组地图埋点数据
     /// </summary>
+    [Serializable]
     public class MonsterGroupMapData : MapData
     {
         /// <summary>

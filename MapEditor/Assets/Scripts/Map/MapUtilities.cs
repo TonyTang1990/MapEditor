@@ -161,8 +161,13 @@ namespace MapEditor
             {
                 return new MonsterGroupMapData(uid, position, rotation);
             }
+            else if(mapDataType == MapDataType.PlayerSpawn)
+            {
+                return new PlayerSpawnMapData(uid, position, rotation);
+            }
             else
             {
+                Debug.LogWarning($"地图埋点类型:{mapDataType}没有创建自定义类型数据，可能不方便未来扩展！");
                 return new MapData(uid, position, rotation);
             }
         }
