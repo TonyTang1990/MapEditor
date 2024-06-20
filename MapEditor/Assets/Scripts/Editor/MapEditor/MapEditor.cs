@@ -1210,7 +1210,7 @@ namespace MapEditor
                 {
                     return mapDataProperty;
                 }
-                mapDataProperty = GetMapDataSerializedPropertyByIndex(index);
+                mapDataProperty = mMapDataListProperty.GetArrayElementAtIndex(index);
                 mMapDataProeprtyMapCache.Add(index, mapDataProperty);
             }
             return mapDataProperty;
@@ -1243,7 +1243,7 @@ namespace MapEditor
             var totalMapDataNum = mMapDataListProperty.arraySize;
             var startIndex = mBatchTickRangeStartIndexProperty.intValue;
             var endIndex = mBatchTickRangeEndIndexProperty.intValue;
-            for(int i = startIndex; i <= endInde; i++)
+            for(int i = startIndex; i <= endIndex; i++)
             {
                 if(i < 0)
                 {
@@ -1393,7 +1393,7 @@ namespace MapEditor
             }
             var result = true;
             UpdateMapObjectDataLogicDatas();
-            if(!RecoverDynamicMapObjectGos())
+            if(!RecoverDynamicMapObjects())
             {
                 result = false;
             }
@@ -1479,7 +1479,7 @@ namespace MapEditor
         /// </summary>
         private void ExportMapData()
         {
-            if(!MapEditorUtilities.CheckIsGameMapAvalibleExport(mTarget))
+            if(!MapUtilities.CheckIsGameMapAvalibleExport(mTarget))
             {
                 EditorUtility.DisplayDialog("导出地图数据", "场景数据有问题，不满足导出条件，导出场景数据失败！", "确认");
                 return;
@@ -1508,7 +1508,8 @@ namespace MapEditor
             {
                 return false;
             }
-            if (!RecoverDynamicMapDatas())
+            var recoverResult = await RecoverDynamicMapDatas();
+            if (!recoverResult)
             {
                 Debug.LogError($"地图:{mTarget?.gameObject.name}恢复动态地图数据失败，一键烘焙导出地图数据失败！");
                 return false;
@@ -1527,7 +1528,8 @@ namespace MapEditor
                 Debug.LogError($"地图:{mTarget?.gameObject.name}拷贝寻路Asset失败，一键烘焙导出地图数据失败！");
                 return false;
             }
-            if (!CleanDynamicMapDatas())
+            var cleanDynamicMapDatasResult = await CleanDynamicMapDatas();
+            if (!cleanDynamicMapDatasResult)
             {
                 Debug.LogError($"地图:{mTarget?.gameObject.name}清除动态地图数据失败，一键烘焙导出地图数据失败！");
                 return false;
@@ -1634,7 +1636,7 @@ namespace MapEditor
             var uidProperty = mapDataProperty.FindPropertyRelative("UID");
             var oldUID = uidProperty.intValue;
             uidProperty.intValue = newUID;
-            var batchOperationSwitchProperty = mapDataProperty.FindPropertyRelalive("BatchOperationSwitch");
+            var batchOperationSwitchProperty = mapDataProperty.FindPropertyRelative("BatchOperationSwitch");
             if(batchOperationSwitchProperty.boolValue)
             {
                 DoMapDataBatchUIDCHangeExcept(mapDataIndex, oldUID, newUID);
@@ -1798,9 +1800,9 @@ namespace MapEditor
         /// 获取指定折叠类型和组id的折叠数据
         /// </summary>
         /// <param name="mapFoldType"></param>
-        /// <param name="indx"></param>
+        /// <param name="index"></param>
         /// <returns></returns>
-        private bool ExistMapUnfold(MapFoldType mapFoldType, int indx)
+        private bool ExistMapUnfold(MapFoldType mapFoldType, int index)
         {
             var groupUnfoldDataListProperty = GetMapUnfoldDataListProperty(mapFoldType);
             var groupUnfoldDataListSize = groupUnfoldDataListProperty.arraySize;
@@ -1808,7 +1810,7 @@ namespace MapEditor
             {
                 return false;
             }
-            return indexer < groupUnfoldDataListSize;
+            return index < groupUnfoldDataListSize;
         }
 
         /// <summary>
@@ -2468,17 +2470,17 @@ namespace MapEditor
             {
                 EditorGUILayout.LabelField($"{mapDataIndex}", MapStyles.TabMiddleStyle, GUILayout.Width(40f));
             }
-            MapDataConfig mapDataConfig;
-            if(MapEditorUtilities.IsShowMapUI(mapDataType, MapDataUIType.UID))
+            MapDataConfig mapDataConfig = null;
+            var uidProperty = mapDataProperty.FindPropertyRelative("UID");
+            var uid = uidProperty.intValue;
+            var positionProperty = mapDataProperty.FindPropertyRelative("Position");
+            mapDataConfig = MapSetting.GetEditorInstance().DataSetting.GetMapDataConfigByUID(uid);
+            if (MapEditorUtilities.IsShowMapUI(mapDataType, MapDataUIType.UID))
             {
-                var uidProperty = mapDataProperty.FindPropertyRelative("UID");
-                var uid = uidProperty.intValue;
-                var positionProperty = mapDataProperty.FindPropertyRelative("Position");
-                mapDataConfig = MapSetting.GetEditorInstance().DataSetting.GetMapDataConfigByUID(uid);
                 EditorGUI.BeginChangeCheck();
-                var mapDataType = mapDataConfig != null ? mapDataConfig.DataType : MapDataType.PlayerSpawn;
-                var mapDataChoiceOptions = GetMapDataChoiceOptionsByType(mapDataType);
-                var mapDataChoiceValues = GetMapDataChoiceValuesByType(mapDataType);
+                var realMapDataType = mapDataConfig != null ? mapDataConfig.DataType : MapDataType.PlayerSpawn;
+                var mapDataChoiceOptions = GetMapDataChoiceOptionsByType(realMapDataType);
+                var mapDataChoiceValues = GetMapDataChoiceValuesByType(realMapDataType);
                 uid = EditorGUILayout.IntPopup(uid, mapDataChoiceOptions, mapDataChoiceValues, GUILayout.Width(150f));
                 if (EditorGUI.EndChangeCheck())
                 {

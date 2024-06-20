@@ -69,10 +69,8 @@ namespace MapEditor
             serializedObject.Update();
 
             EditorGUILayout.BeginVertical();
-            EditorGUILayout.PropertyField(mColliderTypeProperty);
             EditorGUILayout.PropertyField(mCenterProperty);
             EditorGUILayout.PropertyField(mSizeProperty);
-            EditorGUILayout.PropertyField(mRadiusProperty);
 
             if (GUILayout.Button("自动根据Renderer计算", GUILayout.ExpandWidth(true)))
             {
@@ -131,10 +129,10 @@ namespace MapEditor
             {
                 return;
             }
-            var boxCollider = mTarget.gameObject.GetComponent<boxCollider>();
+            var boxCollider = mTarget.gameObject.GetComponent<BoxCollider>();
             if(boxCollider == null)
             {
-                boxCollider = mTarget.gameObject.AddComppnent<BoxCollider>();
+                boxCollider = mTarget.gameObject.AddComponent<BoxCollider>();
             }
             boxCollider.center = mCenterProperty.vector3Value;
             boxCollider.size = mSizeProperty.vector3Value;
