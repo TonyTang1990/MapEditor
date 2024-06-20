@@ -1788,17 +1788,67 @@ namespace MapEditor
             }
             var mapDataProperty = GetMapDataSerializedPropertyByIndex(mapDataIndex);
             var uidProperty = mapDataProperty.FindPropertyRelative("UID");
+            var oldUID = uidProperty.intValue;
             uidProperty.intValue = newUID;
-            OnMapDataUIDChange(mapDataIndex);
+            var batchOperationSwitchProperty = mapDataProperty.FindPropertyRelalive("BatchOperationSwitch");
+            if(batchOperationSwitchProperty.boolValue)
+            {
+                DoMapDataBatchUIDCHangeExcept(mapDataIndex, oldUID, newUID);
+            }
         }
 
         /// <summary>
-        /// 响应指定地图埋点索引的UID变化
+        /// 执行地图埋点数据UID批量变化(排除指定地图数据索引)
+        /// Note:
+        /// 只允许批量修改相同埋点类型的UID数据
         /// </summary>
         /// <param name="mapDataIndex"></param>
-        private void OnMapDataUIDChange(int mapDataIndex)
+        private bool DoMapDataBatchUIDCHangeExcept(int mapDataIndex, int oldUID, int newUID)
         {
-
+            var originalMapDataProperty = GetMapDataSerializedPropertyByIndex(mapDataIndex);
+            if(originalMapDataProperty == null)
+            {
+                Debug.LogError($"找不到地图埋点索引:{mapDataIndex}的埋点数据，批量修改UID到{newUID}失败！");
+                return false;
+            }
+            var originalUIDProperty = originalMapDataProperty.FindPropertyRelative("UID");
+            var originalUID = originalUIDProperty.intValue;
+            var originalMapDataConfig = MapSetting.GetEditorInstance().DataSetting.GetMapDataConfigByUID(originalUID);
+            if(originalMapDataConfig == null)
+            {
+                Debug.LogError($"找不到地图埋点UID:{originalUID}的配置数据，批量修改UID到{newUID}失败！");
+                return false;
+            }
+            List<int> mapDataTypeIndexs = GetMapDataTypeIndexs(originalMapDataConfig.DataType);
+            if(mapDataTypeIndexs == null)
+            {
+                return true;
+            }
+            for(int i = 0, length = mapDataTypeIndexs.Count; i < length; i++)
+            {
+                var realMapDataIndex = mapDataTypeIndexs[i];
+                if(realMapDataIndex == mapDataIndex)
+                {
+                    continue;
+                }
+                var mapDataProperty = GetMapDataSerializedPropertyByIndex(realMapDataIndex);
+                if(mapDataProperty == null)
+                {
+                    continue;
+                }
+                var batchOperationSwitchProperty = mapDataProperty.FindPropertyRelative("BatchOperationSwitch");
+                if(batchOperationSwitchProperty.boolValue)
+                {
+                    var uidProperty = mapDataProperty.FindPropertyRelative("UID");
+                    var originalUID2 = uidProperty.intValue;
+                    if(originalUID2 != oldUID)
+                    {
+                        continue;
+                    }
+                    uidProperty.intValue = newUID;
+                }
+            }
+            return true;
         }
 
         /// <summary>
