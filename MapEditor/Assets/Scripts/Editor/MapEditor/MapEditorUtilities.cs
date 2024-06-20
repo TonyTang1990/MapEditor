@@ -641,5 +641,179 @@ namespace MapEditor
             }
             return false;
         }
+
+        #region 折叠部分
+
+        /// <summary>
+        /// 地图埋点类型和折叠类型映射
+        /// </summary>
+        private static Dictionary<MapDataType, MapFoldType> MapDataTypeFoldTypeMap = new Dictionary<MapDataType, MapFoldType>()
+        {
+            {MapDataType.PlayerSpawn, MapFoldType.PlayerSpawnMapDataFold},
+            {MapDataType.Monster, MapFoldType.MonsterMapDataFold},
+            {MapDataType.MonsterGroup, MapFoldType.MonsterGroupMapDataFold},
+        };
+
+        /// <summary>
+        /// 地图折叠类型和一键折叠标题Map<地图折叠类型，一键折叠标题>
+        /// </summary>
+        private static Dictionary<MapFoldType, string> MapOneKeyFoldTitleMap = new Dictionary<MapFoldType, string>()
+        {
+            {MapFoldType.MapObjectDataFold, "一键折叠所有(通用对象数据)"},
+            {MapFoldType.PlayerSpawnMapDataFold, "一键折叠所有(玩家出生点埋点数据)"},
+            {MapFoldType.MonsterMapDataFold, "一键折叠所有(怪物埋点数据)"},
+            {MapFoldType.MonsterGroupMapDataFold, "一键折叠所有(怪物组埋点数据)"},
+        };
+
+        /// <summary>
+        /// 地图折叠类型和一键展开标题Map<地图折叠类型，一键展开标题>
+        /// </summary>
+        private static Dictionary<MapFoldType, string> MapOneKeyUnfoldTitleMap = new Dictionary<MapFoldType, string>()
+        {
+            {MapFoldType.MapObjectDataFold, "一键展开所有(通用对象数据)"},
+            {MapFoldType.PlayerSpawnMapDataFold, "一键展开所有(玩家出生点埋点数据)"},
+            {MapFoldType.MonsterMapDataFold, "一键展开所有(怪物埋点数据)"},
+            {MapFoldType.MonsterGroupMapDataFold, "一键展开所有(怪物组埋点数据)"},
+        };
+
+        /// <summary>
+        /// 地图埋点类型和UI显示类型Map<地图埋点类型，<地图UI显示类型，是否显示>>
+        /// </summary>
+        private static Dictionary<MapDataType, Dictionary<MapDataUIType, bool>> MapDataFoldAndUITypeMap = new Dictionary<MapDataType, Dictionary<MapDataUIType, bool>>()
+        {
+            {
+                MapDataType.PlayerSpawn, new Dictionary<MapDataUIType, bool>()
+                {
+                    {MapDataUIType.Batch, true},
+                    {MapDataUIType.Index, true},
+                    {MapDataUIType.UID, true},
+                    {MapDataUIType.MapDataType, true},
+                    {MapDataUIType.ConfId, true},
+                    {MapDataUIType.Position, true},
+                    {MapDataUIType.Rotation, true},
+                    {MapDataUIType.Des, true},
+                    {MapDataUIType.MoveUp, true},
+                    {MapDataUIType.MoveDown, true},
+                    {MapDataUIType.Add, true},
+                    {MapDataUIType.Remove, true},
+                }
+            },
+            {
+                MapDataType.Monster, new Dictionary<MapDataUIType, bool>()
+                {
+                    {MapDataUIType.Batch, true},
+                    {MapDataUIType.Index, true},
+                    {MapDataUIType.UID, true},
+                    {MapDataUIType.MapDataType, true},
+                    {MapDataUIType.ConfId, true},
+                    {MapDataUIType.MonsterGroupId, true},
+                    {MapDataUIType.Position, true},
+                    {MapDataUIType.Rotation, true},
+                    {MapDataUIType.Des, true},
+                    {MapDataUIType.MoveUp, true},
+                    {MapDataUIType.MoveDown, true},
+                    {MapDataUIType.Add, true},
+                    {MapDataUIType.Remove, true},
+                }
+            },
+            {
+                MapDataType.MonsterGroup, new Dictionary<MapDataUIType, bool>()
+                {
+                    {MapDataUIType.Batch, true},
+                    {MapDataUIType.Index, true},
+                    {MapDataUIType.UID, true},
+                    {MapDataUIType.MapDataType, true},
+                    {MapDataUIType.ConfId, true},
+                    {MapDataUIType.MonsterGroupId, true},
+                    {MapDataUIType.MonsterCreateRadius, true},
+                    {MapDataUIType.MonsterActiveRadius, true},
+                    {MapDataUIType.MonsterGroupGUISwitchOff, true},
+                    {MapDataUIType.Position, true},
+                    {MapDataUIType.Rotation, true},
+                    {MapDataUIType.Des, true},
+                    {MapDataUIType.MoveUp, true},
+                    {MapDataUIType.MoveDown, true},
+                    {MapDataUIType.Add, true},
+                    {MapDataUIType.Remove, true},
+                }
+            },
+        };
+
+        /// <summary>
+        /// 获取制定地图埋点类型的折叠类型
+        /// </summary>
+        /// <param name="mapDataType"></param>
+        /// <returns></returns>
+        public static MapFoldType GetMapDataFoldType(MapDataType mapDataType)
+        {
+            MapFoldType mapFoldType = MapFoldType.PlayerSpawnMapDataFold;
+            if (!MapDataTypeFoldTypeMap.TryGetValue(mapDataType, out mapFoldType))
+            {
+                Debug.LogError($"找不到地图埋点类型:{mapDataType}的对应折叠类型！");
+            }
+            return mapFoldType;
+        }
+
+        /// <summary>
+        /// 获取指定地图折叠类型的一键折叠标题
+        /// </summary>
+        /// <param name="mapFoldType"></param>
+        /// <returns></returns>
+        public static string GetMapOneKeyFoldTitle(MapFoldType mapFoldType)
+        {
+            string title = "未定义";
+            if (MapOneKeyFoldTitleMap.TryGetValue(mapFoldType, out title))
+            {
+
+            }
+            return title;
+        }
+
+        /// <summary>
+        /// 获取指定地图折叠类型的一键展开标题
+        /// </summary>
+        /// <param name="mapFoldType"></param>
+        /// <returns></returns>
+        public static string GetMapOneKeyUnfoldTitle(MapFoldType mapFoldType)
+        {
+            string title = "未定义";
+            if (MapOneKeyUnfoldTitleMap.TryGetValue(mapFoldType, out title))
+            {
+
+            }
+            return title;
+        }
+
+        /// <summary>
+        /// 是否显示指定数据埋点类型的地图数据
+        /// </summary>
+        /// <param name="mapDataType"></param>
+        /// <returns></returns>
+        public static bool IsShowMapDataFoldType(MapDataType mapDataType)
+        {
+            return MapDataFoldAndUITypeMap.ContainsKey(mapDataType);
+        }
+
+        /// <summary>
+        /// 是否显示指定数据埋点类型和地图UI类型的UI
+        /// </summary>
+        /// <param name="mapDataType"></param>
+        /// <param name="mapDataUIType"></param>
+        /// <returns></returns>
+        public static bool IsShowMapUI(MapDataType mapDataType, MapDataUIType mapDataUIType)
+        {
+            Dictionary<MapDataUIType, bool> mapFoldTypeUIMap;
+            if (!MapDataFoldAndUITypeMap.TryGetValue(mapDataType, out mapFoldTypeUIMap))
+            {
+                return false;
+            }
+            bool isShowMapUI;
+            if (!mapFoldTypeUIMap.TryGetValue(mapDataUIType, out isShowMapUI))
+            {
+                return false;
+            }
+            return isShowMapUI;
+        }
+        #endregion
     }
 }
