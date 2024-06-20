@@ -365,6 +365,16 @@ namespace MapEditor
         private SerializedProperty mMonsterGroupMapGroupUnfoldDataListProperty;
 
         /// <summary>
+        /// BatchTickRangeStartIndex属性
+        /// </summary>
+        private SerializedProperty mBatchTickRangeStartIndexProperty;
+
+        /// <summary>
+        /// BatchTickRangeEndIndex属性
+        /// </summary>
+        private SerializedProperty mBatchTickRangeEndIndexProperty;
+
+        /// <summary>
         /// 红色Label显示GUIStyle
         /// </summary>
         private GUIStyle mRedLabelGUIStyle;
@@ -525,6 +535,8 @@ namespace MapEditor
             mPlayerSpawnMapGroupUnfoldDataListProperty ??= serializedObject.FindProperty("PlayerSpawnMapGroupUnfoldDataList");
             mMonsterMapGroupUnfoldDataListProperty ??= serializedObject.FindProperty("MonsterMapGroupUnfoldDataList");
             mMonsterGroupMapGroupUnfoldDataListProperty ??= serializedObject.FindProperty("MonsterGroupMapGroupUnfoldDataList");
+            mBatchTickRangeStartIndexProperty ??= serializedObject.FindProperty("BatchTickRangeStartIndex");
+            mBatchTickRangeEndIndexProperty ??= serializedObject.FindProperty("BatchTickRangeEndIndex");
         }
 
         /// <summary>
@@ -1428,6 +1440,29 @@ namespace MapEditor
         }
 
         /// <summary>
+        /// 一键勾选指定范围的地图埋点批量数据
+        /// </summary>
+        /// <param name="isOn"></param>
+        private void OneKeySwitchMapDataRangeOperation(bool isOn)
+        {
+            var totalMapDataNum = mMapDataListProperty.arraySize;
+            var startIndex = mBatchTickRangeStartIndexProperty.intValue;
+            var endIndex = mBatchTickRangeEndIndexProperty.intValue;
+            for(int i = startIndex; i <= endInde; i++)
+            {
+                if(i < 0)
+                {
+                    continue;
+                }
+                if(i >= totalMapDataNum)
+                {
+                    break;
+                }
+                UpdateMapDataBatchOperationByIndex(i, isOn);
+            }
+        }
+
+        /// <summary>
         /// 更新所有地图埋点批量选择
         /// </summary>
         /// <param name="isOn"></param>
@@ -1435,10 +1470,24 @@ namespace MapEditor
         {
             for (int i = 0, length = mMapDataListProperty.arraySize; i < length; i++)
             {
-                var mapDataProperty = GetMapDataSerializedPropertyByIndex(i);
-                var batchOperationSwitchProperty = mapDataProperty.FindPropertyRelative("BatchOperationSwitch");
-                batchOperationSwitchProperty.boolValue = isOn;
+                UpdateMapDataBatchOperationByIndex(i, isOn);
             }
+        }
+
+        /// <summary>
+        /// 更新指定地图埋点索引的批量选项
+        /// </summary>
+        /// <param name="index"></param>
+        /// <param name="isOn"></param>
+        private void UpdateMapDataBatchOperationByIndex(int index, bool isOn)
+        {
+            var mapDataProperty = GetMapDataSerializedPropertyByIndex(index);
+            if(mapDataProperty == null)
+            {
+                return;
+            }
+            var batchOperationSwitchProperty = mapDataProperty.FindPropertyRelative("BatchOperationSwitch");
+            batchOperationSwitchProperty.boolValue = isOn;
         }
 
         /// <summary>
@@ -2400,6 +2449,7 @@ namespace MapEditor
                     DoAddMapData(addMapDataValue);
                 }
                 EditorGUILayout.EndHorizontal();
+                EditorGUILayout.BeginHorizontal();
                 if (GUILayout.Button("一键勾选批量", GUILayout.ExpandWidth(true)))
                 {
                     OneKeySwitchMapDataBatchOperation(true);
@@ -2408,6 +2458,21 @@ namespace MapEditor
                 {
                     OneKeySwitchMapDataBatchOperation(false);
                 }
+                EditorGUILayout.EndHorizontal();
+                EditorGUILayout.BeginHorizontal();
+                EditorGUILayout.LabelField("开始索引:", GUILayout.Width(60f));
+                mBatchTickRangeStartIndexProperty.intValue = EditorGUILayout.IntField(mBatchTickRangeStartIndexProperty.intValue, GUILayout.Width(100f));
+                EditorGUILayout.LabelField("结束索引:", GUILayout.Width(60f));
+                mBatchTickRangeEndIndexProperty.intValue = EditorGUILayout.IntField(mBatchTickRangeEndIndexProperty.intValue, GUILayout.Width(100f));
+                if(GUILayout.Button("范围勾选", GUILayout.ExpandWidth(true)))
+                {
+                    OneKeySwitchMapDataRangeOperation(true);
+                }
+                if (GUILayout.Button("范围清除勾选", GUILayout.ExpandWidth(true)))
+                {
+                    OneKeySwitchMapDataRangeOperation(false);
+                }
+                EditorGUILayout.EndHorizontal();
             }
             else
             {

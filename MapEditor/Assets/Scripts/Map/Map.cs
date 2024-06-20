@@ -170,6 +170,18 @@ namespace MapEditor
         [HideInInspector]
         public List<bool> MonsterGroupMapGroupUnfoldDataList = new List<bool>();
 
+        /// <summary>
+        /// 批量勾选起始索引
+        /// </summary>
+        [HideInInspector]
+        public int BatchTickRangeStartIndex;
+
+        /// <summary>
+        /// 批量勾选截止索引
+        /// </summary>
+        [HideInInspector]
+        public int BatchTickRangeEndIndex;
+
 #if UNITY_EDITOR
         /// <summary>
         /// 执行添加指定地图对象UID数据
