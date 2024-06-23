@@ -642,6 +642,216 @@ namespace MapEditor
             return false;
         }
 
+        /// <summary>
+        /// 获取制定数据索引的折叠数据索引
+        /// Note:
+        /// 默认折叠数据分组和折叠数据索引一致
+        /// </summary>
+        /// <param name="index"></param>
+        /// <returns></returns>
+        public static int GetMapFoldIndex(int index)
+        {
+            return index / MapEditorConst.MapFoldNumLimit;
+        }
+
+        /// <summary>
+        /// 获取指定地图对象类型的选项数据
+        /// </summary>
+        /// <param name="mapObjectType"></param>
+        /// <returns></returns>
+        public static (string[] options, int[] values) GetMapObjectChoiceInfosByType(MapObjectType mapObjectType)
+        {
+            var objectSetting = MapSetting.GetEditorInstance().ObjectSetting;
+            var mapObjectTypeAllConfigs = objectSetting.GetAllMapObjectConfigByType(mapObjectType);
+            var mapObjectTypeConfigNum = mapObjectTypeAllConfigs.Count;
+            string[] allChoiceOptions = new string[mapObjectTypeConfigNum];
+            int[] allValueOptions = new int[mapObjectTypeConfigNum];
+            for (int i = 0; i < mapObjectTypeConfigNum; i++)
+            {
+                var mapObjectTypeAllConfig = mapObjectTypeAllConfigs[i];
+                allChoiceOptions[i] = mapObjectTypeAllConfig.GetOptionName();
+                allValueOptions[i] = mapObjectTypeAllConfig.UID;
+            }
+            return (allChoiceOptions, allValueOptions);
+        }
+
+        /// <summary>
+        /// 获取指定地图埋点类型的选项数据
+        /// </summary>
+        /// <param name="mapDataType"></param>
+        /// <returns></returns>
+        public static (string[] options, int[] values) GetMapDataChoiceInfosByType(MapDataType mapDataType)
+        {
+            var dataSetting = MapSetting.GetEditorInstance().DataSetting;
+            var mapDataTypeAllConfigs = dataSetting.GetAllMapDataConfigByType(mapDataType);
+            var mapDataTypeConfigNum = mapDataTypeAllConfigs.Count;
+            string[] allChoiceOptions = new string[mapDataTypeConfigNum];
+            int[] allValueOptions = new int[mapDataTypeConfigNum];
+            for (int i = 0; i < mapDataTypeConfigNum; i++)
+            {
+                var mapObjectTypeAllConfig = mapDataTypeAllConfigs[i];
+                allChoiceOptions[i] = mapObjectTypeAllConfig.GetOptionName();
+                allValueOptions[i] = mapObjectTypeAllConfig.UID;
+            }
+            return (allChoiceOptions, allValueOptions);
+        }
+
+        /// <summary>
+        /// 绘制指定地图埋点类型的埋点数据标题区域
+        /// </summary>
+        /// <param name="mapDataType"></param>
+        public static void DrawMapDataTitleAreaByType(MapDataType mapDataType)
+        {
+            EditorGUILayout.BeginHorizontal("box");
+            if (MapEditorUtilities.IsShowMapUI(mapDataType, MapDataUIType.Batch))
+            {
+                EditorGUILayout.LabelField("批量", MapStyles.TabMiddleStyle, GUILayout.Width(MapEditorConst.InspectorDataBatchUIWidth));
+            }
+            if (MapEditorUtilities.IsShowMapUI(mapDataType, MapDataUIType.Index))
+            {
+                EditorGUILayout.LabelField("索引", MapStyles.TabMiddleStyle, GUILayout.Width(MapEditorConst.InspectorDataIndexUIWidth));
+            }
+            if (MapEditorUtilities.IsShowMapUI(mapDataType, MapDataUIType.UID))
+            {
+                EditorGUILayout.LabelField("UID", MapStyles.TabMiddleStyle, GUILayout.Width(MapEditorConst.InspectorDataUIDUIWidth));
+            }
+            //if (MapEditorUtilities.IsShowMapUI(mapDataType, MapDataUIType.MapDataType))
+            //{
+            //    EditorGUILayout.LabelField("埋点类型", MapStyles.TabMiddleStyle, GUILayout.Width(MapEditorConst.InspectorDataTypeUIWidth));
+            //}
+            if (MapEditorUtilities.IsShowMapUI(mapDataType, MapDataUIType.ConfId))
+            {
+                EditorGUILayout.LabelField("配置Id", MapStyles.TabMiddleStyle, GUILayout.Width(MapEditorConst.InspectorDataConfIdUIWidth));
+            }
+            if (MapEditorUtilities.IsShowMapUI(mapDataType, MapDataUIType.MonsterGroupId))
+            {
+                EditorGUILayout.LabelField("组Id", MapStyles.TabMiddleStyle, GUILayout.Width(MapEditorConst.InspectorDataGroupIdUIWidth));
+            }
+            if (MapEditorUtilities.IsShowMapUI(mapDataType, MapDataUIType.MonsterCreateRadius))
+            {
+                EditorGUILayout.LabelField("创建半径", MapStyles.TabMiddleStyle, GUILayout.Width(MapEditorConst.InspectorDataMonsterCreateRadiusUIWidth));
+            }
+            if (MapEditorUtilities.IsShowMapUI(mapDataType, MapDataUIType.MonsterActiveRadius))
+            {
+                EditorGUILayout.LabelField("警戒半径", MapStyles.TabMiddleStyle, GUILayout.Width(MapEditorConst.InspectorDataMonsterActiveRediusUIWidth));
+            }
+            if (MapEditorUtilities.IsShowMapUI(mapDataType, MapDataUIType.MonsterGroupGUISwitchOff))
+            {
+                EditorGUILayout.LabelField("GUI关闭", MapStyles.TabMiddleStyle, GUILayout.Width(MapEditorConst.InspectorDataMonsterGroupGUISwitchOffUIWidth));
+            }
+            if (MapEditorUtilities.IsShowMapUI(mapDataType, MapDataUIType.Position))
+            {
+                EditorGUILayout.LabelField("位置", MapStyles.TabMiddleStyle, GUILayout.Width(MapEditorConst.InspectorDataPositionUIWidth));
+            }
+            if (MapEditorUtilities.IsShowMapUI(mapDataType, MapDataUIType.Rotation))
+            {
+                EditorGUILayout.LabelField("旋转", MapStyles.TabMiddleStyle, GUILayout.Width(MapEditorConst.InspectorDataRotationUIWidth));
+            }
+            //if (MapEditorUtilities.IsShowMapUI(mapDataType, MapDataUIType.Des))
+            //{
+            //    EditorGUILayout.LabelField("描述", MapStyles.TabMiddleStyle, GUILayout.Width(MapEditorConst.InspectorDataDesUIWidth));
+            //}
+            if (MapEditorUtilities.IsShowMapUI(mapDataType, MapDataUIType.MoveUp))
+            {
+                EditorGUILayout.LabelField("上移", MapStyles.TabMiddleStyle, GUILayout.Width(MapEditorConst.InspectorDataMoveUpUIWidth));
+            }
+            if (MapEditorUtilities.IsShowMapUI(mapDataType, MapDataUIType.MoveDown))
+            {
+                EditorGUILayout.LabelField("下移", MapStyles.TabMiddleStyle, GUILayout.Width(MapEditorConst.InspectorDataMoveDownUIWidth));
+            }
+            if (MapEditorUtilities.IsShowMapUI(mapDataType, MapDataUIType.Add))
+            {
+                EditorGUILayout.LabelField("添加", MapStyles.TabMiddleStyle, GUILayout.Width(MapEditorConst.InspectorDataRemoveUIWidth));
+            }
+            if (MapEditorUtilities.IsShowMapUI(mapDataType, MapDataUIType.Remove))
+            {
+                EditorGUILayout.LabelField("删除", MapStyles.TabMiddleStyle, GUILayout.Width(MapEditorConst.InspectorDataAddUIWidth));
+            }
+            EditorGUILayout.EndHorizontal();
+        }
+
+        /// <summary>
+        /// 将指定属性对象和指定索引的数据向上移动
+        /// </summary>
+        /// <param name="propertyList"></param>
+        /// <param name="index"></param>
+        /// <returns></returns>
+        public static bool MovePropertyDataUpByIndex(SerializedProperty propertyList, int index)
+        {
+            if (propertyList == null || !propertyList.isArray)
+            {
+                Debug.LogError($"传递的属性对象为空或不是数组属性，向上移动属性数据失败！");
+                return false;
+            }
+            var mapDataNum = propertyList.arraySize;
+            if (index < 0 || index > mapDataNum)
+            {
+                Debug.LogError($"指定索引:{index}不是有效索引范围:0-{mapDataNum},向上移动属性数据失败！");
+                return false;
+            }
+            var newIndex = Math.Clamp(index - 1, 0, mapDataNum);
+            ExchangeMapDataByIndex(propertyList, index, newIndex);
+            return true;
+        }
+
+        /// <summary>
+        /// 将指定属性对象和指定索引的数据向下移动
+        /// </summary>
+        /// <param name="propertyList"></param>
+        /// <param name="index"></param>
+        /// <returns></returns>
+        public static bool MovePropertyDataDownByIndex(SerializedProperty propertyList, int index)
+        {
+            if (propertyList == null || !propertyList.isArray)
+            {
+                Debug.LogError($"传递的属性对象为空或不是数组属性，向下移动属性数据失败！");
+                return false;
+            }
+            var mapDataNum = propertyList.arraySize;
+            if (index < 0 || index >= mapDataNum)
+            {
+                Debug.LogError($"指定索引:{index}不是有效索引范围:0-{mapDataNum - 1},向下移动属性数据失败！");
+                return false;
+            }
+            var newIndex = Math.Clamp(index + 1, 0, mapDataNum - 1);
+            ExchangeMapDataByIndex(propertyList, index, newIndex);
+            return true;
+        }
+
+        /// <summary>
+        /// 交换指定属性和交换索引数据
+        /// </summary>
+        /// <param name="propertyList"></param>
+        /// <param name="exchangeIndex1"></param>
+        /// <param name="exchangeIndex2"></param>
+        /// <returns></returns>
+        public static bool ExchangeMapDataByIndex(SerializedProperty propertyList, int exchangeIndex1, int exchangeIndex2)
+        {
+            if (propertyList == null || !propertyList.isArray)
+            {
+                Debug.LogError($"传递的属性对象为空或不是数组属性，交换属性数据位置失败！");
+                return false;
+            }
+            if (exchangeIndex1 == exchangeIndex2)
+            {
+                return true;
+            }
+            var dataNum = propertyList.arraySize;
+            if (exchangeIndex1 < 0 || exchangeIndex2 >= dataNum || exchangeIndex2 < 0 || exchangeIndex2 >= dataNum)
+            {
+                Debug.LogError($"指定交换索引1:{exchangeIndex1}或交换索引2:{exchangeIndex2}不是有效索引范围:0-{dataNum - 1},交换属性数据位置失败！");
+                return false;
+            }
+            var mapDataIndex2Property = propertyList.GetArrayElementAtIndex(exchangeIndex2);
+            var mapData2 = mapDataIndex2Property.managedReferenceValue;
+            var mapDataIndex1Property = propertyList.GetArrayElementAtIndex(exchangeIndex1);
+            var mapData1 = mapDataIndex1Property.managedReferenceValue;
+            mapDataIndex1Property.managedReferenceValue = mapData2;
+            mapDataIndex2Property.managedReferenceValue = mapData1;
+            //Debug.Log($"交换属性数据索引1:{exchangeIndex1}和索引2:{exchangeIndex2}成功！");
+            return true;
+        }
+
         #region 折叠部分
 
         /// <summary>

@@ -348,6 +348,46 @@ PrefabInstance:
       propertyPath: MapAreaGUISwitch
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 3704578141945685453, guid: 17e532285d4b3064ab746a7440568961, type: 3}
+      propertyPath: MapDataUnfoldData
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3704578141945685453, guid: 17e532285d4b3064ab746a7440568961, type: 3}
+      propertyPath: MapObjectDataUnfoldData
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3704578141945685453, guid: 17e532285d4b3064ab746a7440568961, type: 3}
+      propertyPath: MonsterMapGroupUnfoldDataList.Array.size
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3704578141945685453, guid: 17e532285d4b3064ab746a7440568961, type: 3}
+      propertyPath: MapObjectDataGroupUnfoldDataList.Array.size
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3704578141945685453, guid: 17e532285d4b3064ab746a7440568961, type: 3}
+      propertyPath: MonsterMapGroupUnfoldDataList.Array.data[0]
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3704578141945685453, guid: 17e532285d4b3064ab746a7440568961, type: 3}
+      propertyPath: PlayerSpawnMapGroupUnfoldDataList.Array.size
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3704578141945685453, guid: 17e532285d4b3064ab746a7440568961, type: 3}
+      propertyPath: MonsterGroupMapGroupUnfoldDataList.Array.size
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3704578141945685453, guid: 17e532285d4b3064ab746a7440568961, type: 3}
+      propertyPath: MapObjectDataGroupUnfoldDataList.Array.data[0]
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3704578141945685453, guid: 17e532285d4b3064ab746a7440568961, type: 3}
+      propertyPath: PlayerSpawnMapGroupUnfoldDataList.Array.data[0]
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3704578141945685453, guid: 17e532285d4b3064ab746a7440568961, type: 3}
+      propertyPath: MonsterGroupMapGroupUnfoldDataList.Array.data[0]
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 3704578141945685454, guid: 17e532285d4b3064ab746a7440568961, type: 3}
       propertyPath: m_Name
       value: Level1

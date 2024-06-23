@@ -108,6 +108,8 @@
     <Compile Include="Assets\Scripts\Core\Collision\Collision2D\Polygon2D.cs" />
     <Compile Include="Assets\Scripts\Core\Collision\Collision2D\Capsule2D.cs" />
     <Compile Include="Assets\Scripts\Map\MapObject\MapObjectData.cs" />
+    <Compile Include="Assets\Scripts\Map\MapTemplateData\MapTemplateDataMono.cs" />
+    <Compile Include="Assets\Scripts\Map\MapTemplateData\MapTemplateData.cs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="UnityEngine">

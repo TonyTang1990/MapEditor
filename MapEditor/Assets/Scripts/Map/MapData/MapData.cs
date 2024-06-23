@@ -40,6 +40,18 @@ namespace MapEditor
         [Header("批量操作开关")]
         public bool BatchOperationSwitch;
 
+        /// <summary>
+        /// 模版数据局部位置
+        /// </summary>
+        [Header("模版数据局部位置")]
+        public Vector3 TemplateLocalPosition;
+
+        /// <summary>
+        /// 模版数据局部旋转
+        /// </summary>
+        [Header("模版数据局部旋转")]
+        public Vector3 TemplateLocalRotation;
+
         public MapData(int uid)
         {
             UID = uid;

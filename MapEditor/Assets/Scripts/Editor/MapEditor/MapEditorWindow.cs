@@ -111,7 +111,7 @@ namespace MapEditor
         /// </summary>
         private void InitSettingData()
         {
-            mMapSettingAsset = MapUtilities.LoadOrCreateGameMapSetting();
+            mMapSettingAsset = MapSetting.GetEditorInstance();
         }
 
         /// <summary>

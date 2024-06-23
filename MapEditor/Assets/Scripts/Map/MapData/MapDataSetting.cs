@@ -106,7 +106,7 @@ namespace MapEditor
         /// </summary>
         /// <param name="mapDataType"></param>
         /// <returns></returns>
-        public List<MapDataConfig> GetAllMapObjectConfigByType(MapDataType mapDataType)
+        public List<MapDataConfig> GetAllMapDataConfigByType(MapDataType mapDataType)
         {
             List<MapDataConfig> targetMapDataConfigs = new List<MapDataConfig>();
             foreach (var mapObjectConfig in AlllMapDataConfigs)

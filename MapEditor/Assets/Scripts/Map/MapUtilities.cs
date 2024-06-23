@@ -11,6 +11,7 @@ using Unity.AI.Navigation;
 using System.Threading.Tasks;
 using Unity.AI.Navigation.Editor;
 using UnityEngine.AI;
+using System.Collections.Generic;
 #if UNITY_EDITOR
 using UnityEditor;
 using UnityEditor.SceneManagement;
@@ -545,6 +546,104 @@ namespace MapEditor
                 }
             }
             return false;
+        }
+
+        /// <summary>
+        /// 添加指定地图埋点数据到指定地图埋点数据列表
+        /// </summary>
+        /// <param name="mapDataList">地图埋点数据列表</param>
+        /// <param name="uid">插入地图埋点UID</param>
+        /// <param name="initPos">初始位置</param>
+        /// <param name="insertIndex">插入位置(-1表示插入尾部)</param>
+        /// <param name="copyRotation">是否复制旋转值</param>
+        /// <param name="positionOffset">位置偏移</param>
+        /// <returns></returns>
+        public static MapData AddMapDataToList(List<MapData> mapDataList, int uid, Vector3 startPos, int insertIndex = -1, bool copyRotation = false, Vector3? positionOffset = null)
+        {
+            if(mapDataList == null)
+            {
+                Debug.LogError($"不允许添加埋点数据到空埋点数据列表，添加地图埋点数据失败！");
+                return null;
+            }
+            var mapDataConfig = MapSetting.GetEditorInstance().DataSetting.GetMapDataConfigByUID(uid);
+            if (mapDataConfig == null)
+            {
+                Debug.LogError($"未配置地图埋点UID:{uid}配置数据，不支持添加此地图埋点数据！");
+                return null;
+            }
+            var mapDataType = mapDataConfig.DataType;
+            var mapDataTotalNum = mapDataList.Count;
+            var maxInsertIndex = mapDataTotalNum == 0 ? 0 : mapDataTotalNum;
+            var insertPos = 0;
+            if (insertIndex == -1)
+            {
+                insertPos = maxInsertIndex;
+            }
+            else
+            {
+                insertPos = Math.Clamp(insertIndex, 0, maxInsertIndex);
+            }
+            var mapDataPosition = startPos;
+            var mapDataRotation = mapDataConfig.Rotation;
+            if (mapDataTotalNum != 0)
+            {
+                var insertMapDataPos = Math.Clamp(insertPos, 0, maxInsertIndex - 1);
+                var insertMapData = mapDataList[insertMapDataPos];
+                mapDataPosition = insertMapData != null ? insertMapData.Position : mapDataPosition;
+                if (copyRotation)
+                {
+                    mapDataRotation = insertMapData != null ? insertMapData.Rotation : mapDataConfig.Rotation;
+                }
+            }
+            if (positionOffset != null)
+            {
+                mapDataPosition += (Vector3)positionOffset;
+            }
+            var newMapData = MapUtilities.CreateMapDataByType(mapDataType, uid, mapDataPosition, mapDataRotation);
+            mapDataList.Insert(insertPos, newMapData);
+            return newMapData;
+        }
+
+        /// <summary>
+        /// 从指定地图埋点数据列表移除指定索引的地图埋点数据
+        /// </summary>
+        /// <param name="mapDataList">地图埋点数据列表</param>
+        /// <param name="index"></param>
+        /// <returns></returns>
+        public static bool RemoveMapDataFromListByIndex(List<MapData> mapDataList, int index)
+        {
+            if (mapDataList == null)
+            {
+                Debug.LogError($"不允许从空埋点数据列表移除埋点数据，移除地图埋点数据失败！");
+                return false;
+            }
+            var mapDataNum = mapDataList.Count;
+            if (index < 0 || index >= mapDataNum)
+            {
+                Debug.LogError($"指定索引:{index}不是有效索引范围:0-{mapDataNum - 1},移除地图埋点数据失败！");
+                return false;
+            }
+            mapDataList.RemoveAt(index);
+            return true;
+        }
+
+        /// <summary>
+        /// 更新所有地图埋点批量选择
+        /// </summary>
+        /// <param name="mapDataList">地图埋点数据列表</param>
+        /// <param name="isOn"></param>
+        public static bool UpdateAllMapDataBatchOperationByList(List<MapData> mapDataList, bool isOn)
+        {
+            if (mapDataList == null)
+            {
+                Debug.LogError($"不允许从更新空埋点数据列表批量操作数据，更新地图埋点批量操作数据失败！");
+                return false;
+            }
+            for (int i = 0, length = mapDataList.Count; i < length; i++)
+            {
+                mapDataList[i].BatchOperationSwitch = isOn;
+            }
+            return true;
         }
 #endif
     }

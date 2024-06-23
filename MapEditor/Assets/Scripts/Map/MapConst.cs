@@ -17,7 +17,7 @@ namespace MapEditor
         /// <summary>
         /// 游戏地图设置保存路径
         /// </summary>
-        public const string MapSettingSavePath = "Assets/Map/MapSetting.asset";
+        public const string MapSettingSavePath = "Assets/Editor/Map/MapSetting.asset";
 
         /// <summary>
         /// 地图导出目录相对路径(相对Asset目录)

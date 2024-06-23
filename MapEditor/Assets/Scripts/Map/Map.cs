@@ -344,42 +344,7 @@ namespace MapEditor
         /// <returns></returns>
         private MapData AddMapData(int uid, int insertIndex = -1, bool copyRotation = false, Vector3? positionOffset = null)
         {
-            var mapDataConfig = MapSetting.GetEditorInstance().DataSetting.GetMapDataConfigByUID(uid);
-            if (mapDataConfig == null)
-            {
-                Debug.LogError($"未配置地图埋点UID:{uid}配置数据，不支持添加此地图埋点数据！");
-                return null;
-            }
-            var mapDataType = mapDataConfig.DataType;
-            var mapDataTotalNum = MapDataList.Count;
-            var maxInsertIndex = mapDataTotalNum == 0 ? 0 : mapDataTotalNum;
-            var insertPos = 0;
-            if (insertIndex == -1)
-            {
-                insertPos = maxInsertIndex;
-            }
-            else
-            {
-                insertPos = Math.Clamp(insertIndex, 0, maxInsertIndex);
-            }
-            var mapDataPosition = MapStartPos;
-            var mapDataRotation = mapDataConfig.Rotation;
-            if (mapDataTotalNum != 0)
-            {
-                var insertMapDataPos = Math.Clamp(insertPos, 0, maxInsertIndex - 1);
-                var insertMapData = MapDataList[insertMapDataPos];
-                mapDataPosition = insertMapData != null ? insertMapData.Position : mapDataPosition;
-                if(copyRotation)
-                {
-                    mapDataRotation = insertMapData != null ? insertMapData.Rotation : mapDataConfig.Rotation;
-                }
-            }
-            if(positionOffset != null)
-            {
-                mapDataPosition += (Vector3)positionOffset;
-            }
-            var newMapData = MapUtilities.CreateMapDataByType(mapDataType, uid, mapDataPosition, mapDataRotation);
-            MapDataList.Insert(insertPos, newMapData);
+            var newMapData = MapUtilities.AddMapDataToList(MapDataList, uid, MapStartPos, insertIndex, copyRotation, positionOffset);
             return newMapData;
         }
 
@@ -404,26 +369,16 @@ namespace MapEditor
         /// <returns></returns>
         private bool RemoveMapDataByIndex(int index)
         {
-            var mapDataNum = MapDataList.Count;
-            if (index < 0 || index >= mapDataNum)
-            {
-                Debug.LogError($"指定索引:{index}不是有效索引范围:0-{mapDataNum - 1},移除地图埋点数据失败！");
-                return false;
-            }
-            MapDataList.RemoveAt(index);
-            return true;
+            return MapUtilities.RemoveMapDataFromListByIndex(MapDataList, index);
         }
 
         /// <summary>
         /// 更新所有地图埋点批量选择
         /// </summary>
         /// <param name="isOn"></param>
-        public void UpdateAllMapDataBatchOperation(bool isOn)
+        public bool UpdateAllMapDataBatchOperation(bool isOn)
         {
-            for (int i = 0, length = MapDataList.Count; i < length; i++)
-            {
-                MapDataList[i].BatchOperationSwitch = isOn;
-            }
+            return MapUtilities.UpdateAllMapDataBatchOperationByList(MapDataList, isOn);
         }
 
         /// <summary>

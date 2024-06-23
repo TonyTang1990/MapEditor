@@ -68,6 +68,7 @@
     <Compile Include="Assets\Scripts\Editor\Camera\CameraRayCastVisualizationMonoEditor.cs" />
     <Compile Include="Assets\Scripts\Editor\MapEditor\MapEditorConst.cs" />
     <Compile Include="Assets\Scripts\Editor\MapEditor\ColliderDataMonoEditor.cs" />
+    <Compile Include="Assets\Scripts\Editor\MapEditor\MapTemplateData\MapTemplateDataMonoEditor.cs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="UnityEngine">
