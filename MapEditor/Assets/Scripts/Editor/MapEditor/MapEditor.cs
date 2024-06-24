@@ -1119,16 +1119,64 @@ namespace MapEditor
         }
 
         /// <summary>
-        /// 一键操作地图埋点批量勾选
+        /// 一键操作地图批量勾选
         /// </summary>
         /// <param name="isOn"></param>
-        private void OneKeySwitchMapDataBatchOperation(bool isOn)
+        private void OneKeySwitchBatchOperation(bool isOn)
         {
-            UpdateAllMapDataBatchOperation(isOn);
+            var mapTabType = (MapTabType)mPanelToolBarSelectIndex;
+            if(mapTabType == MapTabType.MapBuild)
+            {
+                UpdateAllMapObjectDataBatchOperation(isOn);
+            }
+            else if(mapTabType == MapTabType.DataEditor)
+            {
+                UpdateAllMapDataBatchOperation(isOn);
+            }
         }
 
         /// <summary>
-        /// 一键勾选指定范围的地图埋点批量数据
+        /// 一键勾选指定范围的地图批量数据
+        /// </summary>
+        /// <param name="isOn"></param>
+        private void OneKeySwitchRangeOperation(bool isOn)
+        {
+            var mapTabType = (MapTabType)mPanelToolBarSelectIndex;
+            if (mapTabType == MapTabType.MapBuild)
+            {
+                OneKeySwitchMapObjectDataRangeOperation(isOn);
+            }
+            else if (mapTabType == MapTabType.DataEditor)
+            {
+                OneKeySwitchMapDataRangeOperation(isOn);
+            }
+        }
+
+        /// <summary>
+        /// 一键膝盖地图对象批量数据
+        /// </summary>
+        /// <param name="isOn"></param>
+        private void OneKeySwitchMapObjectDataRangeOperation(bool isOn)
+        {
+            var totalMapDataNum = mMapObjectDataListProperty.arraySize;
+            var startIndex = mBatchTickRangeStartIndexProperty.intValue;
+            var endIndex = mBatchTickRangeEndIndexProperty.intValue;
+            for (int i = startIndex; i <= endIndex; i++)
+            {
+                if (i < 0)
+                {
+                    continue;
+                }
+                if (i >= totalMapDataNum)
+                {
+                    break;
+                }
+                UpdateMapObjectDataBatchOperationByIndex(i, isOn);
+            }
+        }
+
+        /// <summary>
+        /// 一键修改地图埋点批量数据
         /// </summary>
         /// <param name="isOn"></param>
         private void OneKeySwitchMapDataRangeOperation(bool isOn)
@@ -1136,17 +1184,29 @@ namespace MapEditor
             var totalMapDataNum = mMapDataListProperty.arraySize;
             var startIndex = mBatchTickRangeStartIndexProperty.intValue;
             var endIndex = mBatchTickRangeEndIndexProperty.intValue;
-            for(int i = startIndex; i <= endIndex; i++)
+            for (int i = startIndex; i <= endIndex; i++)
             {
-                if(i < 0)
+                if (i < 0)
                 {
                     continue;
                 }
-                if(i >= totalMapDataNum)
+                if (i >= totalMapDataNum)
                 {
                     break;
                 }
                 UpdateMapDataBatchOperationByIndex(i, isOn);
+            }
+        }
+
+        /// <summary>
+        /// 更新所有地图对象批量选择
+        /// </summary>
+        /// <param name="isOn"></param>
+        private void UpdateAllMapObjectDataBatchOperation(bool isOn)
+        {
+            for (int i = 0, length = mMapObjectDataListProperty.arraySize; i < length; i++)
+            {
+                UpdateMapObjectDataBatchOperationByIndex(i, isOn);
             }
         }
 
@@ -1160,6 +1220,22 @@ namespace MapEditor
             {
                 UpdateMapDataBatchOperationByIndex(i, isOn);
             }
+        }
+
+        /// <summary>
+        /// 更新指定地图对象索引的批量选项
+        /// </summary>
+        /// <param name="index"></param>
+        /// <param name="isOn"></param>
+        private void UpdateMapObjectDataBatchOperationByIndex(int index, bool isOn)
+        {
+            var mapObjectDataProperty = mMapObjectDataListProperty.GetArrayElementAt(index);
+            if (mapObjectDataProperty == null)
+            {
+                return;
+            }
+            var batchOperationSwitchProperty = mapObjectDataProperty.FindPropertyRelative("BatchOperationSwitch");
+            batchOperationSwitchProperty.boolValue = isOn;
         }
 
         /// <summary>
@@ -1492,18 +1568,60 @@ namespace MapEditor
             }
             var mapObjectDataProperty = mMapObjectDataListProperty.GetArrayElementAtIndex(mapObjectDataIndex);
             var uidProperty = mapObjectDataProperty.FindPropertyRelative("UID");
+            var oldUID = uidProperty.intValue;
             uidProperty.intValue = newUID;
-            OnMapObjectDataUIDChange(mapObjectDataIndex);
+            var batchOperationSwitchProperty = mapObjectDataProperty.FindPropertyRelative("BatchOperationSwitch");
+            if(batchOperationSwitchProperty.boolValue)
+            {
+                DoMapObjectDataUIDChangeExcept(mapObjectDataIndex, oldUID, newUID);
+            }
         }
 
         /// <summary>
-        /// 响应指定地图对象索引的UID变化
+        /// 执行地图对象数据UID批量变化(排除指定地图对象数据索引)
+        /// Note:
+        /// 只允许批量修改相同埋点对象类型的UID数据
         /// </summary>
         /// <param name="mapObjectDataIndex"></param>
-        private void OnMapObjectDataUIDChange(int mapObjectDataIndex)
+        /// <param name="oldUID"></param>
+        /// <param name="newUID"></param>
+        private void DoMapObjectDataUIDChangeExcept(int mapObjectDataIndex, int oldUID, int newUID)
         {
-            var mapObjectDataProperty = mMapObjectDataListProperty.GetArrayElementAtIndex(mapObjectDataIndex);
-            RecreateMapObjectGo(mapObjectDataProperty);
+            var originalMapDataProperty = mMapObjectDataListProperty.GetArrayElementAt(mapObjectDataIndex);
+            if (originalMapDataProperty == null)
+            {
+                Debug.LogError($"找不到地图对象索引:{mapObjectDataIndex}的埋点数据，批量修改UID到{newUID}失败！");
+                return false;
+            }
+            var originalUIDProperty = originalMapDataProperty.FindPropertyRelative("UID");
+            var originalUID = originalUIDProperty.intValue;
+            var originalMapDataConfig = MapSetting.GetEditorInstance().ObjectSetting.GetMapObjectConfigByUID(originalUID);
+            if (originalMapDataConfig == null)
+            {
+                Debug.LogError($"找不到地图对象UID:{originalUID}的配置数据，批量修改UID到{newUID}失败！");
+                return false;
+            }
+            for (int i = 0, length = mMapObjectDataListProperty.arraySize; i < length; i++)
+            {
+                var mapObjectDataProperty = mMapObjectDataListProperty.GetArrayElementAt(i);
+                if (mapObjectDataProperty == null)
+                {
+                    continue;
+                }
+                var batchOperationSwitchProperty = mapObjectDataProperty.FindPropertyRelative("BatchOperationSwitch");
+                if (batchOperationSwitchProperty.boolValue)
+                {
+                    var uidProperty = mapObjectDataProperty.FindPropertyRelative("UID");
+                    var originalUID2 = uidProperty.intValue;
+                    if (originalUID2 != oldUID)
+                    {
+                        continue;
+                    }
+                    uidProperty.intValue = newUID;
+                    RecreateMapObjectGo(mapObjectDataProperty);
+                }
+            }
+            return true;
         }
 
         /// <summary>
@@ -1532,7 +1650,7 @@ namespace MapEditor
             var batchOperationSwitchProperty = mapDataProperty.FindPropertyRelative("BatchOperationSwitch");
             if(batchOperationSwitchProperty.boolValue)
             {
-                DoMapDataBatchUIDCHangeExcept(mapDataIndex, oldUID, newUID);
+                DoMapDataBatchUIDChangeExcept(mapDataIndex, oldUID, newUID);
             }
         }
 
@@ -1542,7 +1660,7 @@ namespace MapEditor
         /// 只允许批量修改相同埋点类型的UID数据
         /// </summary>
         /// <param name="mapDataIndex"></param>
-        private bool DoMapDataBatchUIDCHangeExcept(int mapDataIndex, int oldUID, int newUID)
+        private bool DoMapDataBatchUIDChangeExcept(int mapDataIndex, int oldUID, int newUID)
         {
             var originalMapDataProperty = GetMapDataSerializedPropertyByIndex(mapDataIndex);
             if(originalMapDataProperty == null)
@@ -1873,6 +1991,7 @@ namespace MapEditor
         private void DrawMapOperationInspectorArea()
         {
             EditorGUILayout.BeginVertical("box");
+            DrawCommonOperationInspectorArea();
             EditorGUILayout.BeginHorizontal();
             mPanelToolBarSelectIndex = GUILayout.Toolbar(mPanelToolBarSelectIndex, mPanelToolBarStrings, EditorStyles.toolbarButton, GUILayout.ExpandWidth(true));
             mSelectedTabType = (MapTabType)mPanelToolBarSelectIndex;
@@ -1885,6 +2004,39 @@ namespace MapEditor
             {
                 DrawMapDataInspectorArea();
             }
+            EditorGUILayout.EndVertical();
+        }
+
+        /// <summary>
+        /// 绘制通用操作Inspector区域
+        /// </summary>
+        private void DrawCommonOperationInspectorArea()
+        {
+            EditorGUILayout.BeginVertical("box");
+            EditorGUILayout.BeginHorizontal();
+            if (GUILayout.Button("一键勾选批量", GUILayout.ExpandWidth(true)))
+            {
+                OneKeySwitchBatchOperation(true);
+            }
+            if (GUILayout.Button("一键清除批量勾选", GUILayout.ExpandWidth(true)))
+            {
+                OneKeySwitchBatchOperation(false);
+            }
+            EditorGUILayout.EndHorizontal();
+            EditorGUILayout.BeginHorizontal();
+            EditorGUILayout.LabelField("开始索引:", GUILayout.Width(60f));
+            mBatchTickRangeStartIndexProperty.intValue = EditorGUILayout.IntField(mBatchTickRangeStartIndexProperty.intValue, GUILayout.Width(100f));
+            EditorGUILayout.LabelField("结束索引:", GUILayout.Width(60f));
+            mBatchTickRangeEndIndexProperty.intValue = EditorGUILayout.IntField(mBatchTickRangeEndIndexProperty.intValue, GUILayout.Width(100f));
+            if (GUILayout.Button("范围勾选", GUILayout.ExpandWidth(true)))
+            {
+                OneKeySwitchRangeOperation(true);
+            }
+            if (GUILayout.Button("范围清除勾选", GUILayout.ExpandWidth(true)))
+            {
+                OneKeySwitchRangeOperation(false);
+            }
+            EditorGUILayout.EndHorizontal();
             EditorGUILayout.EndVertical();
         }
 
@@ -1998,6 +2150,7 @@ namespace MapEditor
         private void DrawMapObjectTitleArea()
         {
             EditorGUILayout.BeginHorizontal("box");
+            EditorGUILayout.LabelField("索引", MapStyles.TabMiddleStyle, GUILayout.Width(MapEditorConst.InspectorObjectBatchUIWidth));
             EditorGUILayout.LabelField("索引", MapStyles.TabMiddleStyle, GUILayout.Width(MapEditorConst.InspectorObjectIndexUIWidth));
             EditorGUILayout.LabelField("UID", MapStyles.TabMiddleStyle, GUILayout.Width(MapEditorConst.InspectorObjectUIDUIWidth));
             EditorGUILayout.LabelField("对象类型", MapStyles.TabMiddleStyle, GUILayout.Width(MapEditorConst.InspectorObjectTypeUIWidth));
@@ -2021,6 +2174,9 @@ namespace MapEditor
         {
             EditorGUILayout.BeginHorizontal();
             var mapObjectDataProperty = mMapObjectDataListProperty.GetArrayElementAtIndex(mapObjectDataIndex);
+            var batchOperationSwitchProperty = mapObjectDataProperty.FindPropertyRelative("BatchOperationSwitch");
+            EditorGUILayout.Space(10f, false);
+            batchOperationSwitchProperty.boolValue = EditorGUILayout.Toggle(batchOperationSwitchProperty.boolValue, GUILayout.Width(MapEditorConst.InspectorObjectBatchUIWidth));
             var uidProperty = mapObjectDataProperty.FindPropertyRelative("UID");
             var uid = uidProperty.intValue;
             var goProperty = mapObjectDataProperty.FindPropertyRelative("Go");
@@ -2125,30 +2281,6 @@ namespace MapEditor
                 {
                     var addMapDataValue = mAddMapDataIndexProperty.intValue;
                     DoAddMapData(addMapDataValue);
-                }
-                EditorGUILayout.EndHorizontal();
-                EditorGUILayout.BeginHorizontal();
-                if (GUILayout.Button("一键勾选批量", GUILayout.ExpandWidth(true)))
-                {
-                    OneKeySwitchMapDataBatchOperation(true);
-                }
-                if (GUILayout.Button("一键清除批量勾选", GUILayout.ExpandWidth(true)))
-                {
-                    OneKeySwitchMapDataBatchOperation(false);
-                }
-                EditorGUILayout.EndHorizontal();
-                EditorGUILayout.BeginHorizontal();
-                EditorGUILayout.LabelField("开始索引:", GUILayout.Width(60f));
-                mBatchTickRangeStartIndexProperty.intValue = EditorGUILayout.IntField(mBatchTickRangeStartIndexProperty.intValue, GUILayout.Width(100f));
-                EditorGUILayout.LabelField("结束索引:", GUILayout.Width(60f));
-                mBatchTickRangeEndIndexProperty.intValue = EditorGUILayout.IntField(mBatchTickRangeEndIndexProperty.intValue, GUILayout.Width(100f));
-                if(GUILayout.Button("范围勾选", GUILayout.ExpandWidth(true)))
-                {
-                    OneKeySwitchMapDataRangeOperation(true);
-                }
-                if (GUILayout.Button("范围清除勾选", GUILayout.ExpandWidth(true)))
-                {
-                    OneKeySwitchMapDataRangeOperation(false);
                 }
                 EditorGUILayout.EndHorizontal();
             }
@@ -2271,11 +2403,11 @@ namespace MapEditor
             {
                 var batchOperationSwitchProperty = mapDataProperty.FindPropertyRelative("BatchOperationSwitch");
                 EditorGUILayout.Space(10f, false);
-                batchOperationSwitchProperty.boolValue = EditorGUILayout.Toggle(batchOperationSwitchProperty.boolValue, GUILayout.Width(30f));
+                batchOperationSwitchProperty.boolValue = EditorGUILayout.Toggle(batchOperationSwitchProperty.boolValue, GUILayout.Width(MapEditorConst.InspectorDataBatchUIWidth));
             }
             if (MapEditorUtilities.IsShowMapUI(mapDataType, MapDataUIType.Index))
             {
-                EditorGUILayout.LabelField($"{mapDataIndex}", MapStyles.TabMiddleStyle, GUILayout.Width(40f));
+                EditorGUILayout.LabelField($"{mapDataIndex}", MapStyles.TabMiddleStyle, GUILayout.Width(MapEditorConst.InspectorDataIndexUIWidth));
             }
             MapDataConfig mapDataConfig = null;
             var uidProperty = mapDataProperty.FindPropertyRelative("UID");
@@ -2288,7 +2420,7 @@ namespace MapEditor
                 var realMapDataType = mapDataConfig != null ? mapDataConfig.DataType : MapDataType.PlayerSpawn;
                 var mapDataChoiceOptions = GetMapDataChoiceOptionsByType(realMapDataType);
                 var mapDataChoiceValues = GetMapDataChoiceValuesByType(realMapDataType);
-                uid = EditorGUILayout.IntPopup(uid, mapDataChoiceOptions, mapDataChoiceValues, GUILayout.Width(150f));
+                uid = EditorGUILayout.IntPopup(uid, mapDataChoiceOptions, mapDataChoiceValues, GUILayout.Width(MapEditorConst.InspectorDataUIDUIWidth));
                 if (EditorGUI.EndChangeCheck())
                 {
                     DoChangeMapDataUID(mapDataIndex, uid);
@@ -2298,22 +2430,22 @@ namespace MapEditor
             //{
             //    if (mapDataConfig != null)
             //    {
-            //        EditorGUILayout.LabelField(mapDataConfig.DataType.ToString(), MapStyles.TabMiddleStyle, GUILayout.Width(150f));
+            //        EditorGUILayout.LabelField(mapDataConfig.DataType.ToString(), MapStyles.TabMiddleStyle, GUILayout.Width(MapEditorConst.InspectorDataTypeUIWidth));
             //    }
             //    else
             //    {
-            //        EditorGUILayout.LabelField("找不到对象类型数据", MapStyles.TabMiddleStyle, GUILayout.Width(150f));
+            //        EditorGUILayout.LabelField("找不到对象类型数据", MapStyles.TabMiddleStyle, GUILayout.Width(MapEditorConst.InspectorDataTypeUIWidth));
             //    }
             //}
             if (MapEditorUtilities.IsShowMapUI(mapDataType, MapDataUIType.ConfId))
             {
                 if (mapDataConfig != null)
                 {
-                    EditorGUILayout.IntField(mapDataConfig.ConfId, MapStyles.TabMiddleStyle, GUILayout.Width(100f));
+                    EditorGUILayout.IntField(mapDataConfig.ConfId, MapStyles.TabMiddleStyle, GUILayout.Width(MapEditorConst.InspectorDataConfIdUIWidth));
                 }
                 else
                 {
-                    EditorGUILayout.LabelField("找不到关联Id数据", MapStyles.TabMiddleStyle, GUILayout.Width(100f));
+                    EditorGUILayout.LabelField("找不到关联Id数据", MapStyles.TabMiddleStyle, GUILayout.Width(MapEditorConst.InspectorDataConfIdUIWidth));
                 }
             }
             if (MapEditorUtilities.IsShowMapUI(mapDataType, MapDataUIType.MonsterGroupId))

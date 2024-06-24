@@ -47,6 +47,12 @@ namespace MapEditor
         public Vector3 LocalScale = Vector3.one;
 
         /// <summary>
+        /// 批量操作开关
+        /// </summary>
+        [Header("批量操作开关")]
+        public bool BatchOperationSwitch;
+
+        /// <summary>
         /// 碰撞器中心点
         /// </summary>
         [Header("碰撞器中心点")]

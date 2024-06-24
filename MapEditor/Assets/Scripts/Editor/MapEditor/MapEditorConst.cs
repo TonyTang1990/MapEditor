@@ -120,6 +120,11 @@ namespace MapEditor
         public const int MapFoldNumLimit = 50;
 
         /// <summary>
+        /// 面板地图对象批量的UI宽度
+        /// </summary>
+        public const float InspectorObjectBatchUIWidth = 40f;
+
+        /// <summary>
         /// 面板地图对象索引的UI宽度
         /// </summary>
         public const float InspectorObjectIndexUIWidth = 40f;
