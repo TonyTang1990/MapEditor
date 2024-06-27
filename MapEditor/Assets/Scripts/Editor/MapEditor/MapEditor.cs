@@ -2366,7 +2366,7 @@ namespace MapEditor
                 var uidProperty = mapDataProperty.FindPropertyRelative("UID");
                 var uid = uidProperty.intValue;
                 var mapDataConfig = MapSetting.GetEditorInstance().DataSetting.GetMapDataConfigByUID(uid);
-                if(mapDataConfig.DataType != mapDataType)
+                if(mapDataConfig == null || mapDataConfig.DataType != mapDataType)
                 {
                     continue;
                 }
