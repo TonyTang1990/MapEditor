@@ -8,7 +8,8 @@
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProductVersion>10.0.20506</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
-    <RootNamespace></RootNamespace>
+    <RootNamespace>
+    </RootNamespace>
     <ProjectGuid>{8FDB5A40-4C78-576C-FBF9-6CA5ED291819}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
@@ -108,7 +109,6 @@
     <Compile Include="Assets\Scripts\Core\Collision\Collision2D\Polygon2D.cs" />
     <Compile Include="Assets\Scripts\Core\Collision\Collision2D\Capsule2D.cs" />
     <Compile Include="Assets\Scripts\Map\MapObject\MapObjectData.cs" />
-    <Compile Include="Assets\Scripts\Map\MapTemplateData\MapTemplateDataMono.cs" />
     <Compile Include="Assets\Scripts\Map\MapTemplateData\MapTemplateData.cs" />
   </ItemGroup>
   <ItemGroup>
