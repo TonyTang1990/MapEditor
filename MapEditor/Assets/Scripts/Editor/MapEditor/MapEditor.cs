@@ -1425,6 +1425,53 @@ namespace MapEditor
         }
 
         /// <summary>
+        /// 移除所有无效UID的配置数据
+        /// </summary>
+        private void RemoveAllInvalideUIDDatas()
+        {
+            RemoveAllInvalideUIDMapObjectDatas();
+            RemoveAllInvalideUIDMapDatas();
+        }
+
+        /// <summary>
+        /// 移除所有无效UID的地图对象配置数据
+        /// </summary>
+        private void RemoveAllInvalideUIDMapObjectDatas()
+        {
+            for(int i = mMapObjectDataListProperty.arraySize - 1; i >= 0; i--)
+            {
+                var mapObjcetDataListProperty = mMapObjectDataListProperty.GetArrayElementAt(i);
+                var uidProperty = mapObjcetDataListProperty.FindPropertyRelative("UID");
+                var uid = uidProperty.intValue;
+                var mapDataConfig = MapSetting.GetEditorInstance().ObjectSetting.GetMapObjectConfigByUID(uid);
+                if(mapDataConfig == null)
+                {
+                    mMapObjectDataListProperty.DeleteArrayElementAtIndex(i);
+                    Debug.Log($"移除索引:{i}的无效UID:{uid}地图对象数据配置！");
+                }
+            }
+        }
+
+        /// <summary>
+        /// 移除所有无效UID的地图埋点配置数据
+        /// </summary>
+        private void RemoveAllInvalideUIDMapDatas()
+        {
+            for (int i = mMapDataListProperty.arraySize - 1; i >= 0; i--)
+            {
+                var mapDataListProperty = mMapDataListProperty.GetArrayElementAt(i);
+                var uidProperty = mapDataListProperty.FindPropertyRelative("UID");
+                var uid = uidProperty.intValue;
+                var mapDataConfig = MapSetting.GetEditorInstance().DataSetting.GetMapDataConfigByUID(uid);
+                if (mapDataConfig == null)
+                {
+                    mMapDataListProperty.DeleteArrayElementAtIndex(i);
+                    Debug.Log($"移除索引:{i}的无效UID:{uid}地图埋点数据配置！");
+                }
+            }
+        }
+
+        /// <summary>
         /// 更新所有地图对象的MapObjectDataMono数据到最新
         /// </summary>
         private void UpdateAllMapObjectDataMonos()
@@ -1963,9 +2010,13 @@ namespace MapEditor
             {
                 CopyNavMeshAsset();
             }
-            if(GUILayout.Button("一键重创地图对象", GUILayout.ExpandWidth(true)))
+            if (GUILayout.Button("一键重创地图对象", GUILayout.ExpandWidth(true)))
             {
                 OneKeyRecreateMapObjectGos();
+            }
+            if (GUILayout.Button("清除无效UID配置", GUILayout.ExpandWidth(true)))
+            {
+                RemoveAllInvalideUIDDatas();
             }
             EditorGUILayout.EndHorizontal();
             EditorGUILayout.BeginHorizontal();
