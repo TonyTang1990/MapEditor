@@ -57,6 +57,9 @@
     <Analyzer Include="G:\Software\VisualStudio\VS2019\Install\Common7\IDE\Extensions\Microsoft\Visual Studio Tools for Unity\Analyzers\Microsoft.Unity.Analyzers.dll" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Assets\Scripts\Map\MapTemplateData\BaseReplaceData.cs" />
+    <Compile Include="Assets\Scripts\Map\MapTemplateData\MapTemplateStrategyData.cs" />
+    <Compile Include="Assets\Scripts\Map\MapTemplateData\ReplaceIntData.cs" />
     <Compile Include="Assets\Scripts\Utilities\FolderUtilities.cs" />
     <Compile Include="Assets\Scripts\Map\MapData\MapDataConfig.cs" />
     <Compile Include="Assets\Scripts\Map\MapData\MonsterMapData.cs" />

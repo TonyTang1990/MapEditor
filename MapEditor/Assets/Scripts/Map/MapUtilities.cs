@@ -553,16 +553,17 @@ namespace MapEditor
         /// </summary>
         /// <param name="mapDataList">地图埋点数据列表</param>
         /// <param name="uid">插入地图埋点UID</param>
-        /// <param name="initPos">初始位置</param>
+        /// <param name="startPos">初始位置</param>
         /// <param name="insertIndex">插入位置(-1表示插入尾部)</param>
         /// <param name="copyRotation">是否复制旋转值</param>
         /// <param name="positionOffset">位置偏移</param>
         /// <returns></returns>
-        public static MapData AddMapDataToList(List<MapData> mapDataList, int uid, Vector3 startPos, int insertIndex = -1, bool copyRotation = false, Vector3? positionOffset = null)
+        public static MapData AddMapDataToList(List<MapData> mapDataList, int uid, Vector3 startPos,
+                                                int insertIndex = -1, bool copyRotation = false, Vector3? positionOffset = null)
         {
             if(mapDataList == null)
             {
-                Debug.LogError($"不允许添加埋点数据到空埋点数据列表，添加地图埋点数据失败！");
+                Debug.LogError($"不允许添加埋点数据到空埋点数据列表，添加地图埋点数据到埋点数据列表失败！");
                 return null;
             }
             var mapDataConfig = MapSetting.GetEditorInstance().DataSetting.GetMapDataConfigByUID(uid);
@@ -599,7 +600,7 @@ namespace MapEditor
             {
                 mapDataPosition += (Vector3)positionOffset;
             }
-            var newMapData = MapUtilities.CreateMapDataByType(mapDataType, uid, mapDataPosition, mapDataRotation);
+            var newMapData = CreateMapDataByType(mapDataType, uid, mapDataPosition, mapDataRotation);
             mapDataList.Insert(insertPos, newMapData);
             return newMapData;
         }
@@ -614,7 +615,7 @@ namespace MapEditor
         {
             if (mapDataList == null)
             {
-                Debug.LogError($"不允许从空埋点数据列表移除埋点数据，移除地图埋点数据失败！");
+                Debug.LogError($"不允许从空埋点数据列表移除埋点数据，移除指定索引地图埋点数据失败！");
                 return false;
             }
             var mapDataNum = mapDataList.Count;
@@ -636,7 +637,7 @@ namespace MapEditor
         {
             if (mapDataList == null)
             {
-                Debug.LogError($"不允许从更新空埋点数据列表批量操作数据，更新地图埋点批量操作数据失败！");
+                Debug.LogError($"不允许更新空埋点数据列表批量操作数据，更新地图埋点批量操作数据失败！");
                 return false;
             }
             for (int i = 0, length = mapDataList.Count; i < length; i++)

@@ -747,6 +747,14 @@ namespace MapEditor
             {
                 EditorGUILayout.LabelField("旋转", MapStyles.TabMiddleStyle, GUILayout.Width(MapEditorConst.InspectorDataRotationUIWidth));
             }
+            if (MapEditorUtilities.IsShowMapUI(mapDataType, MapDataUIType.TemplateAsset))
+            {
+                EditorGUILayout.LabelField("模板Asset", MapStyles.TabMiddleStyle, GUILayout.Width(MapEditorConst.InspectorDataTemplateAssetUIWidth));
+            }
+            if (MapEditorUtilities.IsShowMapUI(mapDataType, MapDataUIType.TemplateStrategyUI))
+            {
+                EditorGUILayout.LabelField("模板策略UID", MapStyles.TabMiddleStyle, GUILayout.Width(MapEditorConst.InspectorDataTemplateStrategyUIDUIWidth));
+            }
             //if (MapEditorUtilities.IsShowMapUI(mapDataType, MapDataUIType.Des))
             //{
             //    EditorGUILayout.LabelField("描述", MapStyles.TabMiddleStyle, GUILayout.Width(MapEditorConst.InspectorDataDesUIWidth));
@@ -862,6 +870,7 @@ namespace MapEditor
             {MapDataType.PlayerSpawn, MapFoldType.PlayerSpawnMapDataFold},
             {MapDataType.Monster, MapFoldType.MonsterMapDataFold},
             {MapDataType.MonsterGroup, MapFoldType.MonsterGroupMapDataFold},
+            {MapDataType.Template, MapFoldType.TemplateMapDataFold},
         };
 
         /// <summary>
@@ -873,6 +882,7 @@ namespace MapEditor
             {MapFoldType.PlayerSpawnMapDataFold, "一键折叠所有(玩家出生点埋点数据)"},
             {MapFoldType.MonsterMapDataFold, "一键折叠所有(怪物埋点数据)"},
             {MapFoldType.MonsterGroupMapDataFold, "一键折叠所有(怪物组埋点数据)"},
+            {MapFoldType.TemplateMapDataFold, "一键折叠所有(模板埋点数据)"},
         };
 
         /// <summary>
@@ -884,6 +894,7 @@ namespace MapEditor
             {MapFoldType.PlayerSpawnMapDataFold, "一键展开所有(玩家出生点埋点数据)"},
             {MapFoldType.MonsterMapDataFold, "一键展开所有(怪物埋点数据)"},
             {MapFoldType.MonsterGroupMapDataFold, "一键展开所有(怪物组埋点数据)"},
+            {MapFoldType.TemplateMapDataFold, "一键展开所有(模板埋点数据)"},
         };
 
         /// <summary>
@@ -947,6 +958,25 @@ namespace MapEditor
                     {MapDataUIType.Remove, true},
                 }
             },
+            {
+                MapDataType.Template, new Dictionary<MapDataUIType, bool>()
+                {
+                    {MapDataUIType.Batch, true},
+                    {MapDataUIType.Index, true},
+                    {MapDataUIType.UID, true},
+                    {MapDataUIType.MapDataType, true},
+                    {MapDataUIType.ConfId, true},
+                    {MapDataUIType.Position, true},
+                    {MapDataUIType.Rotation, true},
+                    {MapDataUIType.TemplateAsset, true},
+                    {MapDataUIType.TemplateStrategyUI, true},
+                    {MapDataUIType.Des, true},
+                    {MapDataUIType.MoveUp, true},
+                    {MapDataUIType.MoveDown, true},
+                    {MapDataUIType.Add, true},
+                    {MapDataUIType.Remove, true},
+                }
+            }
         };
 
         /// <summary>

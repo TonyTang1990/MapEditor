@@ -47,6 +47,12 @@ namespace MapEditor
         public Vector3 Rotation = Vector3.zero;
 
         /// <summary>
+        /// 模板Asset
+        /// </summary>
+        [Header("模板Asset")]
+        public MapTemplateData TemplateDataAsset;
+
+        /// <summary>
         /// 描述
         /// </summary>
         [Header("描述")]

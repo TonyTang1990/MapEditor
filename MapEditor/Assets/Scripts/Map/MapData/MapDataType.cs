@@ -15,5 +15,6 @@ namespace MapEditor
         PlayerSpawn = 0,           // 玩家出生点位置数据
         Monster = 1,               // 怪物数据
         MonsterGroup = 2,          // 怪物组数据
+        Template = 3,              // 模板数据
     }
 }

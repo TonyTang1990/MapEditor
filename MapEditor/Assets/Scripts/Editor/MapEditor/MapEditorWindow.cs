@@ -505,7 +505,8 @@ namespace MapEditor
             EditorGUILayout.LabelField("地图埋点类型", MapStyles.TabMiddleStyle, GUILayout.Width(MapEditorConst.MapDataTypeUIWidth));
             EditorGUILayout.LabelField("关联配置Id", MapStyles.TabMiddleStyle, GUILayout.Width(MapEditorConst.MapDataConfIdUIWidth));
             EditorGUILayout.LabelField("场景球体颜色", MapStyles.TabMiddleStyle, GUILayout.Width(MapEditorConst.MapDataColorUIWidth));
-            EditorGUILayout.LabelField("初始旋转", MapStyles.TabMiddleStyle, GUILayout.Width(MapEditorConst.MapDataRotationUIWidth));
+            //EditorGUILayout.LabelField("初始旋转", MapStyles.TabMiddleStyle, GUILayout.Width(MapEditorConst.MapDataRotationUIWidth));
+            EditorGUILayout.LabelField("模板Asset", MapStyles.TabMiddleStyle, GUILayout.Width(MapEditorConst.MapDataTemplateAssetUIWidth));
             EditorGUILayout.LabelField("地图埋点描述", MapStyles.TabMiddleStyle, GUILayout.Width(MapEditorConst.MapDataDesUIWidth));
             EditorGUILayout.LabelField("操作", MapStyles.TabMiddleStyle, GUILayout.ExpandWidth(true));
             EditorGUILayout.EndHorizontal();
@@ -530,18 +531,26 @@ namespace MapEditor
                     OnMapDataConfigIdChange();
                 }
                 mapDataConfig.SceneSphereColor = EditorGUILayout.ColorField(mapDataConfig.SceneSphereColor, GUILayout.Width(MapEditorConst.MapDataColorUIWidth));
-                var newRotationVector3 = mapDataConfig.Rotation;
-                EditorGUI.BeginChangeCheck();
-                var rotationPositionWidth = (MapEditorConst.MapDataRotationUIWidth - 50f) / 3;
-                EditorGUILayout.LabelField("X", GUILayout.Width(10f));
-                newRotationVector3.x = EditorGUILayout.FloatField(newRotationVector3.x, GUILayout.Width(rotationPositionWidth));
-                EditorGUILayout.LabelField("Y", GUILayout.Width(10f));
-                newRotationVector3.y = EditorGUILayout.FloatField(newRotationVector3.y, GUILayout.Width(rotationPositionWidth));
-                EditorGUILayout.LabelField("Z", GUILayout.Width(10f));
-                newRotationVector3.z = EditorGUILayout.FloatField(newRotationVector3.z, GUILayout.Width(rotationPositionWidth));
-                if(EditorGUI.EndChangeCheck())
+                //var newRotationVector3 = mapDataConfig.Rotation;
+                //EditorGUI.BeginChangeCheck();
+                //var rotationPositionWidth = (MapEditorConst.MapDataRotationUIWidth - 50f) / 3;
+                //EditorGUILayout.LabelField("X", GUILayout.Width(10f));
+                //newRotationVector3.x = EditorGUILayout.FloatField(newRotationVector3.x, GUILayout.Width(rotationPositionWidth));
+                //EditorGUILayout.LabelField("Y", GUILayout.Width(10f));
+                //newRotationVector3.y = EditorGUILayout.FloatField(newRotationVector3.y, GUILayout.Width(rotationPositionWidth));
+                //EditorGUILayout.LabelField("Z", GUILayout.Width(10f));
+                //newRotationVector3.z = EditorGUILayout.FloatField(newRotationVector3.z, GUILayout.Width(rotationPositionWidth));
+                //if(EditorGUI.EndChangeCheck())
+                //{
+                //    mapDataConfig.Rotation = newRotationVector3;
+                //}
+                if(mapDataConfig.DataType == MapDataType.Template)
                 {
-                    mapDataConfig.Rotation = newRotationVector3;
+                    mapDataConfig.TemplateDataAsset = EditorGUILayout.ObjectField(mapDataConfig.TemplateDataAsset, MapConst.MapTemplateDataType, false, GUILayout.Width(MapEditorConst.MapDataTemplateAssetUIWidth)) as MapTemplateData;
+                }
+                else
+                {
+                    EditorGUILayout.ObjectField(mapDataConfig.TemplateDataAsset, MapConst.MapTemplateDataType, false, GUILayout.Width(MapEditorConst.MapDataTemplateAssetUIWidth));
                 }
                 mapDataConfig.Des = EditorGUILayout.TextField(mapDataConfig.Des, GUILayout.Width(MapEditorConst.MapDataDesUIWidth));
                 if (GUILayout.Button("-", GUILayout.ExpandWidth(true)))
