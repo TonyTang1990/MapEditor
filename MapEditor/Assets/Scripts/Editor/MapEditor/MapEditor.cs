@@ -3410,7 +3410,7 @@ namespace MapEditor
         private void DrawMapTemplateStrategyDetailDataArea()
         {
             EditorGUILayout.BeginVertical("box");
-            for(int i = 0, length = mTemplateStrategyDatasProperty.arraySize; i < length; i++)
+            for(int i = 0; i < mTemplateStrategyDatasProperty.arraySize; i++)
             {
                 var templateStrategyDataProperty = mTemplateStrategyDatasProperty.GetArrayElementAtIndex(i);
                 DrawOneMapTemplateStrategyDataArea(templateStrategyDataProperty, i);
@@ -3434,12 +3434,14 @@ namespace MapEditor
             var strategyTitleName = mapTemplateStrategyData.GetTitleName();
             EditorGUILayout.BeginHorizontal();
             isUnfoldProperty.boolValue = EditorGUILayout.Foldout(isUnfoldProperty.boolValue, strategyTitleName);
+            var isRemoved = false;
             if(GUILayout.Button("-", GUILayout.ExpandWidth(true)))
             {
                 DoRemoveMapTempalteStrategyData(index);
+                isRemoved = true;
             }
             EditorGUILayout.EndHorizontal();
-            if(isUnfoldProperty.boolValue)
+            if(!isRemoved && isUnfoldProperty.boolValue)
             {
                 DrawMapTemplateUIDReplaceDatasArea(templateStrategyDataProperty);
                 DrawMapTemplateMonsterGroupIdReplaceDatasArea(templateStrategyDataProperty);
@@ -3460,7 +3462,7 @@ namespace MapEditor
             DrawTemplateUIDOperationArea(templateStrategyDataProperty);
             DrawTemplateUIDReplaceTitleArea();
             var uidReplaceDatasProperty = templateStrategyDataProperty.FindPropertyRelative("UIDReplaceDatas");
-            for(int i = 0, length = uidReplaceDatasProperty.arraySize; i < length; i++)
+            for(int i = 0; i < uidReplaceDatasProperty.arraySize; i++)
             {
                 DrawOneUIDReplaceDataByProperty(uidReplaceDatasProperty, i);
             }
@@ -3554,7 +3556,7 @@ namespace MapEditor
             DrawTemplateMonsterGroupIdOperationArea(templateStrategyDataProperty);
             DrawTemplateMonsterGroupIdReplaceTitleArea();
             var monsterGroupIdReplaceDatasProperty = templateStrategyDataProperty.FindPropertyRelative("MonsterGroupIdReplaceData");
-            for(int i = 0, length = monsterGroupIdReplaceDatasProperty.arraySize; i < length; i++)
+            for(int i = 0; i < monsterGroupIdReplaceDatasProperty.arraySize; i++)
             {
                 DrawOneMonsterGroupIdReplaceDataByProperty(monsterGroupIdReplaceDatasProperty, i);
             }
