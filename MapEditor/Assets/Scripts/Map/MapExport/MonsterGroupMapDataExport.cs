@@ -44,5 +44,26 @@ namespace MapEditor
             MonsterCreateRadius = monsterCreateRadius;
             MonsterActiveRadius = monsterActiveRadius;
         }
+
+        /// <summary>
+        /// 添加怪物导出数据
+        /// </summary>
+        /// <param name="monsterMapDataExport"></param>
+        /// <returns></returns>
+        public bool AddMonsterMapExportData(MonsterMapDataExport monsterMapDataExport)
+        {
+            AllMonsterMapExportDatas.Add(monsterMapDataExport);
+            return true;
+        }
+
+        /// <summary>
+        /// 移除怪物导出数据
+        /// </summary>
+        /// <param name="monsterMapDataExport"></param>
+        /// <returns></returns>
+        public bool RemoveMonsterMapExportData(MonsterMapDataExport monsterMapDataExport)
+        {
+            return AllMonsterMapExportDatas.Remove(monsterMapDataExport);
+        }
     }
 }

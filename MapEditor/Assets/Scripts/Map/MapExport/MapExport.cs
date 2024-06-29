@@ -46,5 +46,22 @@ namespace MapEditor
         /// 剩余其他(不含怪物和怪物组和出生点)地图埋点导出数据成员
         /// </summary>
         public List<BaseMapDataExport> AllOtherMapDatas = new List<BaseMapDataExport>();
+
+        /// <summary>
+        /// 获取指定怪物组id的怪物组导出数据
+        /// </summary>
+        /// <param name="monsterGroupId"></param>
+        /// <returns></returns>
+        public MonsterGroupMapDataExport GetMonsterGroupMapDataExportByGroupId(int monsterGroupId)
+        {
+            foreach(var monsterGroupMapData in AllMonsterGroupMapDatas)
+            {
+                if (monsterGroupMapData.GroupId == monsterGroupId)
+                {
+                    return MonsterGroupMapData;
+                }
+            }
+            return null;
+        }
     }
 }
