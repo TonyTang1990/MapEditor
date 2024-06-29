@@ -45,9 +45,29 @@ namespace MapEditor
 
         }
 
-        public MonsterGroupMapData(int uid, Vector3 position, Vector3 rotation) : base(uid, position, rotation)
+        public MonsterGroupMapData(int uid, Vector3 position, Vector3 rotation, Vector3? templateLocalPosition = null, Vector3? templateLocalRotation = null)
+                                    : base(uid, position, rotation, templateLocalPosition, templateLocalRotation)
         {
 
+        }
+
+        /// <summary>
+        /// 复制自定义数据
+        /// </summary>
+        /// <param name="sourceMapData"></param>
+        /// <returns></returns>
+        public override bool CopyCustomData(MapData sourceMapData)
+        {
+            if(!base.CopyCustomData(sourceMapData))
+            {
+                return false;
+            }
+            var realSourceMapData = sourceMapData as MonsterGroupMapData;
+            GroupId = realSourceMapData.GroupId;
+            MonsterCreateRadius = realSourceMapData.MonsterCreateRadius;
+            MonsterActiveRadius = realSourceMapData.MonsterActiveRadius;
+            GUISwitchOff = realSourceMapData.GUISwitchOff;
+            return true;
         }
     }
 }

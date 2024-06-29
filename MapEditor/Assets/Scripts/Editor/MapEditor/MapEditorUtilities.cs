@@ -423,6 +423,7 @@ namespace MapEditor
                     if(newMapData != null)
                     {
                         dumplicatedMapDatas.Add(newMapData);
+                        newMapData.CopyCustomData(mapData);
                         Debug.Log($"选中对象:{go.name}复制勾选批量的地图埋点索引:{i}数据！");
                     }
                 }
@@ -489,12 +490,19 @@ namespace MapEditor
 
         /// <summary>
         /// 获取指定地图埋点属性列表和指定索引的标签显示名
+        /// Note:
+        /// 直接传递mapDataConfig匹配mapDataPropertyList对应索引的配置来减少不必要的FindPropertyRelative调用
         /// </summary>
+        /// <param name="mapDataConfig"></param>
         /// <param name="mapDataPropertyList"></param>
         /// <param name="index"></param>
         /// <returns></returns>
-        public static string GetMapDataPropertyLabelName(SerializedProperty mapDataPropertyList, int index)
+        public static string GetMapDataPropertyLabelName(MapDataConfig mapDataConfig, SerializedProperty mapDataPropertyList, int index)
         {
+            if(mapDataConfig == null)
+            {
+                return "无效配置";
+            }
             if(mapDataPropertyList == null)
             {
                 return "无效的地图属性";
@@ -517,6 +525,54 @@ namespace MapEditor
             {
                 var groupIdProperty = mapDataProperty.FindPropertyRelative("GroupId");
                 return $"[{index}]{mapDataDes}({groupIdProperty.intValue}组)";
+            }
+            else
+            {
+                return $"[{index}]{mapDataDes}";
+            }
+        }
+
+        /// <summary>
+        /// 获取指定地图埋点数据，指定索引和指定埋点模板策略数据的标签显示名
+        /// </summary>
+        /// <param name="mapData"></param>
+        /// <param name="index"></param>
+        /// <param name="templateStrategyData"></param>
+        /// <returns></returns>
+        public static string GetMapDataLabelName(MapData mapData, int index, MapTemplateStrategyData templateStrategyData = null)
+        {
+            if (mapData == null)
+            {
+                return "无效的地图数据";
+            }
+            var uid = mapData.UID;
+            if (templateStrategyData != null)
+            {
+                var replaceIntData = templateStrategyData != null ? templateStrategyData.GetUIDReplaceData(uid) : null;
+                uid = replaceIntData != null ? replaceIntData.NewData : uid;
+            }
+            var mapDataConfig = MapSetting.GetEditorInstance().DataSetting.GetMapDataConfigByUID(uid);
+            if (mapDataConfig == null)
+            {
+                return $"未知的UID:{uid}";
+            }
+            var mapDataDes = mapDataConfig.Des;
+            var mapDataType = mapDataConfig.DataType;
+            if (mapDataType == MapDataType.Monster)
+            {
+                var monsterMapData = mapData as MonsterMapData;
+                var groupId = monsterMapData.GroupId;
+                var replaceIntData = templateStrategyData != null ? templateStrategyData.GetMonsterGroupIdReplaceData(groupId) : null;
+                groupId = replaceIntData != null ? replaceIntData.NewData : groupId;
+                return $"[{index}]{mapDataDes}({groupId}组)";
+            }
+            else if(mapDataType == MapDataType.MonsterGroup)
+            {
+                var monsterGroupMapData = mapData as MonsterGroupMapData;
+                var groupId = monsterGroupMapData.GroupId;
+                var replaceIntData = templateStrategyData != null ? templateStrategyData.GetMonsterGroupIdReplaceData(groupId) : null;
+                groupId = replaceIntData != null ? replaceIntData.NewData : groupId;
+                return $"[{index}]{mapDataDes}({groupId}组)";
             }
             else
             {

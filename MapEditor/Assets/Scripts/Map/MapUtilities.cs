@@ -151,25 +151,38 @@ namespace MapEditor
         /// <param name="uid"></param>
         /// <param name="position"></param>
         /// <param name="rotation"></param>
+        /// <param name="templateLocalPosition"></param>
+        /// <param name="templateLocalRotation"></param>
         /// <returns></returns>
-        public static MapData CreateMapDataByType(MapDataType mapDataType, int uid, Vector3 position, Vector3 rotation)
+        public static MapData CreateMapDataByType(MapDataType mapDataType, int uid, Vector3 position, Vector3 rotation,
+                                                    Vector3? templateLocalPosition = null, Vector3? templateLocalRotation = null)
         {
             if (mapDataType == MapDataType.Monster)
             {
-                return new MonsterMapData(uid, position, rotation);
+                return new MonsterMapData(uid, position, rotation, templateLocalPosition, templateLocalRotation);
             }
             else if (mapDataType == MapDataType.MonsterGroup)
             {
-                return new MonsterGroupMapData(uid, position, rotation);
+                return new MonsterGroupMapData(uid, position, rotation, templateLocalPosition, templateLocalRotation);
             }
             else if(mapDataType == MapDataType.PlayerSpawn)
             {
-                return new PlayerSpawnMapData(uid, position, rotation);
+                return new PlayerSpawnMapData(uid, position, rotation, templateLocalPosition, templateLocalRotation);
+            }
+            else if(mapDataType == MapDataType.Template)
+            {
+                var templateMapData = new TemplateMapData(uid, position, rotation, templateLocalPosition, templateLocalRotation);
+                var mapDataConfig = MapSetting.GetEditorInstance().DataSetting.GetMapDataConfigByUID(uid);
+                if(mapDataConfig.TemplateDataAsset != null)
+                {
+                    templateMapData.StrategyUID = mapDataConfig.TemplateDataAsset.GetDefaultStrategyUID();
+                }
+                return templateMapData;
             }
             else
             {
                 Debug.LogWarning($"地图埋点类型:{mapDataType}没有创建自定义类型数据，可能不方便未来扩展！");
-                return new MapData(uid, position, rotation);
+                return new MapData(uid, position, rotation, templateLocalPosition, templateLocalRotation);
             }
         }
 

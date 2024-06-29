@@ -756,26 +756,52 @@ namespace MapEditor
         /// </summary>
         private void DrawMapDataGizmosGUI()
         {
-            DrawMapCustomDataGizmos();
+            DrawMapCustomDatasGizmos();
         }
 
         /// <summary>
         /// 绘制地图埋点自定义数据显示
         /// </summary>
-        private void DrawMapCustomDataGizmos()
+        private void DrawMapCustomDatasGizmos()
         {
             for(int i = 0; i < MapDataList.Count; i++)
             {
                 var mapData = MapDataList[i];
-                var mapDataConfig = MapSetting.GetEditorInstance().DataSetting.GetMapDataConfigByUID(mapData.UID);
-                if(mapDataConfig == null)
+                DrawMapCustomDataGizmos(mapData);
+            }
+        }
+        
+        /// <summary>
+        /// 绘制指定地图埋点数据的自定义数据Gizmos
+        /// </summary>
+        /// <param name="mapData"></param>
+        private void DrawMapCustomDataGizmos(MapData mapData)
+        {
+            if(mapData == null)
+            {
+                return;
+            }
+            var mapDataConfig = MapSetting.GetEditorInstance().DataSetting.GetMapDataConfigByUID(mapData.UID);
+            if (mapDataConfig == null)
+            {
+                return;
+            }
+            var mapDataType = mapDataConfig.DataType;
+            if (mapDataType == MapDataType.MonsterGroup)
+            {
+                DrawMapMonsterGroupDataGizmos(mapData);
+            }
+            else if (mapDataType == MapDataType.Template)
+            {
+                var templateDataAsset = mapDataConfig.TemplateDataAsset;
+                if (templateDataAsset == null)
                 {
-                    continue;
+                    return;
                 }
-                var mapDataType = mapDataConfig.DataType;
-                if(mapDataType == MapDataType.MonsterGroup)
+                for(int i = 0, length = templateDataAsset.MapDataList.Count; i < length; i++)
                 {
-                    DrawMapMonsterGroupDataGizmos(mapData);
+                    var nestedMapData = templateDataAsset.MapDataList[i];
+                    DrawMapCustomDataGizmos(nestedMapData);
                 }
             }
         }

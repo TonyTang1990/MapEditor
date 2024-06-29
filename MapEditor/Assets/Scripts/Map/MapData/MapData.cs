@@ -57,11 +57,31 @@ namespace MapEditor
             UID = uid;
         }
 
-        public MapData(int uid, Vector3 position, Vector3 rotation)
+        public MapData(int uid, Vector3 position, Vector3 rotation, Vector3? templateLocalPosition = null, Vector3? templateLocalRotation = null)
         {
             UID = uid;
             Position = position;
             Rotation = rotation;
+            TemplateLocalPosition = templateLocalPosition != null ? (Vector3)templateLocalPosition : Vector3.zero;
+            TemplateLocalRotation = templateLocalRotation != null ? (Vector3)templateLocalRotation : Vector3.zero;
+        }
+
+        /// <summary>
+        /// 复制自定义数据(相同类型才允许复制数据)
+        /// </summary>
+        /// <param name="sourceMapData"></param>
+        /// <returns></returns>
+        public virtual bool CopyCustomData(MapData sourceMapData)
+        {
+            var selfType = GetType();
+            var sourceType = sourceMapData.GetType();
+            if(selfType != sourceType)
+            {
+                Debug.LogError($"自身类型:{selfType.Name}和原数据类型:{sourceType.Name}不一致，复制自定义数据失败！");
+                return false;
+            }
+            Rotation = sourceMapData.Rotation;
+            return true;
         }
     }
 }

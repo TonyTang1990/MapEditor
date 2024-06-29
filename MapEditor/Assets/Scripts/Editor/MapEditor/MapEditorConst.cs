@@ -283,5 +283,25 @@ namespace MapEditor
         /// 面板地图埋点添加的UI宽度
         /// </summary>
         public const float InspectorDataAddUIWidth = 40f;
+
+        /// <summary>
+        /// 模板UID显示UI宽度
+        /// </summary>
+        public const float InspectorTemplateUIDUIWidth = 200f;
+
+        /// <summary>
+        /// 模板UID删除显示宽度
+        /// </summary>
+        public const float InspectorTemplateUIDRemoveUIWidth = 40f;
+
+        /// <summary>
+        /// 模板怪物组ID删除显示UI宽度
+        /// </summary>
+        public const float InspectorTemplateGroupIdRemoveUIWidth = 40f;
+
+        /// <summary>
+        /// 模板怪物组ID显示UI宽度
+        /// </summary>
+        public const float InspectorTemplateGroupIdUIWidth = 200f;
     }
 }

@@ -1253,14 +1253,13 @@ namespace MapEditor
         /// <param name="templateStrategyUID"></param>
         /// <param name="templateStrategyName"></param>
         /// <returns></returns>
-        private MapTemplateStrategyData DoAddMapTeplateStrategyData(int templateStrategyUID, string templateStrategyName)
+        private MapTemplateStrategyData DoAddMapTemplateStrategyData(int templateStrategyUID, string templateStrategyName)
         {
             if (!MapUtilities.CheckOperationAvalible(mTarget?.gameObject))
             {
-                return false;
+                return null;
             }
-            //TODO:
-            return AddMapTeplateStrategyData(int templateStrategyUID, string templateStrategyName);
+            return AddMapTeplateStrategyData(templateStrategyUID, templateStrategyName);
         }
 
         /// <summary>
@@ -1271,8 +1270,22 @@ namespace MapEditor
         /// <returns></returns>
         private MapTemplateStrategyData AddMapTeplateStrategyData(int templateStrategyUID, string templateStrategyName)
         {
-            //TODO:
-            return null;
+            if(templateStrategyUID == 0)
+            {
+                Debug.LogError($"不允许添加UID为0的模板策略UID，添加模板策略数据失败！");
+                return null;
+            }
+            if(IsContainTemplateStrategyByUID(templateStrategyUID))
+            {
+                Debug.LogError($"已包含模板策略UID:{templateStrategyUID}的模板策略数据，添加模板策略数据失败！");
+                return null;
+            }
+            var templateStrategyDataNum = mTemplateStrategyDatasProperty.arraySize;
+            mTemplateStrategyDatasProperty.InsertArrayElementAtIndex(templateStrategyDataNum);
+            var newTemplateStrategyData = new MapTemplateStrategyData(templateStrategyUID, templateStrategyName);
+            var newTemplateStrategyDataProperty = mTemplateStrategyDatasProperty.GetArrayElementAtIndex(templateStrategyDataNum);
+            newTemplateStrategyDataProperty.managedReference = newTemplateStrategyData;
+            return newTemplateStrategyData;
         }
 
         /// <summary>
@@ -1286,7 +1299,7 @@ namespace MapEditor
             {
                 return false;
             }
-            return RemoveMapTempalteStrategyData(int index);
+            return RemoveMapTempalteStrategyData(index);
         }
 
         /// <summary>
@@ -1296,7 +1309,18 @@ namespace MapEditor
         /// <returns></returns>
         private bool RemoveMapTempalteStrategyData(int index)
         {
-            //TODO:
+            if(mTemplateStrategyDatasProperty == null)
+            {
+                Debug.LogError($"找不到有效的模板数据属性，移除模板策略数据索引:{index}失败！");
+                return false;
+            }
+            var templateStrategyDataNum = mTemplateStrategyDatasProperty.arraySize;
+            if(index < 0 || index >= templateStrategyDataNum)
+            {
+                Debug.LogError($"地图模板策略数据索引:{index}不在有效范围:0-{templateStrategyDataNum - 1}内，移除模板策略数据失败！");
+                return false;
+            }
+            mTemplateStrategyDatasProperty.DeleteArrayElementAtIndex(index);
             return true;
         }
 
@@ -1307,7 +1331,15 @@ namespace MapEditor
         /// <returns></returns>
         private bool IsContainTemplateStrategyByUID(int templateStrategyUID)
         {
-            //TODO:
+            for(int i = 0, length = mTemplateStrategyDatasProperty.arraySize; i < length; i++)
+            {
+                var templateStrategyDataProperty = mTemplateStrategyDatasProperty.GetArrayElementAtIndex(i);
+                var strategyUIDProperty = templateStrategyDataProperty.FindPropertyRelative("StrategyUID");
+                if (strategyUIDProperty.intValue == templateStrategyUID)
+                {
+                    return true;
+                }
+            }
             return false;
         }
 
@@ -1334,7 +1366,7 @@ namespace MapEditor
         /// <param name="oldUID"></param>
         /// <param name="newUID"></param>
         /// <returns></returns>
-        private ReplaceIntData AddTemplateMonsterGroupIdData(SerializedProperty templateStrategyDataProperty, int oldUID, int newUID)
+        private ReplaceIntData AddTemplateUIDData(SerializedProperty templateStrategyDataProperty, int oldUID, int newUID)
         {
             if (templateStrategyDataProperty == null)
             {
@@ -1381,11 +1413,11 @@ namespace MapEditor
         /// <param name="uidReplaceDatasProeprty"></param>
         /// <param name="index"></param>
         /// <returns></returns>
-        private bool RemoveMonsterGroupIdReplaceDataByProperty(SerializedProperty uidReplaceDatasProeprty, int index)
+        private bool RemoveUIDReplaceDataByProperty(SerializedProperty uidReplaceDatasProeprty, int index)
         {
             if (uidReplaceDatasProeprty == null)
             {
-                Debug.LogError($"不允许传空怪物组Id列表属性，移除怪物Id替换数据索引:{index}失败！");
+                Debug.LogError($"不允许传空UID替换列表属性，移除UID替换数据索引:{index}失败！");
                 return false;
             }
             var uidReplaceDatasDataNum = uidReplaceDatasProeprty.arraySize;
@@ -3291,6 +3323,258 @@ namespace MapEditor
             }
         }
 
+        /// <summary>
+        /// 绘制数据模板区域
+        /// </summary>
+        private void DrawMapTemplateDataArea()
+        {
+            DrawMapTemplateStrategyDtaArea();
+        }
+
+        /// <summary>
+        /// 绘制地图模板策略数据区域
+        /// </summary>
+        private void DrawMapTemplateStrategyDtaArea()
+        {
+            DrawMapTemplateStrategyOperationArea();
+            DrawMapTemplateStrategyDetailDataArea();
+        }
+
+        /// <summary>
+        /// 绘制地图模板策略操作区域
+        /// </summary>
+        private void DrawMapTemplateStrategyOperationArea()
+        {
+            EditorGUILayout.BeginVertical("box");
+            EditorGUILayout.BeginHorizontal();
+            EditorGUILayout.LabelField("模板策略UID", GUILayout.Width(80f));
+            mAddTemplateStrategyUIDProperty.intValue = EditorGUILayout.IntField(mAddTemplateStrategyUIDProperty.intValue, GUILayout.Width(100f));
+            EditorGUILayout.LabelField("模板策略名", GUILayout.Width(80f));
+            mAddTemplateStrategyNameProperty.stringValue = EditorGUILayout.TextField(mAddTemplateStrategyNameProperty.intValue, GUILayout.Width(100f));
+            if(GUILayout.Button("+", GUILayout.ExpandWidth(true)))
+            {
+                DoAddMapTemplateStrategyData(mAddTemplateStrategyUIDProperty.intValue, mAddTemplateStrategyNameProperty.stringValue);
+            }
+            EditorGUILayout.EndHorizontal();
+            EditorGUILayout.EndVertical();
+        }
+
+        /// <summary>
+        /// 绘制地图模板策略详细数据区域
+        /// </summary>
+        private void DrawMapTemplateStrategyDetailDataArea()
+        {
+            EditorGUILayout.BeginVertical("box");
+            for(int i = 0, length = mTemplateStrategyDatasProperty.arraySize; i < length; i++)
+            {
+                var templateStrategyDataProperty = mTemplateStrategyDatasProperty.GetArrayElementAtIndex(i);
+                DrawOneMapTemplateStrategyDataArea(templateStrategyDataProperty, i);
+            }
+            EditorGUILayout.EndVertical();
+        }
+
+        /// <summary>
+        /// 绘制指定地图模板策略数据区域
+        /// </summary>
+        /// <param name="templateStrategyDataProperty"></param>
+        /// <param name="index"></param>
+        private void DrawOneMapTemplateStrategyDataArea(SerializedProperty templateStrategyDataProperty, int index)
+        {
+            if(templateStrategyDataProperty == null)
+            {
+                return;
+            }
+            var isUnfoldProperty = templateStrategyDataProperty.FindPropertyRelative("IsUnfold");
+            var mapTemplateStrategyData = templateStrategyDataProperty.managedReference as MapTemplateStrategyData;
+            var strategyTitleName = mapTemplateStrategyData.GetTitleName();
+            EditorGUILayout.BeginHorizontal();
+            isUnfoldProperty.boolValue = EditorGUILayout.Foldout(isUnfoldProperty.boolValue, strategyTitleName);
+            if(GUILayout.Button("-", GUILayout.ExpandWidth(true)))
+            {
+                DoRemoveMapTempalteStrategyData(index);
+            }
+            EditorGUILayout.EndHorizontal();
+            if(isUnfoldProperty.boolValue)
+            {
+                DrawMapTemplateUIDReplaceDatasArea(templateStrategyDataProperty);
+                DrawMapTemplateMonsterGroupIdReplaceDatasArea(templateStrategyDataProperty);
+            }
+        }
+
+        /// <summary>
+        /// 绘制指定地图模板策略数据的UID替换区域
+        /// </summary>
+        /// <param name="templateStrategyDataProperty"></param>
+        private void DrawMapTemplateUIDReplaceDatasArea(SerializedProperty templateStrategyDataProperty)
+        {
+            if(templateStrategyDataProperty == null)
+            {
+                return;
+            }
+            EditorGUILayout.BeginVertical("box");
+            DrawTemplateUIDOperationArea(templateStrategyDataProperty);
+            DrawTemplateUIDReplaceTitleArea();
+            var uidReplaceDatasProperty = templateStrategyDataProperty.FindPropertyRelative("UIDReplaceDatas");
+            for(int i = 0, length = uidReplaceDatasProperty.arraySize; i < length; i++)
+            {
+                DrawOneUIDReplaceDataByProperty(uidReplaceDatasProperty, i);
+            }
+            EditorGUILayout.EndVertical();
+        }
+
+        /// <summary>
+        /// 绘制指定模板策略数据属性的模版UID数据操作区域
+        /// </summary>
+        /// <param name="templateStrategyDataProperty"></param>
+        private void DrawTemplateUIDOperationArea(SerializedProperty templateStrategyDataProperty)
+        {
+            EditorGUILayout.BeginHorizontal();
+            EditorGUILayout.LabelField("老UID:", GUILayout.Width(40f));
+            EditorGUI.BeginChangeCheck();
+            mAddTemplateOldUIDProperty.intValue = EditorGUILayout.IntPop(mAddTemplateOldUIDProperty.intValue, AllMapDataChoiceOptions, AllMapDataChoiceValues, GUILayout.Width(150f));
+            if(EditorGUI.EndChangeCheck())
+            {
+                OnAddTemplateOldUIDChange();
+            }
+            EditorGUILayout.LabelField("新UID:", GUILayout.Width(40f));
+            mAddTemplateNewUIDProperty.intValue = EditorGUILayout.IntPop(mAddTemplateNewUIDProperty.intValue, NewAddUIDMapTemplateChoiceOptions, NewAddUIDMapTemplateChoiceValues, GUILayout.Width(150f));
+            if(GUILayout.Button("+", GUILayout.ExpandWidth(true)))
+            {
+                DoAddTemplateUIDData(templateStrategyDataProperty, mAddTemplateOldUIDProperty.intValue, mAddTemplateNewUIDProperty.intValue);
+            }
+            EditorGUILayout.EndHorizontal();
+        }
+
+        /// <summary>
+        /// 绘制指定模板数据属性的UID替换标题区域
+        /// </summary>
+        private void DrawTemplateUIDReplaceTitleArea()
+        {
+            EditorGUILayout.BeginHorizontal();
+            EditorGUILayout.LabelField("老UID", MapStyles.TabMiddleStyle, GUILayout.Width(MapEditorConst.InspectorTemplateUIDUIWidth));
+            EditorGUILayout.LabelField("新UID", MapStyles.TabMiddleStyle, GUILayout.Width(MapEditorConst.InspectorTemplateUIDUIWidth));
+            EditorGUILayout.LabelField("删除", MapStyles.TabMiddleStyle, GUILayout.Width(MapEditorConst.InspectorTemplateUIDRemoveUIWidth));
+            EditorGUILayout.EndHorizontal();
+        }
+
+        /// <summary>
+        /// 绘制指定索引的地图模板策略UID替换数据
+        /// </summary>
+        /// <param name="uidReplaceDatasProperty"></param>
+        /// <param name="index"></param>
+        private void DrawOneUIDReplaceDataByProperty(SerializedProperty uidReplaceDatasProperty, int index)
+        {
+            var uidReplaceDataProperty = uidReplaceDatasProperty.GetArrayElementAtIndex(index);
+            if(uidReplaceDataProperty == null)
+            {
+                return;
+            }
+            var oldDataProperty = uidReplaceDataProperty.FindPropertyRelative("OldData");
+            var oldUID = oldDataProperty.intValue;
+            var oldMapDataConfig = MapSetting.GetEditorInstance().DataSetting.GetMapDataConfigByUID(oldUID);
+            if(oldMapDataConfig == null)
+            {
+                return;
+            }
+            var oldMapDataType = oldMapDataConfig.DataType;
+            var newDataProperty = uidReplaceDataProperty.FindPropertyRelative("NewData");
+            EditorGUILayout.BeginHorizontal();
+            var mapDataChoiceOptions = GetMapDataChoiceOptionsByType(oldMapDataType);
+            var mapDataChoiceValues = GetMapDataChoiceValuesByType(oldMapDataType);
+            EditorGUILayout.IntPopup(oldUID, mapDataChoiceOptions, mapDataChoiceValues, GUILayout.Width(MapEditorConst.InspectorTemplateUIDUIWidth));
+            EditorGUI.BeginChangeCheck();
+            var newUID = EditorGUILayout.IntPopup(newDataProperty.intValue, mapDataChoiceOptions, mapDataChoiceValues, GUILayout.Width(MapEditorConst.InspectorTemplateUIDUIWidth));
+            if(oldUID != newUID)
+            {
+                newDataProperty.intValue = newUID;
+            }
+            if(GUILayout.Button("-", GUILayout.Width(MapEditorConst.InspectorTemplateUIDRemoveUIWidth)))
+            {
+                DoRemoveUIDReplaceDataByProperty(uidReplaceDatasProeprty, index);
+            }
+            EditorGUILayout.EndHorizontal();
+        }
+
+        /// <summary>
+        /// 绘制指定地图模板数据的怪物组ID替换区域
+        /// </summary>
+        /// <param name="templateStrategyDataProperty"></param>
+        private void DrawMapTemplateMonsterGroupIdReplaceDatasArea(SerializedProperty templateStrategyDataProperty)
+        {
+            if(templateStrategyDataProperty == null)
+            {
+                return;
+            }
+            EditorGUILayout.BeginVertical("box");
+            DrawTemplateMonsterGroupIdOperationArea(templateStrategyDataProperty);
+            DrawTemplateMonsterGroupIdReplaceTitleArea();
+            var monsterGroupIdReplaceDatasProperty = templateStrategyDataProperty.FindPropertyRelative("MonsterGroupIdReplaceData");
+            for(int i = 0, length = monsterGroupIdReplaceDatasProperty.arraySize; i < length; i++)
+            {
+                DrawOneMonsterGroupIdReplaceDataByProperty(monsterGroupIdReplaceDatasProperty, i);
+            }
+            EditorGUILayout.EndVertical();
+        }
+
+        /// <summary>
+        /// 惠子指定模板策略数据属性的怪物组Id操作区域
+        /// </summary>
+        /// <param name="templateStrategyDataProperty"></param>
+        private void DrawTemplateMonsterGroupIdOperationArea(SerializeProperty templateStrategyDataProperty)
+        {
+            EditorGUILayout.BeginHorizontal();
+            EditorGUILayout.LabelField("老怪物组ID:", GUILayout.Width(80f));
+            mAddTemplateOldGroupIdProperty.intValue = EditorGUILayout.IntField(mAddTemplateOldGroupIdProperty.intValue, GUILayout.Width(60f));
+            EditorGUILayout.LabelField("新怪物组ID:", GUILayout.Width(80f));
+            mAddTemplateNewGroupIdProperty.intValue = EditorGUILayout.IntField(mAddTemplateNewGroupIdProperty.intValue, GUILayout.Width(60f));
+            if (GUILayout.Button("+", GUILayout.ExpandWidth(true)))
+            {
+                DoAddTemplateMonsterGroupIdData(templateStrategyDataProperty, mAddTemplateOldGroupIdProperty.intValue, mAddTemplateNewGroupIdProperty.intValue);
+            }
+            EditorGUILayout.EndHorizontal();
+        }
+
+        /// <summary>
+        /// 绘制指定模板数据属性的怪物组Id替换标题区域
+        /// </summary>
+        private void DrawTemplateMonsterGroupIdReplaceTitleArea()
+        {
+            EditorGUILayout.BeginHorizontal();
+            EditorGUILayout.LabelField("老怪物组ID", MapStyles.TabMiddleStyle, GUILayout.Width(MapEditorConst.InspectorTemplateGroupIdUIWidth));
+            EditorGUILayout.LabelField("新怪物组ID", MapStyles.TabMiddleStyle, GUILayout.Width(MapEditorConst.InspectorTemplateGroupIdUIWidth));
+            EditorGUILayout.LabelField("删除", MapStyles.TabMiddleStyle, GUILayout.Width(MapEditorConst.InspectorTemplateGroupIdRemoveUIWidth));
+            EditorGUILayout.EndHorizontal();
+        }
+
+        /// <summary>
+        /// 绘制指定索引的地图模板策略怪物组Id替换数据
+        /// </summary>
+        /// <param name="groupIdReplaceDatasProperty"></param>
+        /// <param name="index"></param>
+        private void DrawOneMonsterGroupIdReplaceDataByProperty(SerializedProperty groupIdReplaceDatasProperty, int index)
+        {
+            var groupIdReplaceDataProperty = groupIdReplaceDatasProperty.GetArrayElementAtIndex(index);
+            if (groupIdReplaceDataProperty == null)
+            {
+                return;
+            }
+            var oldDataProperty = groupIdReplaceDataProperty.FindPropertyRelative("OldData");
+            var newDataProperty = groupIdReplaceDataProperty.FindPropertyRelative("NewData");
+            var oldMonsterGroupId = oldDataProperty.intValue;
+            EditorGUILayout.BeginHorizontal();
+            EditorGUILayout.LabelField(oldMonsterGroupId.ToString(), MapStyles.TabMiddleStyle, GUILayout.Width(MapEditorConst.InspectorTemplateGroupIdUIWidth));
+            var newMonsterGroupId = EditorGUILayout.IntField(newDataProperty.intValue, GUILayout.Width(MapEditorConst.InspectorTemplateGroupIdUIWidth));
+            if (oldMonsterGroupId != newMonsterGroupId)
+            {
+                newDataProperty.intValue = newMonsterGroupId;
+            }
+            if (GUILayout.Button("-", GUILayout.Width(MapEditorConst.InspectorTemplateGroupIdRemoveUIWidth)))
+            {
+                DoRemoveMonsterGroupIdReplaceDataByProperty(groupIdReplaceDataProperty, index);
+            }
+            EditorGUILayout.EndHorizontal();
+        }
+
         private void OnSceneGUI()
         {
             if(mSceneGUISwitchProperty != null && mSceneGUISwitchProperty.boolValue)
@@ -3435,13 +3719,81 @@ namespace MapEditor
         {
             for (int i = 0, length = mMapDataListProperty.arraySize; i < length; i++)
             {
-                var mapDataProperty = GetMapDataSerializedPropertyByIndex(i);
-                string mapDataLabelName = MapEditorUtilities.GetMapDataPropertyLabelName(mMapDataListProperty, i);
-                var mapDataPositionProperty = mapDataProperty.FindPropertyRelative("Position");
-                var mapDataBatchOperationSwitchProperty = mapDataProperty.FindPropertyRelative("BatchOperationSwitch");
-                var labelPos = mapDataPositionProperty.vector3Value + MapEditorConst.MapDataLabelPosOffset;
-                var displayGUIStyle = mapDataBatchOperationSwitchProperty.boolValue ? mYellowLabelGUIStyle : mRedLabelGUIStyle;
+                DrawMapDataLabel(i);
+            }
+        }
+
+        /// <summary>
+        /// 绘制指定索引的地图埋点数据
+        /// </summary>
+        /// <param name="index"></param>
+        private void DrawMapDataLabel(int index)
+        {
+            var mapDataProperty = GetMapDataSerializedPropertyByIndex(index);
+            if(mapDataProperty == null)
+            {
+                return;
+            }
+            var uidProperty = mapDataProperty.FindPropertyRelative("UID");
+            var mapDataConfig = MapSetting.GetEditorInstance().DataSetting.GetMapDataConfigByUID(uidProperty.intValue);
+            if (mapDataConfig == null)
+            {
+                return;
+            }
+            var mapDataPositionProperty = mapDataProperty.FindPropertyRelative("Position");
+            string mapDataLabelName = MapEditorUtilities.GetMapDataPropertyLabelName(mapDataConfig, mMapDataListProperty, index);
+            var mapDataBatchOperationSwitchProperty = mapDataProperty.FindPropertyRelative("BatchOperationSwitch");
+            var labelPos = mapDataPositionProperty.vector3Value + MapEditorConst.MapDataLabelPosOffset;
+            var displayGUIStyle = mapDataBatchOperationSwitchProperty.boolValue ? mYellowLabelGUIStyle : mRedLabelGUIStyle;
+            Handles.Label(labelPos, mapDataLabelName, displayGUIStyle);
+            if(mapDataConfig.DataType == MapDataType.Template && mapDataConfig.TemplateDataAsset != null)
+            {
+                var basePosition = mapDataPositionProperty.vector3Value + MapEditorConst.MapDataLabelPosOffset;
+                var templateMapData = mapDataProperty.managedReference as TemplateMapData;
+                DrawMapTemplateDataLabels(mapDataConfig, templateMapData, basePosition, mpaDataBatchOperationSwitchProperty.boolValue);
+            }
+        }
+
+        /// <summary>
+        /// 绘制地图模板数据标签
+        /// Note:
+        /// 为了减少重复的FindPropertyRelative，这里mapDataConfig和templateMapData采用手动匹配传递
+        /// </summary>
+        /// <param name="mapDataProperty"></param>
+        /// <param name="basePosition"></param>
+        /// <param name="batchOperation"></param>
+        private void DrawMapTemplateDataLabels(MapDataConfig mapDataConfig, TemplateMapData templateMapData, Vector3 basePosition, bool batchOperation = false)
+        {
+            if(mapDataConfig == null || mapDataConfig.TemplateDataAsset == null)
+            {
+                return;
+            }
+            var mapTemplateData = mapDataConfig.TemplateDataAsset;
+            var templateStrategyData = mapTemplateData.GetMapTemlateStrategyDataByUID(templateMapData.StrategyUID);
+            for(int i = 0, length = mapTemplateData.MapDataList.Count; i < length; i++)
+            {
+                var mapData = mapTemplateData.MapDataList[i];
+                var uid = mapData.UID;
+                var mapDataConfig2 = MapSetting.GetEditorInstance().DataSetting.GetMapDataConfigByUID(uid);
+                if(mapDataConfig2 == null)
+                {
+                    continue;
+                }
+                var mapDataLabelName = MapEditorUtilities.GetMapDataLabelName(mapData, i, templateStrategyData);
+                var labelPos = basePosition + mapData.TemplateLocalPosition;
+                var displayGUIStyle = batchOperation ? mYellowLabelGUIStyle : mRedLabelGUIStyle;
                 Handles.Label(labelPos, mapDataLabelName, displayGUIStyle);
+                if (mapDataConfig2.DataType == MapDataType.Template)
+                {
+                    if(mapDataConfig.UID == mapDataConfig2.UID)
+                    {
+                        Debug.LogError($"地图模板配置UID:{mapDataConfig.UID}有循环模板UID配置！");
+                        continue;
+                    }
+                    var nestedBasePosition = basePosition + mapData.TemplateLocalPosition;
+                    var nestedTemplateMapData = mapData as TemplateMapData;
+                    DrawMapTemplateDataLabels(mapDataConfig2, nestedTemplateMapData, nestedBasePosition, batchOperation);
+                }
             }
         }
 
@@ -3452,17 +3804,76 @@ namespace MapEditor
         {
             for (int i = 0, length = mMapDataListProperty.arraySize; i < length; i++)
             {
-                var mapDataProperty = GetMapDataSerializedPropertyByIndex(i);
-                var uidProperty = mapDataProperty.FindPropertyRelative("UID");
-                var mapDataUID = uidProperty.intValue;
-                var mapDataPositionProperty = mapDataProperty.FindPropertyRelative("Position");
-                var mapDataRotationProperty = mapDataProperty.FindPropertyRelative("Rotation");
-                var rotationQuaternion = Quaternion.Euler(mapDataRotationProperty.vector3Value);
-                var mapDataConfig = MapSetting.GetEditorInstance().DataSetting.GetMapDataConfigByUID(mapDataUID);
+                DrawMapDataSphere(i);
+            }
+        }
+
+        /// <summary>
+        /// 绘制指定索引的地图埋点球体
+        /// </summary>
+        /// <param name="index"></param>
+        private void DrawMapDataSphere(int index)
+        {
+            var mapDataProperty = GetMapDataSerializedPropertyByIndex(index);
+            if(mapDataProperty == null)
+            {
+                return;
+            }
+            var uidProperty = mapDataProperty.FindPropertyRelative("UID");
+            var mapDataUID = uidProperty.intValue;
+            var mapDataPositionProperty = mapDataProperty.FindPropertyRelative("Position");
+            var mapDataRotationProperty = mapDataProperty.FindPropertyRelative("Rotation");
+            var mapDataPosition = mapDataPositionProperty.vector3Value;
+            var mapDataRotation = mapDataRotationProperty.vector3Value;
+            var rotationQuaternion = Quaternion.Euler(mapDataRotation);
+            var mapDataConfig = MapSetting.GetEditorInstance().DataSetting.GetMapDataConfigByUID(mapDataUID);
+            var preHandlesColor = Handles.color;
+            Handles.color = mapDataConfig != null ? mapDataConfig.SceneSphereColor : Color.gray;
+            Handles.SphereHandleCap(index, mapDataPosition, rotationQuaternion, MapEditorConst.MapDataSphereSize, EventType.Repaint);
+            Handles.color = preHandlesColor;
+            if(mapDataConfig.DataType == MapDataType.Template)
+            {
+                DrawMapTemplateDataSphere(mapDataConfig.TemplateDataAsset, mapDataPosition, mapDataRotation, 0);
+            }
+        }
+
+        /// <summary>
+        /// 绘制指定模板数据和指定基准位置的模板数据球体
+        /// </summary>
+        /// <param name="mapTemplateData"></param>
+        /// <param name="basePosition"></param>
+        /// <param name="baseRotation"></param>
+        /// <param name="depth"></param>
+        private void DrawMapTemplateDataSphere(MapTemplateData mapTemplateData, Vector3 basePosition, Vector3 baseRotation, int depth = 0)
+        {
+            if(mapTemplateData == null)
+            {
+                return;
+            }
+            depth++;
+            for(int i = 0, length = mapTemplateData.MapDataList.Count; i < length; i++)
+            {
+                var mapData = mapTemplateData.MapDataList[i];
+                if(mapData == null)
+                {
+                    continue;
+                }
+                var mapDataPosition = basePosition + mapData.TemplateLocalPosition;
+                var mapDataRotation = baseRotation + mapData.TemplateLocalRotation;
+                var mapDataConfig = MapSetting.GetEditorInstance().DataSetting.GetMapDataConfigByUID(mapData.UID);
+                if(mapDataConfig == null)
+                {
+                    continue;
+                }
                 var preHandlesColor = Handles.color;
                 Handles.color = mapDataConfig != null ? mapDataConfig.SceneSphereColor : Color.gray;
-                Handles.SphereHandleCap(i, mapDataPositionProperty.vector3Value, rotationQuaternion, MapEditorConst.MapDataSphereSize, EventType.Repaint);
+                var index = depth * 1000000 + i;
+                Handles.SphereHandleCap(index, mapDataPosition, rotationQuaternion, MapEditorConst.MapDataSphereSize, EventType.Repaint);
                 Handles.color = preHandlesColor;
+                if(mapDataConfig.DataType == MapDataType.Template)
+                {
+                    DrawMapTemplateDataSphere(mapDataConfig.TemplateDataAsset, mapDataPosition, mapDataRotation, depth);
+                }
             }
         }
 

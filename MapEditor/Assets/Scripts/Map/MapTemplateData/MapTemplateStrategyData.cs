@@ -185,5 +185,15 @@ namespace MapEditor
             }
             return false;
         }
+
+        /// <summary>
+        /// 获取策略标题名
+        /// UID(策略名)
+        /// </summary>
+        /// <returns></returns>
+        public string GetTitleName()
+        {
+            return $"{StrategyUID}({StrategyName})";
+        }
     }
 }
