@@ -1970,7 +1970,8 @@ namespace MapEditor
                 return false;
             }
             var result = true;
-            UpdateMapObjectDataLogicDatas();
+            // 逻辑相关数据在动态物体清理前保存即可，正确预制件操作保存流程一定会走清理动态数据流程
+            //UpdateMapObjectDataLogicDatas();
             if (!RecoverDynamicMapObjects())
             {
                 result = false;
