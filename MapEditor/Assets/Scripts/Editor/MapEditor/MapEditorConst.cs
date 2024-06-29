@@ -30,6 +30,21 @@ namespace MapEditor
         public const string MapTemplateDataSaveFolder = "Asset/Editor/Map/MapData/MapTemplateData";
 
         /// <summary>
+        /// 地图对象类型配置UI显示宽度
+        /// </summary>
+        public const float MapObjectTypeConfigUIWidth = 150f;
+
+        /// <summary>
+        /// 地图对象类型配置是否动态对象UI显示宽度
+        /// </summary>
+        public const float MapObjectTypeConfigIsDynamicUIWidth = 60f;
+
+        /// <summary>
+        /// 地图对象描述配置UI显示宽度
+        /// </summary>
+        public const float MapObjectTypeConfigDesUIWidth = 120f;
+
+        /// <summary>
         /// 地图对象UID UI显示宽度
         /// </summary>
         public const float MapObjectUIDUIWidth = 50f;

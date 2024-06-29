@@ -459,14 +459,17 @@ namespace MapEditor
                 instanceGoName = $"{instanceGoName}_{uid}";
                 instanceGo.name = instanceGoName;
                 // 动态物体碰撞器统一代码创建
-                if (mapObjectConfig.IsDynamic)
-                {
-                    MapUtilities.AddOrUpdateColliderByColliderDataMono(instanceGo);
-                }
-                else
-                {
-                    MapUtilities.UpdateColliderByColliderDataMono(instanceGo);
-                }
+                //if (mapObjectConfig.IsDynamic)
+                //{
+                //    MapUtilities.AddOrUpdateColliderByColliderDataMono(instanceGo);
+                //}
+                //else
+                //{
+                //    MapUtilities.UpdateColliderByColliderDataMono(instanceGo);
+                //}
+                // 优化静态对象碰撞框，所有对象统一代码创建碰撞框
+                // 静态碰撞框会在最后删除动态数据时统一清除
+                MapUtilities.AddOrUpdateColliderByColliderDataMono(instanceGo);
                 MapUtilities.AddOrUpdateMapObjectDataMono(instanceGo, uid);
             }
             return instanceGo;
@@ -575,7 +578,8 @@ namespace MapEditor
                 {
                     continue;
                 }
-                if(mapObjectConfig.IsDynamic && mapObjectData.Go == null)
+                var isDynamic = MapSetting.GetEditorInstance().ObjectSetting.IsDynamicMapObjectType(mapObjectConfig.ObjectType);
+                if(isDynamic && mapObjectData.Go == null)
                 {
                     RecreateMapObjectGo(mapObjectData);
                 }
@@ -656,7 +660,8 @@ namespace MapEditor
                 {
                     continue;
                 }
-                if (mapObjectConfig.IsDynamic && mapObjectData.Go != null)
+                var isDynamic = MapSetting.GetEditorInstance().ObjectSetting.IsDynamicMapObjectType(mapObjectConfig.ObjectType);
+                if (isDynamic && mapObjectData.Go != null)
                 {
                     GameObject.DestroyImmediate(mapObjectData.Go);
                     mapObjectData.Go = null;

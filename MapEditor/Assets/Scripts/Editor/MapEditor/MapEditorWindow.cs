@@ -69,6 +69,16 @@ namespace MapEditor
         private MapSetting mMapSettingAsset;
 
         /// <summary>
+        /// 当前选中添加的地图对象类型配置
+        /// </summary>
+        private MapObjectType mAddMapObjectTypeConfigType = MapObjectType.TreasureBox;
+
+        /// <summary>
+        /// 当前选中地图对象类型配置类型添加的是否是动态对象
+        /// </summary>
+        private bool mAddMapObjectTypeConfigTypeIsDynaic = true;
+
+        /// <summary>
         /// 添加的地图对象UID
         /// </summary>
         private int mAddMapObjectUID;
@@ -115,15 +125,35 @@ namespace MapEditor
         }
 
         /// <summary>
+        /// 执行添加新地图对象类型配置数据
+        /// </summary>
+        /// <param name="mapObjectType"></param>
+        /// <param name="isDynamic"></param>
+        /// <returns></returns>
+        private bool DoAddMapObjectTypeConfig(MapObjectType mapObjectType, bool isDynamic = false)
+        {
+            return mMapSettingAsset.ObjectSetting.AddMapObjectTypeConfig(mapObjectType, isDynamic);
+        }
+
+        /// <summary>
+        /// 执行移除地图对象类型配置数据
+        /// </summary>
+        /// <param name="mapObjectTypeConfig"></param>
+        /// <returns></returns>
+        private bool DoRemoveMapObjectTypeConfig(MapObjectTypeConfig mapObjectTypeConfig)
+        {
+            return mMapSettingAsset.ObjectSetting.RemoveMapObjectTypeConfig(mapObjectTypeConfig);
+        }
+
+        /// <summary>
         /// 执行添加新地图对象配置数据
         /// </summary>
         /// <param name="mapObjectUid"></param>
         /// <param name="mapObjectType"></param>
-        /// <param name="isDynamic"></param>
         /// <returns></returns>
-        private bool DoAddMapObjectConfig(int mapObjectUid, MapObjectType mapObjectType, bool isDynamic = false)
+        private bool DoAddMapObjectConfig(int mapObjectUid, MapObjectType mapObjectType)
         {
-            var newMapObjectConfig = new MapObjectConfig(mapObjectUid, mapObjectType, isDynamic);
+            var newMapObjectConfig = new MapObjectConfig(mapObjectUid, mapObjectType);
             return mMapSettingAsset.ObjectSetting.AddMapObjectDataConfig(newMapObjectConfig);
         }
 
@@ -356,6 +386,93 @@ namespace MapEditor
         /// </summary>
         private void DrawMapBuildPanelView()
         {
+            DrawMapObjectTypeConfigArea();
+            DrawMapObjectConfigArea();
+        }
+
+        /// <summary>
+        /// 绘制地图对象类型配置区域
+        /// </summary>
+        private void DrawMapObjectTypeConfigArea()
+        {
+            EditorGUILayout.BeginVertical("box");
+            EditorGUILayout.LabelField("地图对象类型编辑面板", MapStyles.TabMiddleStyle, GUILayout.ExpandWidth(true));
+            mMapSettingAsset.ObjectSetting.IsMapObjectTypeConfigUnfold = EditorGUILayout.Foldout(mMapSettingAsset.ObjectSetting.IsMapObjectTypeConfigUnfold, "地图对象类型配置");
+            if(mMapSettingAsset.ObjectSetting.IsMapObjectTypeConfigUnfold)
+            {
+                DrawMapObjectTypeConfigAddArea();
+                DrawMapObjectTypeConfigTitleArea();
+                if(mMapSettingAsset.ObjectSetting.AllMapObjectTypeConfigs.Count > 0)
+                {
+                    for(int i = 0; i < mMapSettingAsset.ObjectSetting.AllMapObjectTypeConfigs.Count; i++)
+                    {
+                        DrawOneMapObjectTypeConfig(mMapSettingAsset.ObjectSetting.AllMapObjectTypeConfigs[i]);
+                    }
+                }
+            }
+            EditorGUILayout.EndVertical();
+        }
+
+        /// <summary>
+        /// 绘制地图编辑器对象类型配置添加显示
+        /// </summary>
+        private void DrawMapObjectTypeConfigAddArea()
+        {
+            EditorGUILayout.BeginHorizontal();
+            EditorGUILayout.LabelField("地图对象类型:", GUILayout.Width(80f));
+            mAddMapObjectTypeConfigType = (MapObjectType)EditorGUILayout.EnumPopup(mAddMapObjectTypeConfigType, GUILayout.Width(150f));
+            EditorGUILayout.LabelField("是否是动态对象:", GUILayout.Width(80f));
+            mAddMapObjectTypeConfigTypeIsDynaic = EditorGUILayout.Toggle(mAddMapObjectTypeConfigTypeIsDynaic, GUILayout.Width(40f));
+            if(GUILayout.Button("+", GUILayout.ExpandWidth(true)))
+            {
+                DoAddMapObjectTypeConfig(mAddMapObjectTypeConfigType, mAddMapObjectTypeConfigTypeIsDynaic);
+            }
+            EditorGUILayout.EndHorizontal();
+        }
+
+        /// <summary>
+        /// 绘制地图编辑对象类型配置数据标题显示
+        /// </summary>
+        private void DrawMapObjectTypeConfigTitleArea()
+        {
+            EditorGUILayout.BeginHorizontal("box");
+            EditorGUILayout.LabelField("地图对象类型", MapStyles.TabMiddleStyle, GUILayout.Width(MapEditorConst.MapObjectTypeConfigUIWidth));
+            EditorGUILayout.LabelField("是否动态", MapStyles.TabMiddleStyle, GUILayout.Width(MapEditorConst.MapObjectTypeConfigIsDynamicUIWidth));
+            EditorGUILayout.LabelField("地图对象类型描述", MapStyles.TabMiddleStyle, GUILayout.Width(MapEditorConst.MapObjectTypeConfigDesUIWidth));
+            EditorGUILayout.LabelField("操作", MapStyles.TabMiddleStyle, GUILayout.ExpandWidth(true));
+            EditorGUILayout.EndHorizontal();
+        }
+
+        /// <summary>
+        /// 绘制单个地图对象类型配置数据显示
+        /// </summary>
+        /// <param name="mapObjectTypeConfig"></param>
+        private void DrawOneMapObjectTypeConfig(MapObjectTypeConfig mapObjectTypeConfig)
+        {
+            EditorGUILayout.BeginVertical("box", GUILayout.ExpandWidth(true));
+            if(mapObjectTypeConfig != null)
+            {
+                var preColor = GUI.color;
+                GUI.color = mapObjectTypeConfig.IsDynamic ? Color.yellow : preColor;
+                EditorGUILayout.BeginHorizontal();
+                EditorGUILayout.LabelField(mapObjectTypeConfig.ObjectType.ToString(), MapStyles.ButtonLeftStyle, GUILayout.Width(MapEditorConst.MapObjectTypeConfigUIWidth));
+                EditorGUILayout.Space(MapEditorConst.MapObjectTypeConfigIsDynamicUIWidth / 3, false);
+                mapObjectTypeConfig.IsDynamic = EditorGUILayout.Toggle(mapObjectTypeConfig.IsDynamic, GUILayout.Width(MapEditorConst.MapObjectTypeConfigIsDynamicUIWidth * 2 / 3));
+                mapObjectTypeConfig.Des = EditorGUILayout.TextField(mapObjectTypeConfig.Des, GUILayout.Width(MapEditorConst.MapObjectTypeConfigDesUIWidth));
+                if(GUILayout.Button("-", GUILayout.ExpandWidth(true)))
+                {
+                    DoRemoveMapObjectTypeConfig(mapObjectTypeConfig);
+                }
+                EditorGUILayout.EndHorizontal();
+                GUI.color = preColor;
+            }
+        }
+
+        /// <summary>
+        /// 绘制地图对象配置区域
+        /// </summary>
+        private void DrawMapObjectConfigArea()
+        {
             EditorGUILayout.BeginVertical("box");
             EditorGUILayout.LabelField("地图编辑面板", MapStyles.TabMiddleStyle, GUILayout.ExpandWidth(true));
             DrawMapObjectConfigAddView();
@@ -386,11 +503,9 @@ namespace MapEditor
             mAddMapObjectUID = EditorGUILayout.IntField(mAddMapObjectUID, GUILayout.Width(100f));
             EditorGUILayout.LabelField("地图对象类型:", GUILayout.Width(80f));
             mAddMapObjectType = (MapObjectType)EditorGUILayout.EnumPopup(mAddMapObjectType, GUILayout.Width(150f));
-            EditorGUILayout.LabelField("是否动态对象:", GUILayout.Width(80f));
-            mAddIsDynamic = EditorGUILayout.Toggle(mAddIsDynamic, GUILayout.Width(30f));
             if (GUILayout.Button("+", GUILayout.ExpandWidth(true)))
             {
-                DoAddMapObjectConfig(mAddMapObjectUID, mAddMapObjectType, mAddIsDynamic);
+                DoAddMapObjectConfig(mAddMapObjectUID, mAddMapObjectType);
             }
             EditorGUILayout.EndHorizontal();
         }

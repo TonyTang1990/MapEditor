@@ -1870,6 +1870,7 @@ namespace MapEditor
         {
             if (!MapUtilities.CheckOperationAvalible(mTarget?.gameObject))
             {
+                Debug.LogError($"地图:{mTarget?.gameObject.name}清除动态地图数据失败！");
                 return false;
             }
             bool result = true;
@@ -1877,6 +1878,15 @@ namespace MapEditor
             if (!CleanDynamicMapObjects())
             {
                 result = false;
+            }
+            // 确保静态物体没有碰撞器保留在场景中
+            if(!ClearStaticMapObjectColliders())
+            {
+                result = false;
+            }
+            if (!result)
+            {
+                Debug.LogError($"地图:{mTarget?.gameObject.name}清除动态地图数据失败！");
             }
             return result;
         }
@@ -1902,7 +1912,8 @@ namespace MapEditor
                     continue;
                 }
                 var goProperty = mapObjectDataProperty.FindPropertyRelative("Go");
-                if (mapObjectConfig.IsDynamic && goProperty.objectReferenceValue != null)
+                var isDynamic = MapSetting.GetEditorInstance().ObjectSetting.IsDynamicMapObjectType(mapObjectConfig.ObjectType);
+                if (isDynamic && goProperty.objectReferenceValue != null)
                 {
                     var go = goProperty.objectReferenceValue as GameObject;
                     GameObject.DestroyImmediate(go);
@@ -1911,6 +1922,37 @@ namespace MapEditor
             }
             serializedObject.ApplyModifiedProperties();
             return true;
+        }
+
+        /// <summary>
+        /// 清除静态地图对象的碰撞器组件
+        /// </summary>
+        /// <returns></returns>
+        private bool ClearStaticMapObjectColliders()
+        {
+            if(!MapUtilities.CheckOperationAvalible(mTarget?.gameObject))
+            {
+                Debug.LogError($"地图:{mTarget?.gameObject.name}清除静态地图对象的碰撞器组件失败！");
+                return false;
+            }
+            for(int i = 0, length = mMapObjectDataListProperty.arraySize; i < length; i++)
+            {
+                var mapObjectDataProperty = mMapObjectDataListProperty.GetArrayElementAtIndex(i);
+                if(mapObjectDataProperty == null)
+                {
+                    continue;
+                }
+                var uidProperty = mapObjectDataProperty.FindPropertyRelative("UID");
+                var mapObjectUID = uidProperty.intValue;
+                var mapObjectConfig = MapSetting.GetEditorInstance().ObjectSetting.GetMapObjectConfigByUID(mapObjectUID);
+                if(mapObjectConfig == null)
+                {
+                    continue;
+                }
+                var goProperty = mapObjectDataProperty.FindPropertyRelative("Go");
+                var isDynamic = MapSetting.GetEditorInstance().ObjectSetting.IsDynamicMapObjectType(mapObjectConfig.ObjectType);
+
+            }
         }
 
         /// <summary>
@@ -1999,7 +2041,8 @@ namespace MapEditor
                     continue;
                 }
                 var goProperty = mapObjectDataProperty.FindPropertyRelative("Go");
-                if (mapObjectConfig.IsDynamic && goProperty.objectReferenceValue == null)
+                var isDynamic = MapSetting.GetEditorInstance().ObjectSetting.IsDynamicMapObjectType(mapObjectConfig.ObjectType);
+                if (isDynamic && goProperty.objectReferenceValue == null)
                 {
                     RecreateMapObjectGo(mapObjectDataProperty);
                 }
@@ -2912,7 +2955,8 @@ namespace MapEditor
             {
                 EditorGUILayout.LabelField(mapObjectConfig.ObjectType.ToString(), MapStyles.TabMiddleStyle, GUILayout.Width(MapEditorConst.InspectorObjectTypeUIWidth));
                 EditorGUILayout.Space(20f, false);
-                EditorGUILayout.Toggle(mapObjectConfig.IsDynamic, GUILayout.Width(MapEditorConst.InspectorObjectDynamicUIWidth));
+                var isDynamic = MapSetting.GetEditorInstance().ObjectSetting.IsDynamicMapObjectType(mapObjectConfig.ObjectType);
+                EditorGUILayout.Toggle(isDynamic, GUILayout.Width(MapEditorConst.InspectorObjectDynamicUIWidth));
                 EditorGUILayout.IntField(mapObjectConfig.ConfId, MapStyles.TabMiddleStyle, GUILayout.Width(MapEditorConst.InspectorObjectConfIdUIWidth));
             }
             else

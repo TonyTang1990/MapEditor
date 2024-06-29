@@ -212,7 +212,8 @@ namespace MapEditor
             {
                 var mapObjectUID = mapObjectData.UID;
                 var mapObjectConfig = MapSetting.GetEditorInstance().ObjectSetting.GetMapObjectConfigByUID(mapObjectUID);
-                if (mapObjectConfig.IsDynamic)
+                var isDynamic = MapSetting.GetEditorInstance().ObjectSetting.IsDynamicMapObjectType(mapObjectConfig.ObjectType);
+                if (isDynamic)
                 {
                     var mapDataExport = GetColliderMapDynamicExport(mapObjectData, map.GridSize);
                     mapExport.AllColliderMapDynamicExportDatas.Add(mapDataExport);

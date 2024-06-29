@@ -18,11 +18,79 @@ namespace MapEditor
     public class MapObjectSetting
     {
         /// <summary>
+        /// 地图对象类型配置是否展开
+        /// </summary>
+        [Header("地图对象类型配置是否展开")]
+        public bool IsMapObjectTypeConfigUnfold = false;
+
+        /// <summary>
+        /// 所有地图对象类型配置数据
+        /// </summary>
+        [Header("所有地图对象类型配置数据")]
+        [SerializeReference]
+        public List<MapObjectTypeConfig> AllMapObjectTypeConfigs = new List<MapObjectTypeConfig>();
+
+        /// <summary>
         /// 所有地图对象配置数据
         /// </summary>
         [Header("所有地图对象配置数据")]
         [SerializeReference]
         public List<MapObjectConfig> AllMapObjectConfigs = new List<MapObjectConfig>();
+
+        /// <summary>
+        /// 指定地图对象类型是否是动态类型
+        /// </summary>
+        /// <param name="mapObjectType"></param>
+        /// <returns></returns>
+        public bool IsDynamicMapObjectType(MapObjectType mapObjectType)
+        {
+            var findMapObjectTypeConfig = AllMapObjectTypeConfigs.Find(mapObjectTypeConfig => mapObjectTypeConfig.ObjectType == mapObjectType);
+            return findMapObjectTypeConfig != null ? findMapObjectTypeConfig.IsDynamic : false;
+        }
+
+        /// <summary>
+        /// 添加指定地图对象类型配置
+        /// </summary>
+        /// <param name="mapObjectType"></param>
+        /// <param name="isDynamic"></param>
+        /// <returns></returns>
+        public bool AddMapObjectTypeConfig(MapObjectType mapObjectType, bool isDynamic = false)
+        {
+            if(ExistMapObjectTypeConfigByType(mapObjectType))
+            {
+                Debug.LogError($"已存在地图对象类型:{mapObjectType}的地图对象类型配置数据，添加地图对象类型配置数据失败！");
+                return false;
+            }
+            var mapObjectTypeConfig = new MapObjectTypeConfig(mapObjectType, isDynamic);
+            AllMapObjectTypeConfigs.Add(mapObjectTypeConfig);
+            return true;
+        }
+
+        /// <summary>
+        /// 移除指定地图对象类型配置
+        /// </summary>
+        /// <param name="mapObjectTypeConfig"></param>
+        /// <returns></returns>
+        public bool RemoveMapObjectTypeConfig(MapObjectTypeConfig mapObjectTypeConfig)
+        {
+            var result = AllMapObjectTypeConfigs.Remove(mapObjectTypeConfig);
+            if(!result)
+            {
+                Debug.LogError($"找不到地图对象类型:{mapObjectTypeConfig.ObjectType}对应的地图对象类型配置数据，删除地图对象类型配置数据失败！");
+            }
+            return result;
+        }
+
+        /// <summary>
+        /// 是否存在指定地图对象类型的地图对象类型配置
+        /// </summary>
+        /// <param name="mapObjectType"></param>
+        /// <returns></returns>
+        public bool ExistMapObjectTypeConfigByType(MapObjectType mapObjectType)
+        {
+            var mapObjectTypeConfig = AllMapObjectTypeConfigs.Find(mapObjectConfig => mapObjectConfig.ObjectType == mapObjectType);
+            return mapObjectTypeConfig != null;
+        }
 
         /// <summary>
         /// 添加指定地图对象配置数据

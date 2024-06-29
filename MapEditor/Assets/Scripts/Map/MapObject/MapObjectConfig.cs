@@ -29,12 +29,6 @@ namespace MapEditor
         public MapObjectType ObjectType;
 
         /// <summary>
-        /// 是否是动态地图对象
-        /// </summary>
-        [Header("是否是动态地图对象")]
-        public bool IsDynamic;
-
-        /// <summary>
         /// 关联Id
         /// </summary>
         [Header("关联Id")]
@@ -57,14 +51,12 @@ namespace MapEditor
         /// </summary>
         /// <param name="uid"></param>
         /// <param name="objectType"></param>
-        /// <param name="isDynamic"></param>
         /// <param name="asset"></param>
         /// <param name="des"></param>
-        public MapObjectConfig(int uid, MapObjectType objectType, bool isDynamic = false, GameObject asset = null, string des = "")
+        public MapObjectConfig(int uid, MapObjectType objectType, GameObject asset = null, string des = "")
         {
             UID = uid;
             ObjectType = objectType;
-            IsDynamic = isDynamic;
             Asset = asset;
             Des = des;
         }
