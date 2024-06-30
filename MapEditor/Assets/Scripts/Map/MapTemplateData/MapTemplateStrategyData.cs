@@ -76,7 +76,7 @@ namespace MapEditor
             var uidReplaceDataNum = UIDReplaceDatas.Count;
             if (index < 0 || index >= uidReplaceDataNum)
             {
-                Debug.LogError($"索引:{index}超出UID替换规则索引范围:0-{uidReplaceDataNum - 1}，移除UID替换规则数据失败！")
+                Debug.LogError($"索引:{index}超出UID替换规则索引范围:0-{uidReplaceDataNum - 1}，移除UID替换规则数据失败！");
                 return false;
             }
             UIDReplaceDatas.RemoveAt(index);
@@ -145,7 +145,7 @@ namespace MapEditor
             var monsterGroupIdReplaceDataNum = MonsterGroupIdReplaceDatas.Count;
             if (index < 0 || index >= monsterGroupIdReplaceDataNum)
             {
-                Debug.LogError($"索引:{index}超出怪物组ID替换规则索引范围:0-{monsterGroupIdReplaceDataNum - 1}，替换怪物组ID替换规则数据失败！")
+                Debug.LogError($"索引:{index}超出怪物组ID替换规则索引范围:0-{monsterGroupIdReplaceDataNum - 1}，替换怪物组ID替换规则数据失败！");
                 return false;
             }
             MonsterGroupIdReplaceDatas.RemoveAt(index);

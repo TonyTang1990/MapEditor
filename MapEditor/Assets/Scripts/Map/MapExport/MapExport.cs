@@ -58,7 +58,7 @@ namespace MapEditor
             {
                 if (monsterGroupMapData.GroupId == monsterGroupId)
                 {
-                    return MonsterGroupMapData;
+                    return monsterGroupMapData;
                 }
             }
             return null;

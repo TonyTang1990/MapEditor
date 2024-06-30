@@ -41,4 +41,5 @@ namespace MapEditor
             OldData = oldData;
             NewData = newData;
         }
+    }
 }

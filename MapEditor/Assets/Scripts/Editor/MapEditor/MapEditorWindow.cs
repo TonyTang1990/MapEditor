@@ -538,12 +538,11 @@ namespace MapEditor
             if (mapObjectConfig != null)
             {
                 var preColor = GUI.color;
-                GUI.color = mapObjectConfig.IsDynamic ? Color.yellow : preColor;
+                var isDynamic = MapSetting.GetEditorInstance().ObjectSetting.IsDynamicMapObjectType(mapObjectConfig.ObjectType);
+                GUI.color = isDynamic ? Color.yellow : preColor;
                 EditorGUILayout.BeginHorizontal();
                 EditorGUILayout.IntField(mapObjectConfig.UID, MapStyles.TabMiddleStyle, GUILayout.Width(MapEditorConst.MapObjectUIDUIWidth));
                 EditorGUILayout.LabelField(mapObjectConfig.ObjectType.ToString(), MapStyles.TabMiddleStyle, GUILayout.Width(MapEditorConst.MapObjectTypeUIWidth));
-                EditorGUILayout.Space(MapEditorConst.MapObjectIsDynamicUIWidth / 3, false);
-                mapObjectConfig.IsDynamic = EditorGUILayout.Toggle(mapObjectConfig.IsDynamic, GUILayout.Width(MapEditorConst.MapObjectIsDynamicUIWidth * 2 / 3));
                 EditorGUI.BeginChangeCheck();
                 mapObjectConfig.ConfId = EditorGUILayout.IntField(mapObjectConfig.ConfId, GUILayout.Width(MapEditorConst.MapObjectConfIdUIWidth));
                 if (EditorGUI.EndChangeCheck())

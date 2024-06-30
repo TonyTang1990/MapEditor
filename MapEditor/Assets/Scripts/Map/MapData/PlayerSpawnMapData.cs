@@ -21,7 +21,7 @@ namespace MapEditor
 
         }
 
-        public PlayerSpawnMapData(int uid, Vector3 position, Vector3 rotation) : base(uid, position, rotation)
+        public PlayerSpawnMapData(int uid, Vector3 position, Vector3 rotation, Vector3? templateLocalPosition = null, Vector3? templateLocalRotation = null) : base(uid, position, rotation, templateLocalPosition, templateLocalRotation)
         {
 
         }

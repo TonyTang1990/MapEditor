@@ -117,19 +117,19 @@ namespace MapEditor
         }
 
         /// <summary>
-        /// 获取地图脚本的所有地图埋点类型和地图埋点数据列表Map
+        /// 获取指定地图埋点数据列表的埋点类型和埋点数据列表Map
         /// </summary>
         /// <param name="map"></param>
         /// <returns></returns>
-        private static Dictionary<MapDataType, List<MapData>> GetMapDataTypeDatas(Map map)
+        private static Dictionary<MapDataType, List<MapData>> GetMapDataTypeDatas(List<MapData> mapDatas)
         {
-            if (map == null)
+            if (mapDatas == null)
             {
                 return null;
             }
             Dictionary<MapDataType, List<MapData>> mapDataTypeDatasMap = new Dictionary<MapDataType, List<MapData>>();
             MapDataConfig mapDataConfig;
-            foreach (var mapData in map.MapDataList)
+            foreach (var mapData in mapDatas)
             {
                 mapDataConfig = MapSetting.GetEditorInstance().DataSetting.GetMapDataConfigByUID(mapData.UID);
                 if (mapDataConfig == null)
@@ -195,10 +195,11 @@ namespace MapEditor
         private static MapExport GetMapExport(Map map)
         {
             MapExport mapExport = new MapExport();
-            var mapDataTypeDatasMap = GetMapDataTypeDatas(map);
+            var mapDataTypeDatasMap = GetMapDataTypeDatas(map.MapDataList);
             mapExport.MapData.Width = map.MapWidth;
             mapExport.MapData.Height = map.MapHeight;
             mapExport.MapData.StartPos = map.MapStartPos;
+            mapExport.MapData.GridSize = map.GridSize;
 
             UpdateMapExportByObjects(mapExport, map.MapObjectDataList);
             UpdateMapExportByMapDatas(mapExport, map.MapDataList);
@@ -223,7 +224,7 @@ namespace MapEditor
                 var isDynamic = MapSetting.GetEditorInstance().ObjectSetting.IsDynamicMapObjectType(mapObjectConfig.ObjectType);
                 if (isDynamic)
                 {
-                    var mapDataExport = GetColliderMapDynamicExport(mapObjectData, map.GridSize);
+                    var mapDataExport = GetColliderMapDynamicExport(mapObjectData, mapExport.MapData.GridSize);
                     mapExport.AllColliderMapDynamicExportDatas.Add(mapDataExport);
                 }
                 else

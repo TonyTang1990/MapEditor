@@ -512,13 +512,6 @@ namespace MapEditor
                 return "非数组地图属性";
             }
             var mapDataProperty = mapDataPropertyList.GetArrayElementAtIndex(index);
-            var uidProperty = mapDataProperty.FindPropertyRelative("UID");
-            var uid = uidProperty.intValue;
-            var mapDataConfig = MapSetting.GetEditorInstance().DataSetting.GetMapDataConfigByUID(uid);
-            if(mapDataConfig == null)
-            {
-                return $"未知的UID:{uid}";
-            }
             var mapDataDes = mapDataConfig.Des;
             var mapDataType = mapDataConfig.DataType;
             if(mapDataType == MapDataType.Monster || mapDataType == MapDataType.MonsterGroup)

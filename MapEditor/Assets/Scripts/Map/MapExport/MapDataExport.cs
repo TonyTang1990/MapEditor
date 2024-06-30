@@ -37,6 +37,11 @@ namespace MapEditor
         /// </summary>
         public List<Vector3> BirthPos = new List<Vector3>();
 
+        /// <summary>
+        /// 地图九宫格大小
+        /// </summary>
+        public float GridSize;
+
         public MapDataExport()
         {
 
