@@ -1961,9 +1961,13 @@ namespace MapEditor
                 }
                 var go = goProperty.objectReferenceValue as GameObject;
                 var colliders = go.GetComponentsInChildren<Collider>();
+                if(colliders == null)
+                {
+                    continue;
+                }
                 foreach(var collider in colliders)
                 {
-                    GameObject.Destroy(collider);
+                    GameObject.DestroyImmediate(collider);
                 }
             }
             return true;
