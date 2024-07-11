@@ -268,7 +268,7 @@ namespace MapEditor
                 {
                     continue;
                 }
-                MapExportUtilities.ExportGameMapData(map);
+                MapExportEditorUtilities.ExportGameMapData(map);
                 Debug.Log($"地图预制件:{prefab.name}地图数据导出完成！");
             }
         }

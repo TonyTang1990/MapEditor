@@ -8,7 +8,8 @@
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProductVersion>10.0.20506</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
-    <RootNamespace></RootNamespace>
+    <RootNamespace>
+    </RootNamespace>
     <ProjectGuid>{188B6004-DD78-1262-F94D-3A5FF65D7E3D}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
@@ -57,7 +58,17 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Assets\Scripts\Editor\Common\FolderUtilities.cs" />
+    <Compile Include="Assets\Scripts\Editor\MapEditor\GameObjectStatus.cs" />
     <Compile Include="Assets\Scripts\Editor\MapEditor\MapEditorUtilities.cs" />
+    <Compile Include="Assets\Scripts\Editor\MapEditor\MapExportEditorUtilities.cs" />
+    <Compile Include="Assets\Scripts\Editor\MapEditor\MapExport\BaseMapDataExport.cs" />
+    <Compile Include="Assets\Scripts\Editor\MapEditor\MapExport\BaseMapDynamicExport.cs" />
+    <Compile Include="Assets\Scripts\Editor\MapEditor\MapExport\ColliderMapDynamicExport.cs" />
+    <Compile Include="Assets\Scripts\Editor\MapEditor\MapExport\MapDataExport.cs" />
+    <Compile Include="Assets\Scripts\Editor\MapEditor\MapExport\MapExport.cs" />
+    <Compile Include="Assets\Scripts\Editor\MapEditor\MapExport\MonsterGroupMapDataExport.cs" />
+    <Compile Include="Assets\Scripts\Editor\MapEditor\MapExport\MonsterMapDataExport.cs" />
+    <Compile Include="Assets\Scripts\Editor\MapEditor\MapExtensionEditor.cs" />
     <Compile Include="Assets\Scripts\Editor\MapEditor\MapStyles.cs" />
     <Compile Include="Assets\Scripts\Editor\MapEditor\MapDataUIType.cs" />
     <Compile Include="Assets\Scripts\Editor\MapEditor\MapEditor.cs" />

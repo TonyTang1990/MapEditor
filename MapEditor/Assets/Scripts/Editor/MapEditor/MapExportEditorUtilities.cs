@@ -1,5 +1,5 @@
 ﻿/*
- * Description:             MapExportUtilities.cs
+ * Description:             MapExportEditorUtilities.cs
  * Author:                  TONYTANG
  * Create Date:             2024/05/29
  */
@@ -15,12 +15,11 @@ using UnityEngine;
 namespace MapEditor
 {
     /// <summary>
-    /// MapExportUtilities.cs
+    /// MapExportEditorUtilities.cs
     /// 地图导出工具类
     /// </summary>
-    public static class MapExportUtilities
+    public static class MapExportEditorUtilities
     {
-#if UNITY_EDITOR
         /// <summary>
         /// 获取地图导出目录全路径
         /// </summary>
@@ -626,6 +625,5 @@ namespace MapEditor
             return mapDataType == MapDataType.PlayerSpawn || mapDataType == MapDataType.Monster
                     || mapDataType == MapDataType.MonsterGroup || mapDataType == MapDataType.Template;
         }
-#endif
     }
 }
