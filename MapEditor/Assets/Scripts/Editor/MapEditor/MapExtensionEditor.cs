@@ -473,11 +473,6 @@ namespace MapEditor
         /// <param name="map"></param>
         public static void ExportMapData(this Map map)
         {
-            if (!MapEditorUtilities.CheckIsGameMapAvalibleExport(map))
-            {
-                Debug.LogError($"地图:{map.gameObject.name}场景数据有问题，不满足导出条件，导出场景数据失败！");
-                return;
-            }
             // 流程上说场景给客户端使用一定会经历导出流程
             // 在导出时确保MapObjectDataMono和地图对象配置数据一致
             // 从而确保场景资源被使用时挂在数据和配置匹配

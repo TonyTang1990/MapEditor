@@ -151,17 +151,18 @@ namespace MapEditor
         /// </summary>
         /// <param name="map"></param>
         /// <param name="exportType"></param>
-        public static void ExportGameMapData(Map map)
+        public static bool ExportGameMapData(Map map)
         {
-            if (map == null)
+            if(!CheckIsValideToExport(map))
             {
-                Debug.LogError($"不允许导出空的Map脚本地图数据，导出地图数据失败！");
-                return;
+                Debug.LogError($"地图预制件:{map.gameObject.name}不符合导出条件，地图数据导出失败！");
+                return false;
             }
             CheckOrCreateGameMapExportFolder(map.ExportType);
+            var exportFileName = MapEditorUtilities.GetMapExportFileName(map);
             if (map.ExportType == ExportType.JSON)
             {
-                DoExportGameMapJsonData(map);
+                DoExportGameMapJsonData(map, exportFileName);
             }
             else
             {
@@ -170,15 +171,115 @@ namespace MapEditor
         }
 
         /// <summary>
+        /// 指定Map脚本检查是否符合导出条件
+        /// </summary>
+        /// <param name="map"></param>
+        /// <returns></returns>
+        private static bool CheckIsValideToExport(Map map)
+        {
+            if (map == null)
+            {
+                Debug.LogError($"不允许导出空的Map脚本地图数据，导出地图数据失败！");
+                return false;
+            }
+            if(CheckHasInvalideMapDataUID(map))
+            {
+                return false;
+            }
+            if (CheckHasInvalideMapObjectUID(map))
+            {
+                return false;
+            }
+            return true;
+        }
+
+        /// <summary>
+        /// 检查Map脚本是否有无效埋点类型数据
+        /// </summary>
+        /// <param name="map"></param>
+        /// <returns></returns>
+        private static bool CheckHasInvalideMapDataUID(Map map)
+        {
+            if (map == null)
+            {
+                return false;
+            }
+            return HasInvalideUIDByDatas(map.MapDataList);
+        }
+
+        /// <summary>
+        /// 指定地图埋点数据列表和地图模板策略数据是否有无效UID配置
+        /// </summary>
+        /// <param name="mapDatas"></param>
+        /// <param name="mapTemplateStrategyData"></param>
+        /// <returns></returns>
+        private static bool HasInvalideUIDByDatas(List<MapData> mapDatas, MapTemplateStrategyData mapTemplateStrategyData = null)
+        {
+            if (mapDatas == null)
+            {
+                return false;
+            }
+            MapDataConfig mapDataConfig;
+            foreach (var mapData in map.MapDataList)
+            {
+                mapDataConfig = MapSetting.GetEditorInstance().DataSetting.GetMapDataConfigByUID(mapData.UID);
+                if (mapDataConfig == null)
+                {
+                    Debug.LogError($"地图埋点数据有配置不支持的地图埋点UID:{mapData.UID}");
+                    return true;
+                }
+                if(mapData is TemplateMapData templateMapData)
+                {
+                    var templateDataAsset = mapDataConfig.TemplateDataAsset;
+                    if(templateDataAsset == null)
+                    {
+                        continue;
+                    }
+                    var mapTemplateStrategyData = templateDataAsset.GetMapTemlateStrategyDataByUID(templateMapData.UID);
+                    // 递归调用支持嵌套模板数据
+                    if(HasInvalideUIDByDatas(templateDataAsset.MapDataList, mapTemplateStrategyData))
+                    {
+                        return true;
+                    }
+                }
+            }
+            return false;
+        }
+
+        /// <summary>
+        /// 检查Map脚本是否有无效地图对象UID数据
+        /// </summary>
+        /// <param name="map"></param>
+        /// <returns></returns>
+        private static bool CheckHasInvalideMapObjectUID(Map map)
+        {
+            if (map == null)
+            {
+                return false;
+            }
+            MapObjectConfig mapObjectConfig;
+            foreach (var mapObjectData in map.MapObjectDataList)
+            {
+                mapObjectConfig = MapSetting.GetEditorInstance().ObjectSetting.GetMapObjectConfigByUID(mapObjectData.UID);
+                if (mapObjectConfig == null)
+                {
+                    Debug.LogError($"地图对象数据有配置不支持的地图对象UID:{mapObjectData.UID}");
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        /// <summary>
         /// 导出指定地图组件的Json格式数据
         /// </summary>
         /// <param name="map"></param>
-        private static void DoExportGameMapJsonData(Map map)
+        /// <param name="exportFileName"></param>
+        private static void DoExportGameMapJsonData(Map map, string exportFileName)
         {
             var mapExport = GetMapExport(map);
             var mapDataJsonContent = JsonUtility.ToJson(mapExport, true);
-            var fileName = map.gameObject.name;
-            var exportFileFullPath = GetGameMapExportFileFullPath(map.ExportType, fileName);
+            var exportFileFullPath = GetGameMapExportFileFullPath(map.ExportType, exportFileName);
             using (var sw = File.CreateText(exportFileFullPath))
             {
                 sw.Write(mapDataJsonContent);

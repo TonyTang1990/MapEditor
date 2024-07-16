@@ -58,6 +58,12 @@ namespace MapEditor
         public bool MapObjectAddedAutoFocus = true;
 
         /// <summary>
+        /// 模版切换不改变导出文件名开关
+        /// </summary>
+        [Header("模版切换不改变导出文件名开关")]
+        public bool TemplateNotChangeExportFileNameSwitch = false;
+
+        /// <summary>
         /// 地图横向大小
         /// </summary>
         [Header("地图横向大小")]
@@ -133,6 +139,12 @@ namespace MapEditor
         /// </summary>
         [Header("导出类型")]
         public ExportType ExportType;
+
+        /// <summary>
+        /// 导出文件名(不填表示导出跟预制件同名)
+        /// </summary>
+        [Header("导出文件名(不填表示导出跟预制件同名)")]
+        public string CustomExportFileName = string.Empty;
 
         /// <summary>
         /// 地图对象是否展开数据

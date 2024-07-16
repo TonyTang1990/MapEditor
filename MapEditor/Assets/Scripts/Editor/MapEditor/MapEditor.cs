@@ -71,6 +71,11 @@ namespace MapEditor
         private SerializedProperty mMapObjectAddedAutoFocusProperty;
 
         /// <summary>
+        /// TemplateNotChangeExportFileNameSwitch属性
+        /// </summary>
+        private SerializedProperty mTemplateNotChangeExportFileNameSwitchProperty;
+
+        /// <summary>
         /// MapWidth属性
         /// </summary>
         private SerializedProperty mMapWidthProperty;
@@ -129,6 +134,11 @@ namespace MapEditor
         /// ExportType属性
         /// </summary>
         private SerializedProperty mExportTypeProperty;
+
+        /// <summary>
+        /// CustomExportFileName属性
+        /// </summary>
+        private SerializedProperty mCustomExportFileNameProperty;
 
         /// <summary>
         /// MapObjectDataUnfoldData属性
@@ -367,6 +377,7 @@ namespace MapEditor
             mMapObjectSceneGUISwitchProperty ??= serializedObject.FindProperty("MapObjectSceneGUISwitch");
             mMapDataSceneGUISwitchProperty ??= serializedObject.FindProperty("MapDataSceneGUISwitch");
             mMapObjectAddedAutoFocusProperty ??= serializedObject.FindProperty("MapObjectAddedAutoFocus");
+            mTemplateNotChangeExportFileNameSwitchProperty ??= serializedObject.FindProperty("TemplateNotChangeExportFileNameSwitch");
             mMapWidthProperty ??= serializedObject.FindProperty("MapWidth");
             mMapHeightProperty ??= serializedObject.FindProperty("MapHeight");
             mMapStartPosProperty ??= serializedObject.FindProperty("MapStartPos");
@@ -379,6 +390,7 @@ namespace MapEditor
             mAddMapDataTypeProperty ??= serializedObject.FindProperty("AddMapDataType");
             mAddMapDataIndexProperty ??= serializedObject.FindProperty("AddMapDataIndex");
             mExportTypeProperty ??= serializedObject.FindProperty("ExportType");
+            mCustomExportFileNameProperty ??= serializedObject.FindProperty("CustomExportFileName");
             mMapObjectDataUnfoldDataProperty ??= serializedObject.FindProperty("MapObjectDataUnfoldData");
             mMapObjectDataGroupUnfoldDataListProperty ??= serializedObject.FindProperty("MapObjectDataGroupUnfoldDataList");
             mMapDataUnfoldDataProperty ??= serializedObject.FindProperty("MapDataUnfoldData");
@@ -800,6 +812,15 @@ namespace MapEditor
                 NewAddUIDMapTemplateChoiceOptions = new string[0];
                 NewAddUIDMapTemplateChoiceValues = new int[0];
             }
+        }
+
+        /// <summary>
+        /// 更新自定义导出文件名
+        /// </summary>
+        /// <param name="customExportFileName"></param>
+        private void UpdateCustomExportFileName(string customExportFileName = "")
+        {
+            mCustomExportFileNameProperty.stringValue = customExportFileName;
         }
 
         /// <summary>
@@ -2102,6 +2123,7 @@ namespace MapEditor
         {
             RemoveAllInvalideUIDMapObjectDatas();
             RemoveAllInvalideUIDMapDatas();
+            serializedObject.ApplyModifiedProperties();
         }
 
         /// <summary>
@@ -2166,11 +2188,6 @@ namespace MapEditor
         /// </summary>
         private void ExportMapData()
         {
-            if (!MapEditorUtilities.CheckIsGameMapAvalibleExport(mTarget))
-            {
-                EditorUtility.DisplayDialog("导出地图数据", "场景数据有问题，不满足导出条件，导出场景数据失败！", "确认");
-                return;
-            }
             // 流程上说场景给客户端使用一定会经历导出流程
             // 在导出时确保MapObjectDataMono和地图对象配置数据一致
             // 从而确保场景资源被使用时挂在数据和配置匹配
@@ -2358,11 +2375,17 @@ namespace MapEditor
             mMapDataListProperty.ClearArray();
             ClearMapDataSerializedPropertyCache();
             ClearMapDataTypeIndexsMapCache();
-            if (mTemplateDataProperty.objectReferenceValue == null)
+            var mapTemplateData = mTemplateDataProperty.objectReferenceValue as MapTemplateData;
+            if(!mTemplateNotChangeExportFileNameSwitchProperty.boolValue)
+            {
+                // 为了方便关卡模版数据导出，模版数据切换支持自动修改自定义导出文件名适配模版Asset
+                var mapTemplateDataName = mapTemplateData != null ? mapTemplateData.name : string.Empty;
+                UpdateCustomExportFileName(mapTemplateDataName);
+            }
+            if (mapTemplateData == null)
             {
                 return;
             }
-            var mapTemplateData = mTemplateDataProperty.objectReferenceValue as MapTemplateData;
             mTemplateReferencePositionProperty.vector3Value = mapTemplateData.TemplateReferencePosition;
             for (int i = 0, length = mapTemplateData.MapDataList.Count; i < length; i++)
             {
@@ -2670,6 +2693,7 @@ namespace MapEditor
             EditorGUILayout.PropertyField(mMapObjectSceneGUISwitchProperty);
             EditorGUILayout.PropertyField(mMapDataSceneGUISwitchProperty);
             EditorGUILayout.PropertyField(mMapObjectAddedAutoFocusProperty);
+            EditorGUILayout.PropertyField(mTemplateNotChangeExportFileNameSwitchProperty);
 
             EditorGUI.BeginChangeCheck();
             EditorGUILayout.PropertyField(mMapWidthProperty);
@@ -2744,7 +2768,9 @@ namespace MapEditor
             EditorGUILayout.EndHorizontal();
             EditorGUILayout.BeginHorizontal();
             EditorGUILayout.LabelField("导出类型:", GUILayout.Width(60f));
-            mExportTypeProperty.intValue = (int)(ExportType)EditorGUILayout.EnumPopup((ExportType)mExportTypeProperty.intValue, GUILayout.Width(150f));
+            mExportTypeProperty.intValue = (int)(ExportType)EditorGUILayout.EnumPopup((ExportType)mExportTypeProperty.intValue, GUILayout.Width(80f));
+            EditorGUILayout.LabelField("自定义导出文件名:", GUILayout.Width(100f));
+            mCustomExportFileNameProperty.stringValue = EditorGUILayout.TextField(mCustomExportFileNameProperty.stringValue, GUILayout.Width(100f));
             if (GUILayout.Button("导出地图数据", GUILayout.ExpandWidth(true)))
             {
                 ExportMapData();
