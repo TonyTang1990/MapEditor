@@ -228,20 +228,6 @@ namespace MapEditor
                     Debug.LogError($"地图埋点数据有配置不支持的地图埋点UID:{mapData.UID}");
                     return true;
                 }
-                if(mapData is TemplateMapData templateMapData)
-                {
-                    var templateDataAsset = mapDataConfig.TemplateDataAsset;
-                    if(templateDataAsset == null)
-                    {
-                        continue;
-                    }
-                    var mapTemplateStrategyData = templateDataAsset.GetMapTemlateStrategyDataByUID(templateMapData.UID);
-                    // 递归调用支持嵌套模板数据
-                    if(HasInvalideUIDByDatas(templateDataAsset.MapDataList, mapTemplateStrategyData))
-                    {
-                        return true;
-                    }
-                }
             }
             return false;
         }
@@ -452,37 +438,12 @@ namespace MapEditor
                     continue;
                 }
                 var mapDataType = mapDataConfig.DataType;
-                if (IsOtherMapDataType(mapDataType))
+                if (!IsOtherMapDataType(mapDataType))
                 {
                     continue;
                 }
                 var mapDataExport = GetBaseMapDataExport(mapData, finalBasePosition, finalBaseRotation, mapTemplateStrategyData);
                 mapExport.AllOtherMapDatas.Add(mapDataExport);
-            }
-            // 模板类型递归支持嵌套模板
-            List<MapData> templateMapDatas;
-            if (mapDataTypeDatasMap.TryGetValue(MapDataType.Template, out templateMapDatas))
-            {
-                foreach(var templateMapData in templateMapDatas)
-                {
-                    var mapDataConfig = MapSetting.GetEditorInstance().DataSetting.GetMapDataConfigByUID(templateMapData.UID);
-                    if(mapDataConfig == null)
-                    {
-                        Debug.LogError($"找不到模板UID:{templateMapData.UID}的地图数据配置，不参与数据导出！");
-                        continue;
-                    }
-                    var templateDataAsset = mapDataConfig.TemplateDataAsset;
-                    if(templateDataAsset == null)
-                    {
-                        continue;
-                    }
-                    var realTemplateMapData = templateMapData as TemplateMapData;
-                    var strategyTemplateData = templateDataAsset.GetMapTemlateStrategyDataByUID(realTemplateMapData.StrategyUID);
-                    // 嵌套模板时位置需要反向剔除模板的参考位置
-                    var nestedBasePosition = finalBasePosition + templateMapData.Position - templateDataAsset.TemplateReferencePosition;
-                    var nestedBaseRotation = finalBaseRotation + templateMapData.Rotation;
-                    UpdateMapExportByMapDatas(mapExport, templateDataAsset.MapDataList, nestedBasePosition, nestedBaseRotation, strategyTemplateData);
-                }
             }
         }
 
@@ -723,8 +684,7 @@ namespace MapEditor
         /// <returns></returns>
         private static bool IsOtherMapDataType(MapDataType mapDataType)
         {
-            return mapDataType == MapDataType.PlayerSpawn || mapDataType == MapDataType.Monster
-                    || mapDataType == MapDataType.MonsterGroup || mapDataType == MapDataType.Template;
+            return false;
         }
     }
 }

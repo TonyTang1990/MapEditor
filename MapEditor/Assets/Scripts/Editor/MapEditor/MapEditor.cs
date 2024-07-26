@@ -3108,7 +3108,6 @@ namespace MapEditor
                 DrawMapDataAreaByType(MapDataType.PlayerSpawn);
                 DrawMapDataAreaByType(MapDataType.Monster);
                 DrawMapDataAreaByType(MapDataType.MonsterGroup);
-                DrawMapDataAreaByType(MapDataType.Template);
             }
         }
 
@@ -3838,55 +3837,6 @@ namespace MapEditor
             var labelPos = mapDataPositionProperty.vector3Value + MapEditorConst.MapDataLabelPosOffset;
             var displayGUIStyle = mapDataBatchOperationSwitchProperty.boolValue ? mYellowLabelGUIStyle : mRedLabelGUIStyle;
             Handles.Label(labelPos, mapDataLabelName, displayGUIStyle);
-            if(mapDataConfig.DataType == MapDataType.Template && mapDataConfig.TemplateDataAsset != null)
-            {
-                var basePosition = mapDataPositionProperty.vector3Value + MapEditorConst.MapDataLabelPosOffset;
-                var templateMapData = mapDataProperty.managedReferenceValue as TemplateMapData;
-                DrawMapTemplateDataLabels(mapDataConfig, templateMapData, basePosition, mapDataBatchOperationSwitchProperty.boolValue);
-            }
-        }
-
-        /// <summary>
-        /// 绘制地图模板数据标签
-        /// Note:
-        /// 为了减少重复的FindPropertyRelative，这里mapDataConfig和templateMapData采用手动匹配传递
-        /// </summary>
-        /// <param name="mapDataProperty"></param>
-        /// <param name="basePosition"></param>
-        /// <param name="batchOperation"></param>
-        private void DrawMapTemplateDataLabels(MapDataConfig mapDataConfig, TemplateMapData templateMapData, Vector3 basePosition, bool batchOperation = false)
-        {
-            if(mapDataConfig == null || mapDataConfig.TemplateDataAsset == null)
-            {
-                return;
-            }
-            var mapTemplateData = mapDataConfig.TemplateDataAsset;
-            var templateStrategyData = mapTemplateData.GetMapTemlateStrategyDataByUID(templateMapData.StrategyUID);
-            for(int i = 0, length = mapTemplateData.MapDataList.Count; i < length; i++)
-            {
-                var mapData = mapTemplateData.MapDataList[i];
-                var uid = mapData.UID;
-                var mapDataConfig2 = MapSetting.GetEditorInstance().DataSetting.GetMapDataConfigByUID(uid);
-                if(mapDataConfig2 == null)
-                {
-                    continue;
-                }
-                var mapDataLabelName = MapEditorUtilities.GetMapDataLabelName(mapData, i, templateStrategyData);
-                var labelPos = basePosition + mapData.TemplateLocalPosition;
-                var displayGUIStyle = batchOperation ? mYellowLabelGUIStyle : mRedLabelGUIStyle;
-                Handles.Label(labelPos, mapDataLabelName, displayGUIStyle);
-                if (mapDataConfig2.DataType == MapDataType.Template)
-                {
-                    if(mapDataConfig.UID == mapDataConfig2.UID)
-                    {
-                        Debug.LogError($"地图模板配置UID:{mapDataConfig.UID}有循环模板UID配置！");
-                        continue;
-                    }
-                    var nestedBasePosition = basePosition + mapData.TemplateLocalPosition;
-                    var nestedTemplateMapData = mapData as TemplateMapData;
-                    DrawMapTemplateDataLabels(mapDataConfig2, nestedTemplateMapData, nestedBasePosition, batchOperation);
-                }
-            }
         }
 
         /// <summary>
@@ -3923,51 +3873,6 @@ namespace MapEditor
             Handles.color = mapDataConfig != null ? mapDataConfig.SceneSphereColor : Color.gray;
             Handles.SphereHandleCap(index, mapDataPosition, rotationQuaternion, MapEditorConst.MapDataSphereSize, EventType.Repaint);
             Handles.color = preHandlesColor;
-            if(mapDataConfig.DataType == MapDataType.Template)
-            {
-                DrawMapTemplateDataSphere(mapDataConfig.TemplateDataAsset, mapDataPosition, mapDataRotation, 0);
-            }
-        }
-
-        /// <summary>
-        /// 绘制指定模板数据和指定基准位置的模板数据球体
-        /// </summary>
-        /// <param name="mapTemplateData"></param>
-        /// <param name="basePosition"></param>
-        /// <param name="baseRotation"></param>
-        /// <param name="depth"></param>
-        private void DrawMapTemplateDataSphere(MapTemplateData mapTemplateData, Vector3 basePosition, Vector3 baseRotation, int depth = 0)
-        {
-            if(mapTemplateData == null)
-            {
-                return;
-            }
-            depth++;
-            for(int i = 0, length = mapTemplateData.MapDataList.Count; i < length; i++)
-            {
-                var mapData = mapTemplateData.MapDataList[i];
-                if(mapData == null)
-                {
-                    continue;
-                }
-                var mapDataConfig = MapSetting.GetEditorInstance().DataSetting.GetMapDataConfigByUID(mapData.UID);
-                if(mapDataConfig == null)
-                {
-                    continue;
-                }
-                var mapDataPosition = basePosition + mapData.TemplateLocalPosition;
-                var mapDataRotation = baseRotation + mapData.TemplateLocalRotation;
-                var rotationQuaternion = Quaternion.Euler(mapDataRotation);
-                var preHandlesColor = Handles.color;
-                Handles.color = mapDataConfig != null ? mapDataConfig.SceneSphereColor : Color.gray;
-                var index = depth * 1000000 + i;
-                Handles.SphereHandleCap(index, mapDataPosition, rotationQuaternion, MapEditorConst.MapDataSphereSize, EventType.Repaint);
-                Handles.color = preHandlesColor;
-                if(mapDataConfig.DataType == MapDataType.Template)
-                {
-                    DrawMapTemplateDataSphere(mapDataConfig.TemplateDataAsset, mapDataPosition, mapDataRotation, depth);
-                }
-            }
         }
 
         /// <summary>
@@ -4008,19 +3913,6 @@ namespace MapEditor
                 var monsterGroupMapData = mapData as MonsterGroupMapData;
                 DrawMapMonsterGroupCustomDataHandles(monsterGroupMapData);
             }
-            else if (mapDataType == MapDataType.Template)
-            {
-                var templateDataAsset = mapDataConfig.TemplateDataAsset;
-                if (templateDataAsset == null)
-                {
-                    return;
-                }
-                for(int i = 0, length = templateDataAsset.MapDataList.Count; i<length; i++)
-                {
-                    var nestedMapData = templateDataAsset.MapDataList[i];
-                    DrawMapCustomDataHandles(nestedMapData);
-               }
-           }
         }
 
         /// <summary>

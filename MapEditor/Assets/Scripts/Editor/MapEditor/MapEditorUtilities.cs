@@ -1023,16 +1023,6 @@ namespace MapEditor
             {
                 return new PlayerSpawnMapData(uid, position, rotation, templateLocalPosition, templateLocalRotation);
             }
-            else if (mapDataType == MapDataType.Template)
-            {
-                var templateMapData = new TemplateMapData(uid, position, rotation, templateLocalPosition, templateLocalRotation);
-                var mapDataConfig = MapSetting.GetEditorInstance().DataSetting.GetMapDataConfigByUID(uid);
-                if (mapDataConfig.TemplateDataAsset != null)
-                {
-                    templateMapData.StrategyUID = mapDataConfig.TemplateDataAsset.GetDefaultStrategyUID();
-                }
-                return templateMapData;
-            }
             else
             {
                 Debug.LogWarning($"地图埋点类型:{mapDataType}没有创建自定义类型数据，可能不方便未来扩展！");
@@ -1374,7 +1364,6 @@ namespace MapEditor
             {MapDataType.PlayerSpawn, MapFoldType.PlayerSpawnMapDataFold},
             {MapDataType.Monster, MapFoldType.MonsterMapDataFold},
             {MapDataType.MonsterGroup, MapFoldType.MonsterGroupMapDataFold},
-            {MapDataType.Template, MapFoldType.TemplateMapDataFold},
         };
 
         /// <summary>
@@ -1386,7 +1375,6 @@ namespace MapEditor
             {MapFoldType.PlayerSpawnMapDataFold, "一键折叠所有(玩家出生点埋点数据)"},
             {MapFoldType.MonsterMapDataFold, "一键折叠所有(怪物埋点数据)"},
             {MapFoldType.MonsterGroupMapDataFold, "一键折叠所有(怪物组埋点数据)"},
-            {MapFoldType.TemplateMapDataFold, "一键折叠所有(模板埋点数据)"},
         };
 
         /// <summary>
@@ -1398,7 +1386,6 @@ namespace MapEditor
             {MapFoldType.PlayerSpawnMapDataFold, "一键展开所有(玩家出生点埋点数据)"},
             {MapFoldType.MonsterMapDataFold, "一键展开所有(怪物埋点数据)"},
             {MapFoldType.MonsterGroupMapDataFold, "一键展开所有(怪物组埋点数据)"},
-            {MapFoldType.TemplateMapDataFold, "一键展开所有(模板埋点数据)"},
         };
 
         /// <summary>
@@ -1462,25 +1449,6 @@ namespace MapEditor
                     {MapDataUIType.Remove, true},
                 }
             },
-            {
-                MapDataType.Template, new Dictionary<MapDataUIType, bool>()
-                {
-                    {MapDataUIType.Batch, true},
-                    {MapDataUIType.Index, true},
-                    {MapDataUIType.UID, true},
-                    {MapDataUIType.MapDataType, true},
-                    {MapDataUIType.ConfId, true},
-                    {MapDataUIType.Position, true},
-                    {MapDataUIType.Rotation, true},
-                    {MapDataUIType.TemplateAsset, true},
-                    {MapDataUIType.TemplateStrategyUI, true},
-                    {MapDataUIType.Des, true},
-                    {MapDataUIType.MoveUp, true},
-                    {MapDataUIType.MoveDown, true},
-                    {MapDataUIType.Add, true},
-                    {MapDataUIType.Remove, true},
-                }
-            }
         };
 
         /// <summary>

@@ -28,7 +28,5 @@ namespace MapEditor
         MonsterCreateRadius = 13,               // 怪物创建半径UI
         MonsterActiveRadius = 14,               // 怪物警戒半径UI
         MonsterGroupGUISwitchOff = 15,          // 怪物组GUI关闭开关UI
-        TemplateAsset = 16,                     // 模板数据Asset UI
-        TemplateStrategyUI = 17,                // 模板策略UID
     }
 }

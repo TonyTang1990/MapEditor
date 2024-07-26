@@ -94,7 +94,6 @@
     <Compile Include="Assets\Scripts\Map\MapTemplateData\MapTemplateStrategyData.cs" />
     <Compile Include="Assets\Scripts\Core\Collision\Collision2D\AABB2D.cs" />
     <Compile Include="Assets\Scripts\Core\Collision\Collision2D\VisibleDraw\AABB2DVisible.cs" />
-    <Compile Include="Assets\Scripts\Map\MapData\TemplateMapData.cs" />
     <Compile Include="Assets\Scripts\Map\Map.cs" />
     <Compile Include="Assets\Scripts\Core\Collision\Collision2D\VisibleDraw\Capsule2DVisible.cs" />
     <Compile Include="Assets\Scripts\Map\MapTemplateData\ReplaceIntData.cs" />

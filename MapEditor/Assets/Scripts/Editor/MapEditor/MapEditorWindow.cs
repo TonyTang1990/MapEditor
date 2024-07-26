@@ -658,14 +658,6 @@ namespace MapEditor
                 //{
                 //    mapDataConfig.Rotation = newRotationVector3;
                 //}
-                if(mapDataConfig.DataType == MapDataType.Template)
-                {
-                    mapDataConfig.TemplateDataAsset = EditorGUILayout.ObjectField(mapDataConfig.TemplateDataAsset, MapConst.MapTemplateDataType, false, GUILayout.Width(MapEditorConst.MapDataTemplateAssetUIWidth)) as MapTemplateData;
-                }
-                else
-                {
-                    EditorGUILayout.ObjectField(mapDataConfig.TemplateDataAsset, MapConst.MapTemplateDataType, false, GUILayout.Width(MapEditorConst.MapDataTemplateAssetUIWidth));
-                }
                 mapDataConfig.Des = EditorGUILayout.TextField(mapDataConfig.Des, GUILayout.Width(MapEditorConst.MapDataDesUIWidth));
                 if (GUILayout.Button("-", GUILayout.ExpandWidth(true)))
                 {
