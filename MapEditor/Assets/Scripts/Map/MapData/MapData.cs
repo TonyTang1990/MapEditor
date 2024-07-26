@@ -80,7 +80,12 @@ namespace MapEditor
                 Debug.LogError($"自身类型:{selfType.Name}和原数据类型:{sourceType.Name}不一致，复制自定义数据失败！");
                 return false;
             }
+            UID = sourceMapData.UID;
+            Position = sourceMapData.Position;
             Rotation = sourceMapData.Rotation;
+            BatchOperationSwitch = sourceMapData.BatchOperationSwitch;
+            TemplateLocalPosition = sourceMapData.TemplateLocalPosition;
+            TemplateLocalRotation = sourceMapData.TemplateLocalRotation;
             return true;
         }
     }

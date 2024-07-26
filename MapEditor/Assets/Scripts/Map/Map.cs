@@ -314,51 +314,6 @@ namespace MapEditor
             {
                 return;
             }
-            var mapDataType = mapDataConfig.DataType;
-            if (mapDataType == MapDataType.MonsterGroup)
-            {
-                DrawMapMonsterGroupDataGizmos(mapData);
-            }
-            else if (mapDataType == MapDataType.Template)
-            {
-                var templateDataAsset = mapDataConfig.TemplateDataAsset;
-                if (templateDataAsset == null)
-                {
-                    return;
-                }
-                for(int i = 0, length = templateDataAsset.MapDataList.Count; i < length; i++)
-                {
-                    var nestedMapData = templateDataAsset.MapDataList[i];
-                    DrawMapCustomDataGizmos(nestedMapData);
-                }
-            }
-        }
-
-        /// <summary>
-        /// 绘制指定地图怪物组埋点数据的自定义数据Gizmos
-        /// </summary>
-        /// <param name="mapData"></param>
-        private void DrawMapMonsterGroupDataGizmos(MapData mapData)
-        {
-            var monsterGroupMapData = mapData as MonsterGroupMapData;
-            if(monsterGroupMapData == null)
-            {
-                return;
-            }
-            if(monsterGroupMapData.GUISwitchOff)
-            {
-                return;
-            }
-            var position = monsterGroupMapData.Position;
-            var preGizmosColor = Gizmos.color;
-            Gizmos.color = Color.green;
-            Gizmos.DrawWireSphere(position, monsterGroupMapData.MonsterCreateRadius);
-            Gizmos.color = preGizmosColor;
-
-            preGizmosColor = Gizmos.color;
-            Gizmos.color = Color.red;
-            Gizmos.DrawWireSphere(position, monsterGroupMapData.MonsterActiveRadius);
-            Gizmos.color = preGizmosColor;
         }
     }
 }

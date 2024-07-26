@@ -3689,6 +3689,7 @@ namespace MapEditor
                     {
                         DrawMapDataLabels();
                         DrawMapDataSpheres();
+                        DrawMapCustomDataHandles();
                     }
                 }
 
@@ -3970,17 +3971,95 @@ namespace MapEditor
         }
 
         /// <summary>
+        /// 绘制自定义数据的Handles
+        /// </summary>
+        private void DrawMapCustomDataHandles()
+        {
+            for(int i = 0, length = mMapDataListProperty.arraySize; i < length; i++)
+            {
+                var mapDataProperty = GetMapDataSerializedPropertyByIndex(i);
+                if(mapDataProperty == null)
+                {
+                    continue;
+                }
+                var mapData = mapDataProperty.managedReferenceValue as MapData;
+                DrawMapCustomDataHandles(mapData);
+            }
+        }
+
+        /// <summary>
+        /// 绘制指定地图埋点属性对象的自定义Handles
+        /// </summary>
+        /// <param name="mapData"></param>
+        private void DrawMapCustomDataHandles(MapData mapData)
+        {
+            if(mapData == null)
+            {
+                return;
+            }
+            var mapDataConfig = MapSetting.GetEditorInstance().DataSetting.GetMapDataConfigByUID(mapData.UID);
+            if(mapDataConfig == null)
+            {
+                return;
+            }
+            var mapDataType = mapDataConfig.DataType;
+            if(mapDataType == MapDataType.MonsterGroup)
+            {
+                var monsterGroupMapData = mapData as MonsterGroupMapData;
+                DrawMapMonsterGroupCustomDataHandles(monsterGroupMapData);
+            }
+            else if (mapDataType == MapDataType.Template)
+            {
+                var templateDataAsset = mapDataConfig.TemplateDataAsset;
+                if (templateDataAsset == null)
+                {
+                    return;
+                }
+                for(int i = 0, length = templateDataAsset.MapDataList.Count; i<length; i++)
+                {
+                    var nestedMapData = templateDataAsset.MapDataList[i];
+                    DrawMapCustomDataHandles(nestedMapData);
+               }
+           }
+        }
+
+        /// <summary>
+        /// 绘制怪物组自定义Handles
+        /// </summary>
+        /// <param name="monsterGroupMapData"></param>
+        private void DrawMapMonsterGroupCustomDataHandles(MonsterGroupMapData monsterGroupMapData)
+        {
+            if (monsterGroupMapData == null || monsterGroupMapData.GUISwitchOff)
+            {
+                return;
+            }
+            var preHandlesColor = Handles.color;
+            Handles.color = Color.green;
+            Handles.DrawWireDisc(monsterGroupMapData.Position, Vector3.up, monsterGroupMapData.MonsterCreateRadius);
+            Handles.color = preHandlesColor;
+
+            preHandlesColor = Handles.color;
+            Handles.color = Color.red;
+            Handles.DrawWireDisc(monsterGroupMapData.Position, Vector3.up, monsterGroupMapData.MonsterActiveRadius);
+            Handles.color = preHandlesColor;
+        }
+
+        /// <summary>
         /// 绘制所有地图埋点数据坐标操作PositionHandle
         /// </summary>
         private void DrawMapDataPositionHandles()
         {
             for (int i = 0, length = mMapDataListProperty.arraySize; i < length; i++)
             {
-                EditorGUI.BeginChangeCheck();
                 var mapDataProperty = GetMapDataSerializedPropertyByIndex(i);
+                if (mapDataProperty == null)
+                {
+                    continue;
+                }
                 var mapDataPositionProperty = mapDataProperty.FindPropertyRelative("Position");
                 var mapDataRotationProperty = mapDataProperty.FindPropertyRelative("Rotation");
                 var rotationQuaternion = Quaternion.Euler(mapDataRotationProperty.vector3Value);
+                EditorGUI.BeginChangeCheck();
                 var newTargetPosition = Handles.PositionHandle(mapDataPositionProperty.vector3Value, rotationQuaternion);
                 if(EditorGUI.EndChangeCheck())
                 {
@@ -3998,11 +4077,15 @@ namespace MapEditor
         {
             for (int i = 0, length = mMapDataListProperty.arraySize; i < length; i++)
             {
-                EditorGUI.BeginChangeCheck();
                 var mapDataProperty = GetMapDataSerializedPropertyByIndex(i);
+                if(mapDataProperty == null)
+                {
+                    continue;
+                }
                 var mapDataPositionProperty = mapDataProperty.FindPropertyRelative("Position");
                 var mapDataRotationProperty = mapDataProperty.FindPropertyRelative("Rotation");
                 var rotationQuaternion = Quaternion.Euler(mapDataRotationProperty.vector3Value);
+                EditorGUI.BeginChangeCheck();
                 var newTargetRotation = Handles.RotationHandle(rotationQuaternion, mapDataPositionProperty.vector3Value);
                 if (EditorGUI.EndChangeCheck())
                 {

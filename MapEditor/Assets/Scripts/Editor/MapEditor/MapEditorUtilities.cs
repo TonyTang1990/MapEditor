@@ -422,8 +422,11 @@ namespace MapEditor
                     var newMapData = map.DoAddMapData(mapData.UID, i, true, MapEditorConst.MapDataDuplicatePositionOffset);
                     if(newMapData != null)
                     {
+                        // 复制自定义数据是复制所有数据，这里需要记录位置并还原复制的最新位置
+                        var newPosition = newMapData.Position;
                         dumplicatedMapDatas.Add(newMapData);
                         newMapData.CopyCustomData(mapData);
+                        newMapData.Position = newPosition;
                         Debug.Log($"选中对象:{go.name}复制勾选批量的地图埋点索引:{i}数据！");
                     }
                 }
