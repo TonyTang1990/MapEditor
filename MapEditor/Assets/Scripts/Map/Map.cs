@@ -58,12 +58,6 @@ namespace MapEditor
         public bool MapObjectAddedAutoFocus = true;
 
         /// <summary>
-        /// 模版切换不改变导出文件名开关
-        /// </summary>
-        [Header("模版切换不改变导出文件名开关")]
-        public bool TemplateNotChangeExportFileNameSwitch = false;
-
-        /// <summary>
         /// 地图横向大小
         /// </summary>
         [Header("地图横向大小")]
@@ -195,59 +189,9 @@ namespace MapEditor
         public int BatchTickRangeEndIndex;
 
         /// <summary>
-        /// 模板参考位置
+        /// 关卡数据Asset
         /// </summary>
-        [Header("模板参考位置")]
-        public Vector3 TemplateReferencePosition;
-
-        /// <summary>
-        /// 模板数据Asset
-        /// </summary>
-        [Header("模板数据Asset")]
-        public MapTemplateData TemplateData;
-
-        /// <summary>
-        /// 地图模板策略数据列表
-        /// </summary>
-        [Header("地图模板策略数据列表")]
-        [SerializeReference]
-        public List<MapTemplateStrategyData> TemplateStrategyDatas = new List<MapTemplateStrategyData>();
-
-        /// <summary>
-        /// 新增模板策略UID
-        /// </summary>
-        [HideInInspector]
-        public int AddTemplateStrategyUID = 1;
-
-        /// <summary>
-        /// 新增模板策略名
-        /// </summary>
-        [HideInInspector]
-        public string AddTemplateStrategyName = MapConst.DefaultTemplateStrategyName;
-
-        /// <summary>
-        /// 新增UID老值
-        /// </summary>
-        [HideInInspector]
-        public int AddTemplateOldUID = 1;
-
-        /// <summary>
-        /// 新增UID新值
-        /// </summary>
-        [HideInInspector]
-        public int AddTemplateNewUID = 1;
-
-        /// <summary>
-        /// 新增怪物组ID老值
-        /// </summary>
-        [HideInInspector]
-        public int AddTemplateOldGroupId = 1;
-
-        /// <summary>
-        /// 新增怪物组ID新值
-        /// </summary>
-        [HideInInspector]
-        public int AddTemplateNewGroupId = 1;
+        public LevelMapData LevelMapData;
 
         /// <summary>
         /// 选中Gizmos显示

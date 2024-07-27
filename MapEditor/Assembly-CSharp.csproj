@@ -57,6 +57,7 @@
     <Analyzer Include="G:\Software\VisualStudio\VS2019\Install\Common7\IDE\Extensions\Microsoft\Visual Studio Tools for Unity\Analyzers\Microsoft.Unity.Analyzers.dll" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Assets\Scripts\Map\Level\LevelMapData.cs" />
     <Compile Include="Assets\Scripts\Utilities\FolderUtilities.cs" />
     <Compile Include="Assets\Scripts\Map\MapData\MapDataConfig.cs" />
     <Compile Include="Assets\Scripts\Map\MapData\MonsterMapData.cs" />
@@ -64,7 +65,6 @@
     <Compile Include="Assets\Scripts\Map\MapObject\MapObjectType.cs" />
     <Compile Include="Assets\Scripts\Core\Collision\Collision3D\Collision3DUtilities.cs" />
     <Compile Include="Assets\Scripts\Map\MapData\MonsterGroupMapData.cs" />
-    <Compile Include="Assets\Scripts\Map\MapTemplateData\BaseReplaceData.cs" />
     <Compile Include="Assets\Scripts\Map\MapObject\MapObjectDataMono.cs" />
     <Compile Include="Assets\Scripts\Map\MapData\MapDataType.cs" />
     <Compile Include="Assets\Scripts\Camera\CameraRayCastVisualizationMono.cs" />
@@ -80,7 +80,6 @@
     <Compile Include="Assets\Scripts\Core\Collision\Collision2D\Sector2D.cs" />
     <Compile Include="Assets\Scripts\Map\MapSetting.cs" />
     <Compile Include="Assets\Scripts\Map\MapUtilities.cs" />
-    <Compile Include="Assets\Scripts\Map\MapTemplateData\MapTemplateData.cs" />
     <Compile Include="Assets\Scripts\Core\Collision\Collision2D\Collision2DUtilities.cs" />
     <Compile Include="Assets\Scripts\Map\MapObject\ColliderDataMono.cs" />
     <Compile Include="Assets\Scripts\Core\Collision\Collision3D\Sphere3D.cs" />
@@ -91,12 +90,10 @@
     <Compile Include="Assets\Scripts\Core\Extension\GameObjectExtension.cs" />
     <Compile Include="Assets\Scripts\Core\Collision\Collision2D\OBB2D.cs" />
     <Compile Include="Assets\Scripts\Map\MapExport\ExportType.cs" />
-    <Compile Include="Assets\Scripts\Map\MapTemplateData\MapTemplateStrategyData.cs" />
     <Compile Include="Assets\Scripts\Core\Collision\Collision2D\AABB2D.cs" />
     <Compile Include="Assets\Scripts\Core\Collision\Collision2D\VisibleDraw\AABB2DVisible.cs" />
     <Compile Include="Assets\Scripts\Map\Map.cs" />
     <Compile Include="Assets\Scripts\Core\Collision\Collision2D\VisibleDraw\Capsule2DVisible.cs" />
-    <Compile Include="Assets\Scripts\Map\MapTemplateData\ReplaceIntData.cs" />
     <Compile Include="Assets\Scripts\Map\MapData\MapDataSetting.cs" />
     <Compile Include="Assets\Scripts\Map\MapObject\MapObjectSetting.cs" />
     <Compile Include="Assets\Scripts\Utilities\PathUtilities.cs" />

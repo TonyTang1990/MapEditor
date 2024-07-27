@@ -533,20 +533,14 @@ namespace MapEditor
         /// </summary>
         /// <param name="mapData"></param>
         /// <param name="index"></param>
-        /// <param name="templateStrategyData"></param>
         /// <returns></returns>
-        public static string GetMapDataLabelName(MapData mapData, int index, MapTemplateStrategyData templateStrategyData = null)
+        public static string GetMapDataLabelName(MapData mapData, int index)
         {
             if (mapData == null)
             {
                 return "无效的地图数据";
             }
             var uid = mapData.UID;
-            if (templateStrategyData != null)
-            {
-                var replaceIntData = templateStrategyData != null ? templateStrategyData.GetUIDReplaceData(uid) : null;
-                uid = replaceIntData != null ? replaceIntData.NewData : uid;
-            }
             var mapDataConfig = MapSetting.GetEditorInstance().DataSetting.GetMapDataConfigByUID(uid);
             if (mapDataConfig == null)
             {
@@ -558,16 +552,12 @@ namespace MapEditor
             {
                 var monsterMapData = mapData as MonsterMapData;
                 var groupId = monsterMapData.GroupId;
-                var replaceIntData = templateStrategyData != null ? templateStrategyData.GetMonsterGroupIdReplaceData(groupId) : null;
-                groupId = replaceIntData != null ? replaceIntData.NewData : groupId;
                 return $"[{index}]{mapDataDes}({groupId}组)";
             }
             else if(mapDataType == MapDataType.MonsterGroup)
             {
                 var monsterGroupMapData = mapData as MonsterGroupMapData;
                 var groupId = monsterGroupMapData.GroupId;
-                var replaceIntData = templateStrategyData != null ? templateStrategyData.GetMonsterGroupIdReplaceData(groupId) : null;
-                groupId = replaceIntData != null ? replaceIntData.NewData : groupId;
                 return $"[{index}]{mapDataDes}({groupId}组)";
             }
             else
@@ -799,14 +789,6 @@ namespace MapEditor
             {
                 EditorGUILayout.LabelField("旋转", MapStyles.TabMiddleStyle, GUILayout.Width(MapEditorConst.InspectorDataRotationUIWidth));
             }
-            if (MapEditorUtilities.IsShowMapUI(mapDataType, MapDataUIType.TemplateAsset))
-            {
-                EditorGUILayout.LabelField("模板Asset", MapStyles.TabMiddleStyle, GUILayout.Width(MapEditorConst.InspectorDataTemplateAssetUIWidth));
-            }
-            if (MapEditorUtilities.IsShowMapUI(mapDataType, MapDataUIType.TemplateStrategyUI))
-            {
-                EditorGUILayout.LabelField("模板策略UID", MapStyles.TabMiddleStyle, GUILayout.Width(MapEditorConst.InspectorDataTemplateStrategyUIDUIWidth));
-            }
             //if (MapEditorUtilities.IsShowMapUI(mapDataType, MapDataUIType.Des))
             //{
             //    EditorGUILayout.LabelField("描述", MapStyles.TabMiddleStyle, GUILayout.Width(MapEditorConst.InspectorDataDesUIWidth));
@@ -1005,28 +987,25 @@ namespace MapEditor
         /// <param name="uid"></param>
         /// <param name="position"></param>
         /// <param name="rotation"></param>
-        /// <param name="templateLocalPosition"></param>
-        /// <param name="templateLocalRotation"></param>
         /// <returns></returns>
-        public static MapData CreateMapDataByType(MapDataType mapDataType, int uid, Vector3 position, Vector3 rotation,
-                                                    Vector3? templateLocalPosition = null, Vector3? templateLocalRotation = null)
+        public static MapData CreateMapDataByType(MapDataType mapDataType, int uid, Vector3 position, Vector3 rotation)
         {
             if (mapDataType == MapDataType.Monster)
             {
-                return new MonsterMapData(uid, position, rotation, templateLocalPosition, templateLocalRotation);
+                return new MonsterMapData(uid, position, rotation);
             }
             else if (mapDataType == MapDataType.MonsterGroup)
             {
-                return new MonsterGroupMapData(uid, position, rotation, templateLocalPosition, templateLocalRotation);
+                return new MonsterGroupMapData(uid, position, rotation);
             }
             else if (mapDataType == MapDataType.PlayerSpawn)
             {
-                return new PlayerSpawnMapData(uid, position, rotation, templateLocalPosition, templateLocalRotation);
+                return new PlayerSpawnMapData(uid, position, rotation);
             }
             else
             {
                 Debug.LogWarning($"地图埋点类型:{mapDataType}没有创建自定义类型数据，可能不方便未来扩展！");
-                return new MapData(uid, position, rotation, templateLocalPosition, templateLocalRotation);
+                return new MapData(uid, position, rotation);
             }
         }
 

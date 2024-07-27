@@ -55,9 +55,9 @@ namespace MapEditor
         public static readonly Type MapDataType = typeof(MapDataType);
 
         /// <summary>
-        /// MapTempalateData类型信息
+        /// LevelMapData类型信息
         /// </summary>
-        public static readonly Type MapTemplateDataType = typeof(MapTemplateData);
+        public static readonly Type LevelMapDataType = typeof(LevelMapData);
 
         /// <summary>
         /// 地图对象父节点挂点名
@@ -73,10 +73,5 @@ namespace MapEditor
         /// 默认地图地形预制件路径
         /// </summary>
         public const string DetaulMapTerrianPrefabPath = "Assets/Resources/Terrian/Terrian.prefab";
-
-        /// <summary>
-        /// 默认模板策略名
-        /// </summary>
-        public const string DefaultTemplateStrategyName = "默认策略名";
     }
 }

@@ -40,30 +40,16 @@ namespace MapEditor
         [Header("批量操作开关")]
         public bool BatchOperationSwitch;
 
-        /// <summary>
-        /// 模版数据局部位置
-        /// </summary>
-        [Header("模版数据局部位置")]
-        public Vector3 TemplateLocalPosition;
-
-        /// <summary>
-        /// 模版数据局部旋转
-        /// </summary>
-        [Header("模版数据局部旋转")]
-        public Vector3 TemplateLocalRotation;
-
         public MapData(int uid)
         {
             UID = uid;
         }
 
-        public MapData(int uid, Vector3 position, Vector3 rotation, Vector3? templateLocalPosition = null, Vector3? templateLocalRotation = null)
+        public MapData(int uid, Vector3 position, Vector3 rotation)
         {
             UID = uid;
             Position = position;
             Rotation = rotation;
-            TemplateLocalPosition = templateLocalPosition != null ? (Vector3)templateLocalPosition : Vector3.zero;
-            TemplateLocalRotation = templateLocalRotation != null ? (Vector3)templateLocalRotation : Vector3.zero;
         }
 
         /// <summary>
@@ -84,8 +70,6 @@ namespace MapEditor
             Position = sourceMapData.Position;
             Rotation = sourceMapData.Rotation;
             BatchOperationSwitch = sourceMapData.BatchOperationSwitch;
-            TemplateLocalPosition = sourceMapData.TemplateLocalPosition;
-            TemplateLocalRotation = sourceMapData.TemplateLocalRotation;
             return true;
         }
     }

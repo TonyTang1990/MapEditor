@@ -25,9 +25,9 @@ namespace MapEditor
         public const string MapPrefabFolderRelativePath = "Assets/Resources/Maps";
 
         /// <summary>
-        /// 地图埋点模板数据保存路径
+        /// 关卡地图数据保存路径
         /// </summary>
-        public const string MapTemplateDataSaveFolder = "Asset/Editor/Map/MapData/MapTemplateData";
+        public const string LevelMapDataSaveFolder = "Asset/Editor/Map/Level/LevelMapData/";
 
         /// <summary>
         /// 地图对象类型配置UI显示宽度
@@ -108,11 +108,6 @@ namespace MapEditor
         /// 地图埋点初始旋转显示宽度
         /// </summary>
         public const float MapDataRotationUIWidth = 160f;
-
-        /// <summary>
-        /// 地图埋点模板Asset显示宽度
-        /// </summary>
-        public const float MapDataTemplateAssetUIWidth = 150f;
 
         /// <summary>
         /// 地图埋点描述UI显示宽度
@@ -265,16 +260,6 @@ namespace MapEditor
         public const float InspectorDataRotationUIWidth = 140f;
 
         /// <summary>
-        /// 面板地图埋点模板Asset的UI宽度
-        /// </summary>
-        public const float InspectorDataTemplateAssetUIWidth = 150f;
-
-        /// <summary>
-        /// 面板地图埋点模板策略UID的UI宽度
-        /// </summary>
-        public const float InspectorDataTemplateStrategyUIDUIWidth = 100f;
-
-        /// <summary>
         /// 面板地图埋点描述的UI宽度
         /// </summary>
         public const float InspectorDataDesUIWidth = 140f;
@@ -298,25 +283,5 @@ namespace MapEditor
         /// 面板地图埋点添加的UI宽度
         /// </summary>
         public const float InspectorDataAddUIWidth = 40f;
-
-        /// <summary>
-        /// 模板UID显示UI宽度
-        /// </summary>
-        public const float InspectorTemplateUIDUIWidth = 200f;
-
-        /// <summary>
-        /// 模板UID删除显示宽度
-        /// </summary>
-        public const float InspectorTemplateUIDRemoveUIWidth = 40f;
-
-        /// <summary>
-        /// 模板怪物组ID删除显示UI宽度
-        /// </summary>
-        public const float InspectorTemplateGroupIdRemoveUIWidth = 40f;
-
-        /// <summary>
-        /// 模板怪物组ID显示UI宽度
-        /// </summary>
-        public const float InspectorTemplateGroupIdUIWidth = 200f;
     }
 }

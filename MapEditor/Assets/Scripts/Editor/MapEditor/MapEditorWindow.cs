@@ -628,7 +628,6 @@ namespace MapEditor
             EditorGUILayout.LabelField("关联配置Id", MapStyles.TabMiddleStyle, GUILayout.Width(MapEditorConst.MapDataConfIdUIWidth));
             EditorGUILayout.LabelField("场景球体颜色", MapStyles.TabMiddleStyle, GUILayout.Width(MapEditorConst.MapDataColorUIWidth));
             //EditorGUILayout.LabelField("初始旋转", MapStyles.TabMiddleStyle, GUILayout.Width(MapEditorConst.MapDataRotationUIWidth));
-            EditorGUILayout.LabelField("模板Asset", MapStyles.TabMiddleStyle, GUILayout.Width(MapEditorConst.MapDataTemplateAssetUIWidth));
             EditorGUILayout.LabelField("地图埋点描述", MapStyles.TabMiddleStyle, GUILayout.Width(MapEditorConst.MapDataDesUIWidth));
             EditorGUILayout.LabelField("操作", MapStyles.TabMiddleStyle, GUILayout.ExpandWidth(true));
             EditorGUILayout.EndHorizontal();
