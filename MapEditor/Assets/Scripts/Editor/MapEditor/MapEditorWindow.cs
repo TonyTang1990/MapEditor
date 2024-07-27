@@ -153,6 +153,10 @@ namespace MapEditor
         /// <returns></returns>
         private bool DoAddMapObjectConfig(int mapObjectUid, MapObjectType mapObjectType)
         {
+            if (mapObjectUid == 0)
+            {
+                mapObjectUid = mMapSettingAsset.ObjectSetting.GetAvalibleUID();
+            }
             var newMapObjectConfig = new MapObjectConfig(mapObjectUid, mapObjectType);
             return mMapSettingAsset.ObjectSetting.AddMapObjectDataConfig(newMapObjectConfig);
         }
@@ -175,6 +179,10 @@ namespace MapEditor
         /// <returns></returns>
         private bool DoAddMapDataConfig(int uid, MapDataType mapDataType)
         {
+            if(uid == 0)
+            {
+                uid = mMapSettingAsset.DataSetting.GetAvalibleUID();
+            }
             var mapDataTypeColor = MapEditorUtilities.GetMapDataColor(mapDataType);
             var newMapDataConfig = new MapDataConfig(uid, mapDataType, mapDataTypeColor);
             return mMapSettingAsset.DataSetting.AddMapDataConfig(newMapDataConfig);
@@ -307,15 +315,15 @@ namespace MapEditor
 
         private void OnGUI()
         {
-            DrawOperationPanelView();
-            DrawDefaultSettingView();
-            DrawGameMapPanelView();
+            DrawOperationPanelArea();
+            DrawDefaultSettingArea();
+            DrawGameMapPanelArea();
         }
 
         /// <summary>
         /// 绘制操作面板
         /// </summary>
-        private void DrawOperationPanelView()
+        private void DrawOperationPanelArea()
         {
             EditorGUILayout.BeginVertical("box");
             EditorGUILayout.LabelField("快捷操作面板", MapStyles.TabMiddleStyle, GUILayout.ExpandWidth(true));
@@ -347,7 +355,7 @@ namespace MapEditor
         /// <summary>
         /// 绘制默认设置面板
         /// </summary>
-        private void DrawDefaultSettingView()
+        private void DrawDefaultSettingArea()
         {
             EditorGUILayout.BeginVertical("box");
             EditorGUILayout.LabelField("默认设置", MapStyles.TabMiddleStyle, GUILayout.ExpandWidth(true));
@@ -363,7 +371,7 @@ namespace MapEditor
         /// <summary>
         /// 绘制游戏地图面板显示
         /// </summary>
-        private void DrawGameMapPanelView()
+        private void DrawGameMapPanelArea()
         {
             EditorGUILayout.BeginVertical("box");
             EditorGUILayout.BeginHorizontal();
@@ -372,11 +380,11 @@ namespace MapEditor
             EditorGUILayout.EndHorizontal();
             if (mSelectedPanelType == GameMapPanelType.MapBuild)
             {
-                DrawMapBuildPanelView();
+                DrawMapBuildPanelArea();
             }
             else if (mSelectedPanelType == GameMapPanelType.DataEditor)
             {
-                DrawDataEditorPanelView();
+                DrawDataEditorPanelArea();
             }
             EditorGUILayout.EndVertical();
         }
@@ -384,7 +392,7 @@ namespace MapEditor
         /// <summary>
         /// 绘制地图编辑器面板显示
         /// </summary>
-        private void DrawMapBuildPanelView()
+        private void DrawMapBuildPanelArea()
         {
             DrawMapObjectTypeConfigArea();
             DrawMapObjectConfigArea();
@@ -475,14 +483,14 @@ namespace MapEditor
         {
             EditorGUILayout.BeginVertical("box");
             EditorGUILayout.LabelField("地图编辑面板", MapStyles.TabMiddleStyle, GUILayout.ExpandWidth(true));
-            DrawMapObjectConfigAddView();
-            DrawMapObjectConfigTitleView();
+            DrawMapObjectConfigAddArea();
+            DrawMapObjectConfigTitleArea();
             mMapObjectDataPanelScrollPos = EditorGUILayout.BeginScrollView(mMapObjectDataPanelScrollPos);
             if (mMapSettingAsset.ObjectSetting.AllMapObjectConfigs.Count > 0)
             {
                 for (int i = 0; i < mMapSettingAsset.ObjectSetting.AllMapObjectConfigs.Count; i++)
                 {
-                    DrawOneMapObjectConfigView(mMapSettingAsset.ObjectSetting.AllMapObjectConfigs[i]);
+                    DrawOneMapObjectConfigArea(mMapSettingAsset.ObjectSetting.AllMapObjectConfigs[i]);
                 }
             }
             else
@@ -496,10 +504,10 @@ namespace MapEditor
         /// <summary>
         /// 绘制地图编辑对象添加显示
         /// </summary>
-        private void DrawMapObjectConfigAddView()
+        private void DrawMapObjectConfigAddArea()
         {
             EditorGUILayout.BeginHorizontal();
-            EditorGUILayout.LabelField("地图对象UID:", GUILayout.Width(80f));
+            EditorGUILayout.LabelField("地图对象UID(0表示自动生成):", GUILayout.Width(170f));
             mAddMapObjectUID = EditorGUILayout.IntField(mAddMapObjectUID, GUILayout.Width(100f));
             EditorGUILayout.LabelField("地图对象类型:", GUILayout.Width(80f));
             mAddMapObjectType = (MapObjectType)EditorGUILayout.EnumPopup(mAddMapObjectType, GUILayout.Width(150f));
@@ -513,7 +521,7 @@ namespace MapEditor
         /// <summary>
         /// 绘制地图编辑对象配置数据标题显示
         /// </summary>
-        private void DrawMapObjectConfigTitleView()
+        private void DrawMapObjectConfigTitleArea()
         {
             EditorGUILayout.BeginHorizontal("box");
             EditorGUILayout.LabelField("UID", MapStyles.TabMiddleStyle, GUILayout.Width(MapEditorConst.MapObjectUIDUIWidth));
@@ -531,7 +539,7 @@ namespace MapEditor
         /// 绘制单个地图对象配置数据显示
         /// </summary>
         /// <param name="mapObjectConfig"></param>
-        private void DrawOneMapObjectConfigView(MapObjectConfig mapObjectConfig)
+        private void DrawOneMapObjectConfigArea(MapObjectConfig mapObjectConfig)
         {
             var configViewMaxHeight = Math.Max(20f, MapEditorConst.MapObjectPreviewUIHeight);
             EditorGUILayout.BeginVertical("box", GUILayout.ExpandWidth(true), GUILayout.Height(configViewMaxHeight));
@@ -570,18 +578,18 @@ namespace MapEditor
         /// <summary>
         /// 绘制数据埋点面板显示
         /// </summary>
-        private void DrawDataEditorPanelView()
+        private void DrawDataEditorPanelArea()
         {
             EditorGUILayout.BeginVertical("box");
             EditorGUILayout.LabelField("数据埋点面板", MapStyles.TabMiddleStyle, GUILayout.ExpandWidth(true));
-            DrawMapDataConfigAddView();
-            DrawMapDataConfigTitleView();
+            DrawMapDataConfigAddArea();
+            DrawMapDataConfigTitleArea();
             mMapDataPanelScrollPos = EditorGUILayout.BeginScrollView(mMapDataPanelScrollPos);
-            if (mMapSettingAsset.DataSetting.AlllMapDataConfigs.Count > 0)
+            if (mMapSettingAsset.DataSetting.AllMapDataConfigs.Count > 0)
             {
-                for (int i = 0; i < mMapSettingAsset.DataSetting.AlllMapDataConfigs.Count; i++)
+                for (int i = 0; i < mMapSettingAsset.DataSetting.AllMapDataConfigs.Count; i++)
                 {
-                    DrawOneMapDataConfigView(mMapSettingAsset.DataSetting.AlllMapDataConfigs[i]);
+                    DrawOneMapDataConfigArea(mMapSettingAsset.DataSetting.AllMapDataConfigs[i]);
                 }
             }
             else
@@ -595,10 +603,10 @@ namespace MapEditor
         /// <summary>
         /// 绘制地图埋点对象添加显示
         /// </summary>
-        private void DrawMapDataConfigAddView()
+        private void DrawMapDataConfigAddArea()
         {
             EditorGUILayout.BeginHorizontal();
-            EditorGUILayout.LabelField("地图埋点UID:", GUILayout.Width(80f));
+            EditorGUILayout.LabelField("地图埋点UID(0表示自动生成):", GUILayout.Width(170f));
             mAddMapDataUID = EditorGUILayout.IntField(mAddMapDataUID, GUILayout.Width(100f));
             EditorGUILayout.LabelField("地图埋点类型:", GUILayout.Width(80f));
             mSelectedMapDataType = (MapDataType)EditorGUILayout.EnumPopup(mSelectedMapDataType, GUILayout.Width(150f));
@@ -612,7 +620,7 @@ namespace MapEditor
         /// <summary>
         /// 绘制地图埋点对象配置数据标题显示
         /// </summary>
-        private void DrawMapDataConfigTitleView()
+        private void DrawMapDataConfigTitleArea()
         {
             EditorGUILayout.BeginHorizontal("box");
             EditorGUILayout.LabelField("UID", MapStyles.TabMiddleStyle, GUILayout.Width(MapEditorConst.MapDataUIDUIWidth));
@@ -630,7 +638,7 @@ namespace MapEditor
         /// 绘制单个地图埋点配置数据显示
         /// </summary>
         /// <param name="mapDataConfig"></param>
-        private void DrawOneMapDataConfigView(MapDataConfig mapDataConfig)
+        private void DrawOneMapDataConfigArea(MapDataConfig mapDataConfig)
         {
             EditorGUILayout.BeginVertical("box");
             if (mapDataConfig != null)

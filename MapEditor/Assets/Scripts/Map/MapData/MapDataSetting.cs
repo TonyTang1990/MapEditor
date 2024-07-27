@@ -22,7 +22,7 @@ namespace MapEditor
         /// </summary>
         [Header("所有地图埋点数据配置")]
         [SerializeReference]
-        public List<MapDataConfig> AlllMapDataConfigs = new List<MapDataConfig>();
+        public List<MapDataConfig> AllMapDataConfigs = new List<MapDataConfig>();
 
         /// <summary>
         /// 添加指定地图埋点配置数据
@@ -41,8 +41,9 @@ namespace MapEditor
                 Debug.LogError($"不允许重复添加地图埋点UID:{mapDataConfig.UID}的配置数据，添加地图埋点配置数据失败！");
                 return false;
             }
-            AlllMapDataConfigs.Add(mapDataConfig);
+            AllMapDataConfigs.Add(mapDataConfig);
             DoSortMapDataConfigs();
+            Debug.Log($"添加地图埋点UID:{mapDataConfig.UID}的配置数据成功！");
             return true;
         }
 
@@ -53,7 +54,7 @@ namespace MapEditor
         /// <returns></returns>
         public bool RemoveMapDataConfig(MapDataConfig mapDataConfig)
         {
-            var result = AlllMapDataConfigs.Remove(mapDataConfig);
+            var result = AllMapDataConfigs.Remove(mapDataConfig);
             if(result == false)
             {
                 Debug.LogError($"找不到地图埋点类型:{mapDataConfig.DataType},埋点描述:{mapDataConfig.Des}对应的地图埋点配置数据，删除地图埋点配置数据失败！");
@@ -68,7 +69,7 @@ namespace MapEditor
         /// <returns></returns>
         public bool ExistMapDataConfig(int uid)
         {
-            return AlllMapDataConfigs.Find(mapDataConfig => mapDataConfig.UID == uid) != null;
+            return AllMapDataConfigs.Find(mapDataConfig => mapDataConfig.UID == uid) != null;
         }
         
         /// <summary>
@@ -76,7 +77,7 @@ namespace MapEditor
         /// </summary>
         public void DoSortMapDataConfigs()
         {
-            AlllMapDataConfigs.Sort(SortMapDataConfigs);
+            AllMapDataConfigs.Sort(SortMapDataConfigs);
         }
 
         /// <summary>
@@ -97,7 +98,7 @@ namespace MapEditor
         /// <returns></returns>
         public MapDataConfig GetMapDataConfigByUID(int uid)
         {
-            var mapDataConfig = AlllMapDataConfigs.Find(mapDataConfig => mapDataConfig.UID == uid);
+            var mapDataConfig = AllMapDataConfigs.Find(mapDataConfig => mapDataConfig.UID == uid);
             return mapDataConfig;
         }
 
@@ -109,7 +110,7 @@ namespace MapEditor
         public List<MapDataConfig> GetAllMapDataConfigByType(MapDataType mapDataType)
         {
             List<MapDataConfig> targetMapDataConfigs = new List<MapDataConfig>();
-            foreach (var mapObjectConfig in AlllMapDataConfigs)
+            foreach (var mapObjectConfig in AllMapDataConfigs)
             {
                 if (mapObjectConfig.DataType == mapDataType)
                 {
@@ -117,6 +118,26 @@ namespace MapEditor
                 }
             }
             return targetMapDataConfigs;
+        }
+
+        /// <summary>
+        /// 获取一个有效的地图埋点UID
+        /// </summary>
+        /// <returns></returns>
+        public int GetAvalibleUID()
+        {
+            var nextAvalibleUID = 1;
+            // 因为AllMapDataConfigs是按UID升序排序
+            // 所以按顺序正向匹配不到的UID就表示可以使用
+            foreach(var mapDataConfig in AllMapDataConfigs)
+            {
+                if (mapDataConfig.UID != nextAvalibleUID)
+                {
+                    break;
+                }
+                nextAvalibleUID++;
+            }
+            return nextAvalibleUID;
         }
     }
 }

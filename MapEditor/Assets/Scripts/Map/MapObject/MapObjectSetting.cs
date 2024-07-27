@@ -111,6 +111,7 @@ namespace MapEditor
             }
             AllMapObjectConfigs.Add(mapObjectConfig);
             DoSortMapObjectConfigs();
+            Debug.Log($"添加地图对象UID:{mapObjectConfig.UID}的配置数据成功！");
             return true;
         }
 
@@ -185,6 +186,26 @@ namespace MapEditor
                 }
             }
             return targetMapObjectConfigs;
+        }
+
+        /// <summary>
+        /// 获取一个有效的地图对象UID
+        /// </summary>
+        /// <returns></returns>
+        public int GetAvalibleUID()
+        {
+            var nextAvalibleUID = 1;
+            // 因为AllMapObjectConfigs是按UID升序排序
+            // 所以按顺序正向匹配不到的UID就表示可以使用
+            foreach (var mapObjectConfig in AllMapObjectConfigs)
+            {
+                if (mapObjectConfig.UID != nextAvalibleUID)
+                {
+                    break;
+                }
+                nextAvalibleUID++;
+            }
+            return nextAvalibleUID;
         }
     }
 }

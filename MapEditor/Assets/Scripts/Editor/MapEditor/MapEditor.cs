@@ -784,7 +784,7 @@ namespace MapEditor
         private void UpdateMapTemplateChoiceDatas()
         {
             var dataSetting = MapSetting.GetEditorInstance().DataSetting;
-            var allMapDataConfig = dataSetting.AlllMapDataConfigs;
+            var allMapDataConfig = dataSetting.AllMapDataConfigs;
             var allMapDataConfigNum = allMapDataConfig.Count;
             AllMapDataChoiceOptions = new string[allMapDataConfigNum];
             AllMapDataChoiceValues = new int[allMapDataConfigNum];
