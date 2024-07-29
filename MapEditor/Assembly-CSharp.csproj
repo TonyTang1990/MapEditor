@@ -73,6 +73,7 @@
     <Compile Include="Assets\Scripts\Core\Collision\Collision3D\VisibleDraw\Sphere3DVisible.cs" />
     <Compile Include="Assets\Scripts\Map\MapData\PlayerSpawnMapData.cs" />
     <Compile Include="Assets\Scripts\Core\Extension\StringExt.cs" />
+    <Compile Include="Assets\Scripts\Utilities\UnityUtilities.cs" />
     <Compile Include="Assets\Scripts\Utilities\Vector3Utilities.cs" />
     <Compile Include="Assets\Scripts\Core\Collision\Collision2D\VisibleDraw\Sector2DVisible.cs" />
     <Compile Include="Assets\Scripts\Map\MapObject\MapObjectConfig.cs" />

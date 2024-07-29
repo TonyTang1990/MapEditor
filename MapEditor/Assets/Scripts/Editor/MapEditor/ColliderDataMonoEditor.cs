@@ -96,17 +96,7 @@ namespace MapEditor
                 Debug.LogError($"目标组件或Center属性或Size属性为空，自动根据Mesh填充数据失败！");
                 return;
             }
-            var renderers = mTarget.GetComponentsInChildren<Renderer>();
-            if (renderers == null || renderers.Length == 0)
-            {
-                Debug.LogError($"目标对象子节点找不到任何Renderer组件，自动根据Renderer填充数据失败！");
-                return;
-            }
-            var bounds = new Bounds(Vector3.zero, Vector3.zero);
-            foreach (var renderer in renderers)
-            {
-                bounds.Encapsulate(renderer.bounds);
-            }
+            var bounds = UnityUtilities.GetGoRenderersBounds(mTarget);
             var size = bounds.size;
             size.x = (float)Math.Round((double)size.x, 2);
             size.y = (float)Math.Round((double)size.y, 2);
