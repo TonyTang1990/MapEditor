@@ -53,6 +53,12 @@ namespace MapEditor
         public bool BatchOperationSwitch;
 
         /// <summary>
+        /// GUI关闭开关
+        /// </summary>
+        [Header("GUI关闭开关")]
+        public bool GUISwitchOff = false;
+
+        /// <summary>
         /// 碰撞器中心点
         /// </summary>
         [Header("碰撞器中心点")]

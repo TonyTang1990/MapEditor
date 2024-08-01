@@ -1,0 +1,161 @@
+{
+    "MapData": {
+        "Width": 6,
+        "Height": 30,
+        "StartPos": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": 0.0
+        },
+        "BirthPos": [
+            {
+                "x": 3.0,
+                "y": 0.0,
+                "z": 2.0
+            }
+        ],
+        "GridSize": 6.0
+    },
+    "AllBaseMapObjectExportDatas": [
+        {
+            "MapObjectType": 2,
+            "ConfId": 1,
+            "Position": {
+                "x": 3.869999885559082,
+                "y": 0.0,
+                "z": 4.940000057220459
+            },
+            "Rotation": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
+            },
+            "LocalScale": {
+                "x": 4.0,
+                "y": 2.0,
+                "z": 0.10000000149011612
+            },
+            "OwnerGridUIDs": []
+        }
+    ],
+    "AllColliderMapDynamicExportDatas": [
+        {
+            "MapObjectType": 0,
+            "ConfId": 3,
+            "Position": {
+                "x": 3.869999885559082,
+                "y": 0.0,
+                "z": 11.890000343322754
+            },
+            "Rotation": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
+            },
+            "LocalScale": {
+                "x": 1.0,
+                "y": 1.0,
+                "z": 1.0
+            },
+            "OwnerGridUIDs": [
+                10000,
+                20000
+            ],
+            "ColliderCenter": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
+            },
+            "ColliderSize": {
+                "x": 1.0,
+                "y": 1.0,
+                "z": 1.0
+            }
+        },
+        {
+            "MapObjectType": 1,
+            "ConfId": 2,
+            "Position": {
+                "x": 3.869999885559082,
+                "y": 0.0,
+                "z": 16.670000076293947
+            },
+            "Rotation": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
+            },
+            "LocalScale": {
+                "x": 0.5,
+                "y": 0.5,
+                "z": 0.5
+            },
+            "OwnerGridUIDs": [
+                20000
+            ],
+            "ColliderCenter": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
+            },
+            "ColliderSize": {
+                "x": 1.0,
+                "y": 1.0,
+                "z": 1.0
+            }
+        }
+    ],
+    "AllMonsterGroupMapDatas": [
+        {
+            "MapDataType": 2,
+            "ConfId": 0,
+            "Position": {
+                "x": 3.0,
+                "y": 0.0,
+                "z": 13.0
+            },
+            "Roation": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
+            },
+            "GroupId": 1,
+            "MonsterCreateRadius": 4.0,
+            "MonsterActiveRadius": 3.0,
+            "AllMonsterMapExportDatas": [
+                {
+                    "MapDataType": 1,
+                    "ConfId": 1,
+                    "Position": {
+                        "x": 2.0,
+                        "y": 0.0,
+                        "z": 10.0
+                    },
+                    "Roation": {
+                        "x": 0.0,
+                        "y": 0.0,
+                        "z": 0.0
+                    },
+                    "GroupId": 1
+                },
+                {
+                    "MapDataType": 1,
+                    "ConfId": 2,
+                    "Position": {
+                        "x": 4.0,
+                        "y": 0.0,
+                        "z": 15.0
+                    },
+                    "Roation": {
+                        "x": 0.0,
+                        "y": 0.0,
+                        "z": 0.0
+                    },
+                    "GroupId": 1
+                }
+            ]
+        }
+    ],
+    "ALlNoGroupMonsterMapDatas": [],
+    "AllOtherMapDatas": []
+}

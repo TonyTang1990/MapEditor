@@ -34,19 +34,13 @@ namespace MapEditor
         [Header("怪物警戒半径")]
         public float MonsterActiveRadius = 3;
 
-        /// <summary>
-        /// GUI关闭开关
-        /// </summary>
-        [Header("GUI关闭开关")]
-        public bool GUISwitchOff = false;
-
         public MonsterGroupMapData(int uid) : base(uid)
         {
 
         }
 
-        public MonsterGroupMapData(int uid, Vector3 position, Vector3 rotation, Vector3? templateLocalPosition = null, Vector3? templateLocalRotation = null)
-                                    : base(uid, position, rotation, templateLocalPosition, templateLocalRotation)
+        public MonsterGroupMapData(int uid, Vector3 position, Vector3 rotation)
+                                    : base(uid, position, rotation)
         {
 
         }
@@ -66,7 +60,6 @@ namespace MapEditor
             GroupId = realSourceMapData.GroupId;
             MonsterCreateRadius = realSourceMapData.MonsterCreateRadius;
             MonsterActiveRadius = realSourceMapData.MonsterActiveRadius;
-            GUISwitchOff = realSourceMapData.GUISwitchOff;
             return true;
         }
     }

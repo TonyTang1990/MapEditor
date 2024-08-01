@@ -429,8 +429,8 @@ namespace MapEditor
             EditorGUILayout.BeginHorizontal();
             EditorGUILayout.LabelField("地图对象类型:", GUILayout.Width(80f));
             mAddMapObjectTypeConfigType = (MapObjectType)EditorGUILayout.EnumPopup(mAddMapObjectTypeConfigType, GUILayout.Width(150f));
-            EditorGUILayout.LabelField("是否是动态对象:", GUILayout.Width(80f));
-            mAddMapObjectTypeConfigTypeIsDynaic = EditorGUILayout.Toggle(mAddMapObjectTypeConfigTypeIsDynaic, GUILayout.Width(40f));
+            EditorGUILayout.LabelField("是否是动态对象:", GUILayout.Width(100f));
+            mAddMapObjectTypeConfigTypeIsDynaic = EditorGUILayout.Toggle(mAddMapObjectTypeConfigTypeIsDynaic, GUILayout.Width(20f));
             if(GUILayout.Button("+", GUILayout.ExpandWidth(true)))
             {
                 DoAddMapObjectTypeConfig(mAddMapObjectTypeConfigType, mAddMapObjectTypeConfigTypeIsDynaic);
@@ -474,6 +474,7 @@ namespace MapEditor
                 EditorGUILayout.EndHorizontal();
                 GUI.color = preColor;
             }
+            EditorGUILayout.EndVertical();
         }
 
         /// <summary>

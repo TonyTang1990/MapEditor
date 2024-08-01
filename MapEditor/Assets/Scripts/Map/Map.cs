@@ -249,7 +249,7 @@ namespace MapEditor
         /// <param name="mapData"></param>
         private void DrawMapCustomDataGizmos(MapData mapData)
         {
-            if(mapData == null)
+            if(mapData == null || mapData.GUISwitchOff)
             {
                 return;
             }

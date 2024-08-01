@@ -207,7 +207,7 @@ namespace MapEditor
         /// <summary>
         /// 操作面板标题列表
         /// </summary>
-        private string[] mPanelToolBarStrings = { "地图编辑", "数据埋点", "埋点模板数据" };
+        private string[] mPanelToolBarStrings = { "地图编辑", "数据埋点" };
 
         /// <summary>
         /// 操作面板选择索引
@@ -464,7 +464,7 @@ namespace MapEditor
         /// </summary>
         private void RecreateMapTerrianNode()
         {
-            if (!MapUtilities.CheckOperationAvalible(mTarget?.gameObject))
+            if (!MapEditorUtilities.CheckOperationAvalible(mTarget?.gameObject))
             {
                 return;
             }
@@ -1075,7 +1075,7 @@ namespace MapEditor
                 var insertMapData = insertMapDataProperty.managedReferenceValue as MapData;
                 mapDataPosition = insertMapData != null ? insertMapData.Position : mapDataPosition;
             }
-            var newMapData = MapEditorUtilities.CreateMapDataByType(mapDataType, uid, mapDataPosition, mapDataConfig.Rotation);
+            var newMapData = MapUtilities.CreateMapDataByType(mapDataType, uid, mapDataPosition, mapDataConfig.Rotation);
             mMapDataListProperty.InsertArrayElementAtIndex(insertPos);
             var newMapDataProperty = GetMapDataSerializedPropertyByIndex(insertPos);
             newMapDataProperty.managedReferenceValue = newMapData;
@@ -1898,7 +1898,7 @@ namespace MapEditor
             {
                 var mapData = levelMapData.MapDataList[i];
                 mMapDataListProperty.InsertArrayElementAtIndex(i);
-                var mapDataProperty = mMapDataListProperty.GetArrayElementAt(i);
+                var mapDataProperty = mMapDataListProperty.GetArrayElementAtIndex(i);
                 mapDataProperty.managedReferenceValue = mapData;
             }
             UpdateMapDataTypeIndexDatas();
@@ -2260,14 +2260,14 @@ namespace MapEditor
             EditorGUILayout.LabelField("导出类型:", GUILayout.Width(60f));
             mExportTypeProperty.intValue = (int)(ExportType)EditorGUILayout.EnumPopup((ExportType)mExportTypeProperty.intValue, GUILayout.Width(80f));
             EditorGUILayout.LabelField("自定义导出文件名:", GUILayout.Width(100f));
-            mCustomExportFileNameProperty.stringValue = EditorGUILayout.TextField(mCustomExportFileNameProperty.stringValue, GUILayout.Width(100f));
+            mCustomExportFileNameProperty.stringValue = EditorGUILayout.TextField(mCustomExportFileNameProperty.stringValue, GUILayout.Width(115f));
             if (GUILayout.Button("导出地图数据", GUILayout.ExpandWidth(true)))
             {
                 ExportMapData();
             }
             EditorGUILayout.EndHorizontal();
             EditorGUILayout.BeginHorizontal();
-            EditorGUILayout.LabelField("$关卡数据Asset:", GUILayout.Width(90f));
+            EditorGUILayout.LabelField("关卡数据Asset:", GUILayout.Width(90f));
             EditorGUI.BeginChangeCheck();
             mLevelMapDataProperty.objectReferenceValue = EditorGUILayout.ObjectField(mLevelMapDataProperty.objectReferenceValue, MapConst.LevelMapDataType, GUILayout.Width(270f));
             if (EditorGUI.EndChangeCheck())
@@ -2453,12 +2453,13 @@ namespace MapEditor
         private void DrawMapObjectTitleArea()
         {
             EditorGUILayout.BeginHorizontal("box");
-            EditorGUILayout.LabelField("索引", MapStyles.TabMiddleStyle, GUILayout.Width(MapEditorConst.InspectorObjectBatchUIWidth));
+            EditorGUILayout.LabelField("批量", MapStyles.TabMiddleStyle, GUILayout.Width(MapEditorConst.InspectorObjectBatchUIWidth));
             EditorGUILayout.LabelField("索引", MapStyles.TabMiddleStyle, GUILayout.Width(MapEditorConst.InspectorObjectIndexUIWidth));
             EditorGUILayout.LabelField("UID", MapStyles.TabMiddleStyle, GUILayout.Width(MapEditorConst.InspectorObjectUIDUIWidth));
             EditorGUILayout.LabelField("对象类型", MapStyles.TabMiddleStyle, GUILayout.Width(MapEditorConst.InspectorObjectTypeUIWidth));
             EditorGUILayout.LabelField("是否动态", MapStyles.TabMiddleStyle, GUILayout.Width(MapEditorConst.InspectorObjectDynamicUIWidth));
             EditorGUILayout.LabelField("配置Id", MapStyles.TabMiddleStyle, GUILayout.Width(MapEditorConst.InspectorObjectConfIdUIWidth));
+            EditorGUILayout.LabelField("GUI关闭", MapStyles.TabMiddleStyle, GUILayout.Width(MapEditorConst.InspectorObjectGUISwitchOffUIWidth));
             EditorGUILayout.LabelField("实体对象", MapStyles.TabMiddleStyle, GUILayout.Width(MapEditorConst.InspectorObjectInstanceUIWidth));
             EditorGUILayout.LabelField("位置", MapStyles.TabMiddleStyle, GUILayout.Width(MapEditorConst.InspectorObjectPositionUIWidth));
             //EditorGUILayout.LabelField("描述", MapStyles.TabMiddleStyle, GUILayout.Width(MapEditorConst.InspectorObjectDesUIWidth));
@@ -2478,8 +2479,9 @@ namespace MapEditor
             EditorGUILayout.BeginHorizontal();
             var mapObjectDataProperty = mMapObjectDataListProperty.GetArrayElementAtIndex(mapObjectDataIndex);
             var batchOperationSwitchProperty = mapObjectDataProperty.FindPropertyRelative("BatchOperationSwitch");
-            EditorGUILayout.Space(10f, false);
-            batchOperationSwitchProperty.boolValue = EditorGUILayout.Toggle(batchOperationSwitchProperty.boolValue, GUILayout.Width(MapEditorConst.InspectorObjectBatchUIWidth));
+            var batchSpace = 10f;
+            EditorGUILayout.Space(batchSpace, false);
+            batchOperationSwitchProperty.boolValue = EditorGUILayout.Toggle(batchOperationSwitchProperty.boolValue, GUILayout.Width(MapEditorConst.InspectorObjectBatchUIWidth - batchSpace));
             var uidProperty = mapObjectDataProperty.FindPropertyRelative("UID");
             var uid = uidProperty.intValue;
             var goProperty = mapObjectDataProperty.FindPropertyRelative("Go");
@@ -2497,9 +2499,10 @@ namespace MapEditor
             if (mapObjectConfig != null)
             {
                 EditorGUILayout.LabelField(mapObjectConfig.ObjectType.ToString(), MapStyles.TabMiddleStyle, GUILayout.Width(MapEditorConst.InspectorObjectTypeUIWidth));
-                EditorGUILayout.Space(20f, false);
+                var dynamicSpace = 20f;
+                EditorGUILayout.Space(dynamicSpace, false);
                 var isDynamic = MapSetting.GetEditorInstance().ObjectSetting.IsDynamicMapObjectType(mapObjectConfig.ObjectType);
-                EditorGUILayout.Toggle(isDynamic, GUILayout.Width(MapEditorConst.InspectorObjectDynamicUIWidth));
+                EditorGUILayout.Toggle(isDynamic, GUILayout.Width(MapEditorConst.InspectorObjectDynamicUIWidth - dynamicSpace));
                 EditorGUILayout.IntField(mapObjectConfig.ConfId, MapStyles.TabMiddleStyle, GUILayout.Width(MapEditorConst.InspectorObjectConfIdUIWidth));
             }
             else
@@ -2508,11 +2511,15 @@ namespace MapEditor
                 EditorGUILayout.LabelField("找不到是否动态数据", MapStyles.TabMiddleStyle, GUILayout.Width(MapEditorConst.InspectorObjectDynamicUIWidth));
                 EditorGUILayout.LabelField("找不到关联Id数据", MapStyles.TabMiddleStyle, GUILayout.Width(MapEditorConst.InspectorObjectConfIdUIWidth));
             }
+            var guiSwitchOffProperty = mapObjectDataProperty.FindPropertyRelative("GUISwitchOff");
+            var space = 20f;
+            EditorGUILayout.Space(space, false);
+            guiSwitchOffProperty.boolValue = EditorGUILayout.Toggle(guiSwitchOffProperty.boolValue, GUILayout.Width(MapEditorConst.InspectorObjectGUISwitchOffUIWidth - space));
             var gameObject = goProperty.objectReferenceValue as GameObject;
             EditorGUILayout.ObjectField(goProperty.objectReferenceValue, MapConst.GameObjectType, true, GUILayout.Width(MapEditorConst.InspectorObjectInstanceUIWidth));
             var newVector3Value = gameObject != null ? gameObject.transform.position : Vector3.zero;
             EditorGUI.BeginChangeCheck();
-            var posWidth = (MapEditorConst.InspectorObjectPositionUIWidth - 33f) / 3;
+            var posWidth = (MapEditorConst.InspectorObjectPositionUIWidth - 43f) / 3;
             EditorGUILayout.LabelField("X", GUILayout.Width(10f));
             newVector3Value.x = EditorGUILayout.FloatField(newVector3Value.x, GUILayout.Width(posWidth));
             EditorGUILayout.LabelField("Y", GUILayout.Width(10f));
@@ -2706,8 +2713,9 @@ namespace MapEditor
             if (MapEditorUtilities.IsShowMapUI(mapDataType, MapDataUIType.Batch))
             {
                 var batchOperationSwitchProperty = mapDataProperty.FindPropertyRelative("BatchOperationSwitch");
-                EditorGUILayout.Space(10f, false);
-                batchOperationSwitchProperty.boolValue = EditorGUILayout.Toggle(batchOperationSwitchProperty.boolValue, GUILayout.Width(MapEditorConst.InspectorDataBatchUIWidth));
+                var space = 10f;
+                EditorGUILayout.Space(space, false);
+                batchOperationSwitchProperty.boolValue = EditorGUILayout.Toggle(batchOperationSwitchProperty.boolValue, GUILayout.Width(MapEditorConst.InspectorDataBatchUIWidth - space));
             }
             if (MapEditorUtilities.IsShowMapUI(mapDataType, MapDataUIType.Index))
             {
@@ -2752,38 +2760,19 @@ namespace MapEditor
                     EditorGUILayout.LabelField("找不到关联Id数据", MapStyles.TabMiddleStyle, GUILayout.Width(MapEditorConst.InspectorDataConfIdUIWidth));
                 }
             }
-            if (MapEditorUtilities.IsShowMapUI(mapDataType, MapDataUIType.MonsterGroupId))
+            //if (MapEditorUtilities.IsShowMapUI(mapDataType, MapDataUIType.Des))
+            //{
+            //    var des = mapDataConfig != null ? mapDataConfig.Des : "";
+            //    EditorGUILayout.LabelField(des, MapStyles.TabMiddleStyle, GUILayout.Width(MapEditorConst.InspectorDataDesUIWidth));
+            //}
+            if (MapEditorUtilities.IsShowMapUI(mapDataType, MapDataUIType.GUISwitchOff))
             {
-                var groupIdProperty = mapDataProperty.FindPropertyRelative("GroupId");
-                if (groupIdProperty != null)
-                {
-                    groupIdProperty.intValue = EditorGUILayout.IntField(groupIdProperty.intValue, GUILayout.Width(MapEditorConst.InspectorDataGroupIdUIWidth));
-                }
-            }
-            if (MapEditorUtilities.IsShowMapUI(mapDataType, MapDataUIType.MonsterCreateRadius))
-            {
-                var monsterCreateRadiusProperty = mapDataProperty.FindPropertyRelative("MonsterCreateRaduis");
-                if (monsterCreateRadiusProperty != null)
-                {
-                    monsterCreateRadiusProperty.floatValue = EditorGUILayout.FloatField(monsterCreateRadiusProperty.floatValue, GUILayout.Width(MapEditorConst.InspectorDataMonsterCreateRadiusUIWidth));
-                }
-            }
-            if (MapEditorUtilities.IsShowMapUI(mapDataType, MapDataUIType.MonsterActiveRadius))
-            {
-                var monsterActiveRadiusProperty = mapDataProperty.FindPropertyRelative("MonsterActiveRaduis");
-                if (monsterActiveRadiusProperty != null)
-                {
-                    monsterActiveRadiusProperty.floatValue = EditorGUILayout.FloatField(monsterActiveRadiusProperty.floatValue, GUILayout.Width(MapEditorConst.InspectorDataMonsterActiveRediusUIWidth));
-                }
-            }
-            if (MapEditorUtilities.IsShowMapUI(mapDataType, MapDataUIType.MonsterGroupGUISwitchOff))
-            {
-                var guiSwitchOffProperty = mapDataProperty.FindPropertyRelative("GUISwithOff");
+                var guiSwitchOffProperty = mapDataProperty.FindPropertyRelative("GUISwitchOff");
                 if (guiSwitchOffProperty != null)
                 {
                     var space = 20f;
-                    EditorGUILayout.Space(space, true);
-                    guiSwitchOffProperty.boolValue = EditorGUILayout.Toggle(guiSwitchOffProperty.boolValue, GUILayout.Width(MapEditorConst.InspectorDataMonsterGroupGUISwitchOffUIWidth - space));
+                    EditorGUILayout.Space(space, false);
+                    guiSwitchOffProperty.boolValue = EditorGUILayout.Toggle(guiSwitchOffProperty.boolValue, GUILayout.Width(MapEditorConst.InspectorDataGUISwitchOffUIWidth - space));
                 }
             }
             if (MapEditorUtilities.IsShowMapUI(mapDataType, MapDataUIType.Position))
@@ -2820,12 +2809,30 @@ namespace MapEditor
                     rotationProperty.vector3Value = newRotationVector3Value;
                 }
             }
-            //if (MapEditorUtilities.IsShowMapUI(mapDataType, MapDataUIType.Des))
-            //{
-            //    var des = mapDataConfig != null ? mapDataConfig.Des : "";
-            //    EditorGUILayout.LabelField(des, MapStyles.TabMiddleStyle, GUILayout.Width(MapEditorConst.InspectorDataDesUIWidth));
-            //}
-
+            if (MapEditorUtilities.IsShowMapUI(mapDataType, MapDataUIType.MonsterGroupId))
+            {
+                var groupIdProperty = mapDataProperty.FindPropertyRelative("GroupId");
+                if (groupIdProperty != null)
+                {
+                    groupIdProperty.intValue = EditorGUILayout.IntField(groupIdProperty.intValue, GUILayout.Width(MapEditorConst.InspectorDataGroupIdUIWidth));
+                }
+            }
+            if (MapEditorUtilities.IsShowMapUI(mapDataType, MapDataUIType.MonsterCreateRadius))
+            {
+                var monsterCreateRadiusProperty = mapDataProperty.FindPropertyRelative("MonsterCreateRadius");
+                if (monsterCreateRadiusProperty != null)
+                {
+                    monsterCreateRadiusProperty.floatValue = EditorGUILayout.FloatField(monsterCreateRadiusProperty.floatValue, GUILayout.Width(MapEditorConst.InspectorDataMonsterCreateRadiusUIWidth));
+                }
+            }
+            if (MapEditorUtilities.IsShowMapUI(mapDataType, MapDataUIType.MonsterActiveRadius))
+            {
+                var monsterActiveRadiusProperty = mapDataProperty.FindPropertyRelative("MonsterActiveRadius");
+                if (monsterActiveRadiusProperty != null)
+                {
+                    monsterActiveRadiusProperty.floatValue = EditorGUILayout.FloatField(monsterActiveRadiusProperty.floatValue, GUILayout.Width(MapEditorConst.InspectorDataMonsterActiveRediusUIWidth));
+                }
+            }
             if (MapEditorUtilities.IsShowMapUI(mapDataType, MapDataUIType.MoveUp))
             {
                 if (GUILayout.Button("↑", GUILayout.Width(MapEditorConst.InspectorDataMoveUpUIWidth)))
@@ -2980,6 +2987,11 @@ namespace MapEditor
             for(int i = 0; i < mMapObjectDataListProperty.arraySize; i++)
             {
                 var mapObjectDataProperty = mMapObjectDataListProperty.GetArrayElementAtIndex(i);
+                var guiSwitchOffProperty = mapObjectDataProperty.FindPropertyRelative("GUISwitchOff");
+                if (guiSwitchOffProperty.boolValue)
+                {
+                    continue;
+                }
                 var goProperty = mapObjectDataProperty.FindPropertyRelative("Go");
                 var go = goProperty.objectReferenceValue as GameObject;
                 if(go == null)
@@ -3015,6 +3027,11 @@ namespace MapEditor
         {
             var mapDataProperty = GetMapDataSerializedPropertyByIndex(index);
             if(mapDataProperty == null)
+            {
+                return;
+            }
+            var guiSwitchOffProperty = mapDataProperty.FindPropertyRelative("GUISwitchOff");
+            if (guiSwitchOffProperty.boolValue)
             {
                 return;
             }
@@ -3054,6 +3071,11 @@ namespace MapEditor
             {
                 return;
             }
+            var guiSwitchOffProperty = mapDataProperty.FindPropertyRelative("GUISwitchOff");
+            if (guiSwitchOffProperty.boolValue)
+            {
+                return;
+            }
             var uidProperty = mapDataProperty.FindPropertyRelative("UID");
             var mapDataUID = uidProperty.intValue;
             var mapDataPositionProperty = mapDataProperty.FindPropertyRelative("Position");
@@ -3077,6 +3099,11 @@ namespace MapEditor
             {
                 var mapDataProperty = GetMapDataSerializedPropertyByIndex(i);
                 if(mapDataProperty == null)
+                {
+                    continue;
+                }
+                var guiSwitchOffProperty = mapDataProperty.FindPropertyRelative("GUISwitchOff");
+                if(guiSwitchOffProperty.boolValue)
                 {
                     continue;
                 }
@@ -3114,7 +3141,7 @@ namespace MapEditor
         /// <param name="monsterGroupMapData"></param>
         private void DrawMapMonsterGroupCustomDataHandles(MonsterGroupMapData monsterGroupMapData)
         {
-            if (monsterGroupMapData == null || monsterGroupMapData.GUISwitchOff)
+            if (monsterGroupMapData == null)
             {
                 return;
             }

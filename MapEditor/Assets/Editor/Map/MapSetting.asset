@@ -14,47 +14,45 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   DefaultMapWidth: 6
   DefaultMapHeight: 30
+  DefaultGridSize: 6
   ObjectSetting:
+    IsMapObjectTypeConfigUnfold: 1
+    AllMapObjectTypeConfigs:
+    - rid: 1875189631230672896
+    - rid: 1875189631230672897
+    - rid: 1875189631230672898
     AllMapObjectConfigs:
     - rid: 3718244341701672961
     - rid: 3718244341701672962
     - rid: 3718244341701672963
   DataSetting:
-    AlllMapDataConfigs:
-    - rid: 3718244341701672964
-    - rid: 3718244341701672965
-    - rid: 3718244341701672966
+    AllMapDataConfigs:
+    - rid: 1875189631230672899
+    - rid: 1875189631230672900
+    - rid: 1875189631230672901
+    - rid: 1875189631230672902
   references:
     version: 2
     RefIds:
-    - rid: 3718244341701672961
-      type: {class: MapObjectConfig, ns: MapEditor, asm: Assembly-CSharp}
+    - rid: 1875189631230672896
+      type: {class: MapObjectTypeConfig, ns: MapEditor, asm: Assembly-CSharp}
       data:
-        UID: 1
-        ObjectType: 2
-        IsDynamic: 0
-        ConfId: 1
-        Asset: {fileID: 314933842123915321, guid: 02f4e8e5fd6b8a14db50fb565d03032d, type: 3}
-        Des: "\u95E8"
-    - rid: 3718244341701672962
-      type: {class: MapObjectConfig, ns: MapEditor, asm: Assembly-CSharp}
-      data:
-        UID: 2
-        ObjectType: 1
-        IsDynamic: 1
-        ConfId: 2
-        Asset: {fileID: 1276204567218273734, guid: 83e17cb4c5fc71d4d9b8d5fce4eedbda, type: 3}
-        Des: "\u9677\u9631"
-    - rid: 3718244341701672963
-      type: {class: MapObjectConfig, ns: MapEditor, asm: Assembly-CSharp}
-      data:
-        UID: 3
         ObjectType: 0
         IsDynamic: 1
-        ConfId: 3
-        Asset: {fileID: 4864366610927410093, guid: de0f3a20960abdd44bf5cceadae7d629, type: 3}
         Des: "\u5B9D\u7BB1"
-    - rid: 3718244341701672964
+    - rid: 1875189631230672897
+      type: {class: MapObjectTypeConfig, ns: MapEditor, asm: Assembly-CSharp}
+      data:
+        ObjectType: 1
+        IsDynamic: 1
+        Des: "\u9677\u9631"
+    - rid: 1875189631230672898
+      type: {class: MapObjectTypeConfig, ns: MapEditor, asm: Assembly-CSharp}
+      data:
+        ObjectType: 2
+        IsDynamic: 0
+        Des: "\u95E8"
+    - rid: 1875189631230672899
       type: {class: MapDataConfig, ns: MapEditor, asm: Assembly-CSharp}
       data:
         UID: 1
@@ -63,16 +61,16 @@ MonoBehaviour:
         SceneSphereColor: {r: 1, g: 0.92156863, b: 0.015686275, a: 1}
         Rotation: {x: 0, y: 0, z: 0}
         Des: "\u51FA\u751F\u70B9"
-    - rid: 3718244341701672965
+    - rid: 1875189631230672900
       type: {class: MapDataConfig, ns: MapEditor, asm: Assembly-CSharp}
       data:
         UID: 2
         DataType: 1
         ConfId: 1
         SceneSphereColor: {r: 1, g: 0, b: 1, a: 1}
-        Rotation: {x: 0, y: 90, z: 0}
-        Des: "\u602A\u7269"
-    - rid: 3718244341701672966
+        Rotation: {x: 0, y: 0, z: 0}
+        Des: "\u602A\u72691"
+    - rid: 1875189631230672901
       type: {class: MapDataConfig, ns: MapEditor, asm: Assembly-CSharp}
       data:
         UID: 3
@@ -81,3 +79,36 @@ MonoBehaviour:
         SceneSphereColor: {r: 1, g: 0, b: 0, a: 1}
         Rotation: {x: 0, y: 0, z: 0}
         Des: "\u602A\u7269\u7EC4"
+    - rid: 1875189631230672902
+      type: {class: MapDataConfig, ns: MapEditor, asm: Assembly-CSharp}
+      data:
+        UID: 4
+        DataType: 1
+        ConfId: 2
+        SceneSphereColor: {r: 1, g: 0, b: 1, a: 1}
+        Rotation: {x: 0, y: 0, z: 0}
+        Des: "\u602A\u72692"
+    - rid: 3718244341701672961
+      type: {class: MapObjectConfig, ns: MapEditor, asm: Assembly-CSharp}
+      data:
+        UID: 1
+        ObjectType: 2
+        ConfId: 1
+        Asset: {fileID: 314933842123915321, guid: 02f4e8e5fd6b8a14db50fb565d03032d, type: 3}
+        Des: "\u95E8"
+    - rid: 3718244341701672962
+      type: {class: MapObjectConfig, ns: MapEditor, asm: Assembly-CSharp}
+      data:
+        UID: 2
+        ObjectType: 1
+        ConfId: 2
+        Asset: {fileID: 1276204567218273734, guid: 83e17cb4c5fc71d4d9b8d5fce4eedbda, type: 3}
+        Des: "\u9677\u9631"
+    - rid: 3718244341701672963
+      type: {class: MapObjectConfig, ns: MapEditor, asm: Assembly-CSharp}
+      data:
+        UID: 3
+        ObjectType: 0
+        ConfId: 3
+        Asset: {fileID: 4864366610927410093, guid: de0f3a20960abdd44bf5cceadae7d629, type: 3}
+        Des: "\u5B9D\u7BB1"

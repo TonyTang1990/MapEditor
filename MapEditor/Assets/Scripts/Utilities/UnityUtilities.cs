@@ -21,7 +21,7 @@ public static class UnityUtilities
     /// <returns></returns>
     public static Bounds GetGoRenderersBounds(GameObject gameObject)
     {
-        var bounds = new Bounds(Vector3.zero, Vector3.zero);
+        var bounds = new Bounds(gameObject.transform.position, Vector3.zero);
         if (gameObject == null)
         {
             return bounds;

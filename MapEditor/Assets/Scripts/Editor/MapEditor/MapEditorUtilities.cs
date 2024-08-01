@@ -8,7 +8,9 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
+using System.Threading.Tasks;
 using Unity.AI.Navigation;
+using Unity.AI.Navigation.Editor;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.AI;
@@ -765,6 +767,22 @@ namespace MapEditor
             {
                 EditorGUILayout.LabelField("配置Id", MapStyles.TabMiddleStyle, GUILayout.Width(MapEditorConst.InspectorDataConfIdUIWidth));
             }
+            //if (MapEditorUtilities.IsShowMapUI(mapDataType, MapDataUIType.Des))
+            //{
+            //    EditorGUILayout.LabelField("描述", MapStyles.TabMiddleStyle, GUILayout.Width(MapEditorConst.InspectorDataDesUIWidth));
+            //}
+            if (MapEditorUtilities.IsShowMapUI(mapDataType, MapDataUIType.GUISwitchOff))
+            {
+                EditorGUILayout.LabelField("GUI关闭", MapStyles.TabMiddleStyle, GUILayout.Width(MapEditorConst.InspectorDataGUISwitchOffUIWidth));
+            }
+            if (MapEditorUtilities.IsShowMapUI(mapDataType, MapDataUIType.Position))
+            {
+                EditorGUILayout.LabelField("位置", MapStyles.TabMiddleStyle, GUILayout.Width(MapEditorConst.InspectorDataPositionUIWidth));
+            }
+            if (MapEditorUtilities.IsShowMapUI(mapDataType, MapDataUIType.Rotation))
+            {
+                EditorGUILayout.LabelField("旋转", MapStyles.TabMiddleStyle, GUILayout.Width(MapEditorConst.InspectorDataRotationUIWidth));
+            }
             if (MapEditorUtilities.IsShowMapUI(mapDataType, MapDataUIType.MonsterGroupId))
             {
                 EditorGUILayout.LabelField("组Id", MapStyles.TabMiddleStyle, GUILayout.Width(MapEditorConst.InspectorDataGroupIdUIWidth));
@@ -777,22 +795,6 @@ namespace MapEditor
             {
                 EditorGUILayout.LabelField("警戒半径", MapStyles.TabMiddleStyle, GUILayout.Width(MapEditorConst.InspectorDataMonsterActiveRediusUIWidth));
             }
-            if (MapEditorUtilities.IsShowMapUI(mapDataType, MapDataUIType.MonsterGroupGUISwitchOff))
-            {
-                EditorGUILayout.LabelField("GUI关闭", MapStyles.TabMiddleStyle, GUILayout.Width(MapEditorConst.InspectorDataMonsterGroupGUISwitchOffUIWidth));
-            }
-            if (MapEditorUtilities.IsShowMapUI(mapDataType, MapDataUIType.Position))
-            {
-                EditorGUILayout.LabelField("位置", MapStyles.TabMiddleStyle, GUILayout.Width(MapEditorConst.InspectorDataPositionUIWidth));
-            }
-            if (MapEditorUtilities.IsShowMapUI(mapDataType, MapDataUIType.Rotation))
-            {
-                EditorGUILayout.LabelField("旋转", MapStyles.TabMiddleStyle, GUILayout.Width(MapEditorConst.InspectorDataRotationUIWidth));
-            }
-            //if (MapEditorUtilities.IsShowMapUI(mapDataType, MapDataUIType.Des))
-            //{
-            //    EditorGUILayout.LabelField("描述", MapStyles.TabMiddleStyle, GUILayout.Width(MapEditorConst.InspectorDataDesUIWidth));
-            //}
             if (MapEditorUtilities.IsShowMapUI(mapDataType, MapDataUIType.MoveUp))
             {
                 EditorGUILayout.LabelField("上移", MapStyles.TabMiddleStyle, GUILayout.Width(MapEditorConst.InspectorDataMoveUpUIWidth));
@@ -981,35 +983,6 @@ namespace MapEditor
         }
 
         /// <summary>
-        /// 创建指定地图埋点数据类型，指定uid和指定位置的埋点数据
-        /// </summary>
-        /// <param name="mapDataType"></param>
-        /// <param name="uid"></param>
-        /// <param name="position"></param>
-        /// <param name="rotation"></param>
-        /// <returns></returns>
-        public static MapData CreateMapDataByType(MapDataType mapDataType, int uid, Vector3 position, Vector3 rotation)
-        {
-            if (mapDataType == MapDataType.Monster)
-            {
-                return new MonsterMapData(uid, position, rotation);
-            }
-            else if (mapDataType == MapDataType.MonsterGroup)
-            {
-                return new MonsterGroupMapData(uid, position, rotation);
-            }
-            else if (mapDataType == MapDataType.PlayerSpawn)
-            {
-                return new PlayerSpawnMapData(uid, position, rotation);
-            }
-            else
-            {
-                Debug.LogWarning($"地图埋点类型:{mapDataType}没有创建自定义类型数据，可能不方便未来扩展！");
-                return new MapData(uid, position, rotation);
-            }
-        }
-
-        /// <summary>
         /// 指定GameObject根据指定碰撞器数据更新
         /// </summary>
         /// <param name="go"></param>
@@ -1108,7 +1081,7 @@ namespace MapEditor
             {
                 return GameObjectStatus.Asset;
             }
-            if (PrefabStageUtility.GetPrefabStage(go) != null)
+            if (UnityEditor.SceneManagement.PrefabStageUtility.GetPrefabStage(go) != null)
             {
                 return GameObjectStatus.PrefabContent;
             }
@@ -1166,7 +1139,7 @@ namespace MapEditor
             {
                 return;
             }
-            PrefabStageUtility.OpenPrefab(prefabAssetPath);
+            UnityEditor.SceneManagement.PrefabStageUtility.OpenPrefab(prefabAssetPath);
         }
 
         /// <summary>
@@ -1208,7 +1181,8 @@ namespace MapEditor
                 navMeshSurface = mapGO.AddComponent<NavMeshSurface>();
             }
             navMeshSurface.collectObjects = CollectObjects.Children;
-            navMeshSurface.useGeometry = NavMeshCollectGeometry.PhysicsColliders;
+            navMeshSurface.useGeometry = NavMeshCollectGeometry.RenderMeshes;
+            navMeshSurface.layerMask = LayerMask.GetMask("NavigationBake");
             return navMeshSurface;
         }
 
@@ -1307,7 +1281,7 @@ namespace MapEditor
             }
             else if (gameObjectStatus == GameObjectStatus.PrefabContent)
             {
-                var prefabStage = PrefabStageUtility.GetPrefabStage(gameObject);
+                var prefabStage = UnityEditor.SceneManagement.PrefabStageUtility.GetPrefabStage(gameObject);
                 assetPath = prefabStage != null ? prefabStage.assetPath : null;
             }
             return assetPath;
@@ -1380,9 +1354,10 @@ namespace MapEditor
                     {MapDataUIType.UID, true},
                     {MapDataUIType.MapDataType, true},
                     {MapDataUIType.ConfId, true},
+                    {MapDataUIType.Des, true},
+                    {MapDataUIType.GUISwitchOff, true},
                     {MapDataUIType.Position, true},
                     {MapDataUIType.Rotation, true},
-                    {MapDataUIType.Des, true},
                     {MapDataUIType.MoveUp, true},
                     {MapDataUIType.MoveDown, true},
                     {MapDataUIType.Add, true},
@@ -1397,10 +1372,11 @@ namespace MapEditor
                     {MapDataUIType.UID, true},
                     {MapDataUIType.MapDataType, true},
                     {MapDataUIType.ConfId, true},
-                    {MapDataUIType.MonsterGroupId, true},
+                    {MapDataUIType.Des, true},
+                    {MapDataUIType.GUISwitchOff, true},
                     {MapDataUIType.Position, true},
                     {MapDataUIType.Rotation, true},
-                    {MapDataUIType.Des, true},
+                    {MapDataUIType.MonsterGroupId, true},
                     {MapDataUIType.MoveUp, true},
                     {MapDataUIType.MoveDown, true},
                     {MapDataUIType.Add, true},
@@ -1415,13 +1391,13 @@ namespace MapEditor
                     {MapDataUIType.UID, true},
                     {MapDataUIType.MapDataType, true},
                     {MapDataUIType.ConfId, true},
+                    {MapDataUIType.Des, true},
+                    {MapDataUIType.GUISwitchOff, true},
+                    {MapDataUIType.Position, true},
+                    {MapDataUIType.Rotation, true},
                     {MapDataUIType.MonsterGroupId, true},
                     {MapDataUIType.MonsterCreateRadius, true},
                     {MapDataUIType.MonsterActiveRadius, true},
-                    {MapDataUIType.MonsterGroupGUISwitchOff, true},
-                    {MapDataUIType.Position, true},
-                    {MapDataUIType.Rotation, true},
-                    {MapDataUIType.Des, true},
                     {MapDataUIType.MoveUp, true},
                     {MapDataUIType.MoveDown, true},
                     {MapDataUIType.Add, true},

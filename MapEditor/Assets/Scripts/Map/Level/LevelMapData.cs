@@ -4,19 +4,22 @@
  * Create Date:             2024/07/27
  */
 
+using System.Collections.Generic;
+using UnityEngine;
+
 namespace MapEditor
 {
     /// <summary>
     /// LevelMapData.cs
     /// 关卡数据ScriptableObject
     /// </summary>
-    public class LevelMapData: ScriptaleObject
+    public class LevelMapData: ScriptableObject
     {
         /// <summary>
         /// 地图埋点数据列表
         /// </summary>
         [Header("地图埋点数据列表")]
-        [SerializeReferece]
+        [SerializeReference]
         public List<MapData> MapDataList = new List<MapData>();
 
         /// <summary>

@@ -12,7 +12,7 @@ GameObject:
   - component: {fileID: 1276204567218273733}
   - component: {fileID: 1276204567218273732}
   - component: {fileID: 5635710599176330515}
-  m_Layer: 0
+  m_Layer: 10
   m_Name: Trap
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -96,7 +96,5 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 50108f3b024308e45814f8178ab1425b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  ColliderType: 1
   Center: {x: 0, y: 0, z: 0}
   Size: {x: 1, y: 1, z: 1}
-  Radius: 0.5

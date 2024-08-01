@@ -96,7 +96,7 @@ namespace MapEditor
                 Debug.LogError($"目标组件或Center属性或Size属性为空，自动根据Mesh填充数据失败！");
                 return;
             }
-            var bounds = UnityUtilities.GetGoRenderersBounds(mTarget);
+            var bounds = UnityUtilities.GetGoRenderersBounds(mTarget.gameObject);
             var size = bounds.size;
             size.x = (float)Math.Round((double)size.x, 2);
             size.y = (float)Math.Round((double)size.y, 2);

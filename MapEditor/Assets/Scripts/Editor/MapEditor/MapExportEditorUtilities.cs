@@ -163,10 +163,12 @@ namespace MapEditor
             if (map.ExportType == ExportType.JSON)
             {
                 DoExportGameMapJsonData(map, exportFileName);
+                return true;
             }
             else
             {
                 Debug.LogError($"不支持的导出类型:{map.ExportType.ToString()}，导出地图数据失败！");
+                return false;
             }
         }
 
@@ -211,16 +213,15 @@ namespace MapEditor
         /// 指定地图埋点数据列表和地图模板策略数据是否有无效UID配置
         /// </summary>
         /// <param name="mapDatas"></param>
-        /// <param name="mapTemplateStrategyData"></param>
         /// <returns></returns>
-        private static bool HasInvalideUIDByDatas(List<MapData> mapDatas, MapTemplateStrategyData mapTemplateStrategyData = null)
+        private static bool HasInvalideUIDByDatas(List<MapData> mapDatas)
         {
             if (mapDatas == null)
             {
                 return false;
             }
             MapDataConfig mapDataConfig;
-            foreach (var mapData in map.MapDataList)
+            foreach (var mapData in mapDatas)
             {
                 mapDataConfig = MapSetting.GetEditorInstance().DataSetting.GetMapDataConfigByUID(mapData.UID);
                 if (mapDataConfig == null)
@@ -322,30 +323,23 @@ namespace MapEditor
         }
 
         /// <summary>
-        /// 指定地图埋点数据列表和模板替换规则数据列表更新地图导出数据
+        /// 指定地图埋点数据列表更新地图导出数据
         /// </summary>
         /// <param name="mapExport"></param>
         /// <param name="mapDatas"></param>
-        /// <param name="basePosition"></param>
-        /// <param name="baseRotation"></param>
-        /// <param name="mapTemplateStrategyData"></param>
-        private static void UpdateMapExportByMapDatas(MapExport mapExport, List<MapData> mapDatas, Vector3? basePosition = null,
-                                                        Vector3? baseRotation = null, MapTemplateStrategyData mapTemplateStrategyData = null)
+        private static void UpdateMapExportByMapDatas(MapExport mapExport, List<MapData> mapDatas)
         {
             if(mapDatas == null)
             {
                 return;
             }
-            var finalBasePosition = basePosition != null ? (Vector3)basePosition : Vector3.zero;
-            var finalBaseRotation = baseRotation != null ? (Vector3)baseRotation : Vector3.zero;
             var mapDataTypeDatasMap = GetMapDataTypeDatas(mapDatas);
             List<MapData> playerSpawnDatas;
             if (mapDataTypeDatasMap.TryGetValue(MapDataType.PlayerSpawn, out playerSpawnDatas))
             {
                 foreach (var playerSpawnData in playerSpawnDatas)
                 {
-                    var playerSpawnPosition = finalBasePosition + playerSpawnData.Position;
-                    mapExport.MapData.BirthPos.Add(playerSpawnPosition);
+                    mapExport.MapData.BirthPos.Add(playerSpawnData.Position);
                 }
             }
 
@@ -356,8 +350,7 @@ namespace MapEditor
                 foreach (var mapData in monsterGroupDatas)
                 {
                     var monsterGroupData = mapData as MonsterGroupMapData;
-                    var monsterGroupIdReplaceData = mapTemplateStrategyData != null ? mapTemplateStrategyData.GetMonsterGroupIdReplaceData(monsterGroupData.GroupId) : null;
-                    var monsterGroupId = monsterGroupIdReplaceData != null ? monsterGroupIdReplaceData.NewData : monsterGroupData.GroupId;
+                    var monsterGroupId = monsterGroupData.GroupId;
                     if (!monsterGroupMap.ContainsKey(monsterGroupId))
                     {
                         monsterGroupMap.Add(monsterGroupId, monsterGroupData);
@@ -377,8 +370,7 @@ namespace MapEditor
                 foreach (var mapData in monsterDatas)
                 {
                     var monsterData = mapData as MonsterMapData;
-                    var monsterGroupIdReplaceData = mapTemplateStrategyData != null ? mapTemplateStrategyData.GetMonsterGroupIdReplaceData(monsterData.GroupId) : null;
-                    var monsterGroupId = monsterGroupIdReplaceData != null ? monsterGroupIdReplaceData.NewData : monsterData.GroupId;
+                    var monsterGroupId = monsterData.GroupId;
                     if (!monsterGroupMap.ContainsKey(monsterGroupId))
                     {
                         noGroupMonsterDatas.Add(monsterData);
@@ -406,14 +398,14 @@ namespace MapEditor
                 {
                     Debug.LogWarning($"有重复怪物组Id:{groupId}的数据，理论上导出前已经做检查，不应该进入这里，请检查代码！");
                 }
-                monsterGroupMapDataExport = GetMonsterGroupMapDataExport(monsterGroupMapData, finalBasePosition, finalBaseRotation, mapTemplateStrategyData);
+                monsterGroupMapDataExport = GetMonsterGroupMapDataExport(monsterGroupMapData);
                 mapExport.AllMonsterGroupMapDatas.Add(monsterGroupMapDataExport);
                 List<MapData> groupMonsterMapDatas;
                 if (monsterMap.TryGetValue(groupId, out groupMonsterMapDatas))
                 {
                     foreach (var mapData in groupMonsterMapDatas)
                     {
-                        var monsterMapDataExport = GetMonsterMapDataExport(mapData, finalBasePosition, finalBaseRotation, mapTemplateStrategyData);
+                        var monsterMapDataExport = GetMonsterMapDataExport(mapData);
                         monsterGroupMapDataExport.AddMonsterMapExportData(monsterMapDataExport);
                     }
                 }
@@ -423,15 +415,14 @@ namespace MapEditor
             {
                 foreach (var noGroupMonsterData in noGroupMonsterDatas)
                 {
-                    var monsterMapDataExport = GetMonsterMapDataExport(noGroupMonsterData, finalBasePosition, finalBaseRotation, mapTemplateStrategyData);
+                    var monsterMapDataExport = GetMonsterMapDataExport(noGroupMonsterData);
                     mapExport.ALlNoGroupMonsterMapDatas.Add(monsterMapDataExport);
                 }
             }
 
             foreach (var mapData in mapDatas)
             {
-                var uidReplaceData = mapTemplateStrategyData != null ? mapTemplateStrategyData.GetUIDReplaceData(mapData.UID) : null;
-                var mapDataUID = uidReplaceData != null ? uidReplaceData.NewData : mapData.UID;
+                var mapDataUID = mapData.UID;
                 var mapDataConfig = MapSetting.GetEditorInstance().DataSetting.GetMapDataConfigByUID(mapDataUID);
                 if(mapDataConfig == null)
                 {
@@ -442,7 +433,7 @@ namespace MapEditor
                 {
                     continue;
                 }
-                var mapDataExport = GetBaseMapDataExport(mapData, finalBasePosition, finalBaseRotation, mapTemplateStrategyData);
+                var mapDataExport = GetBaseMapDataExport(mapData);
                 mapExport.AllOtherMapDatas.Add(mapDataExport);
             }
         }
@@ -498,34 +489,24 @@ namespace MapEditor
         /// 获取指定地图埋点数据的地图埋点怪物组导出数据
         /// </summary>
         /// <param name="mapData"></param>
-        /// <param name="basePosition"></param>
-        /// <param name="baseRotation"></param>
-        /// <param name="mapTemplateStrategyData"></param>
         /// <returns></returns>
-        private static MonsterGroupMapDataExport GetMonsterGroupMapDataExport(MapData mapData, Vector3? basePosition = null,
-                                                                                Vector3? baseRotation = null, MapTemplateStrategyData mapTemplateStrategyData = null)
+        private static MonsterGroupMapDataExport GetMonsterGroupMapDataExport(MapData mapData)
         {
             if (mapData == null)
             {
                 Debug.LogError("不允许获取空地图埋点数据的地图埋点怪物组导出数据失败！");
                 return null;
             }
-            var replaceUIDData = mapTemplateStrategyData != null ? mapTemplateStrategyData.GetUIDReplaceData(mapData.UID) : null;
-            var mapDataUID = replaceUIDData != null ? replaceUIDData.NewData : mapData.UID;
+            var mapDataUID = mapData.UID;
             var mapDataConfig = MapSetting.GetEditorInstance().DataSetting.GetMapDataConfigByUID(mapDataUID);
             if (mapDataConfig == null)
             {
                 Debug.LogError($"找不到地图埋点UID:{mapDataUID}的配置，获取地图埋点怪物组导出数据失败！");
                 return null;
             }
-            var finalBasePosition = basePosition != null ? (Vector3)basePosition : Vector3.zero;
-            var finalBaseRotation= baseRotation != null ? (Vector3)baseRotation : Vector3.zero;
             var monsterGroupMapData = mapData as MonsterGroupMapData;
-            var replaceGroupIdData = mapTemplateStrategyData != null ? mapTemplateStrategyData.GetMonsterGroupIdReplaceData(monsterGroupMapData.GroupId) : null;
-            var groupId = replaceGroupIdData != null ? replaceGroupIdData.NewData : monsterGroupMapData.GroupId;
-            var finalPosition = finalBasePosition + mapData.Position;
-            var finalRotation = finalBaseRotation + mapData.Rotation;
-            return new MonsterGroupMapDataExport(mapDataConfig.DataType, mapDataConfig.ConfId, finalPosition, finalRotation,
+            var groupId = monsterGroupMapData.GroupId;
+            return new MonsterGroupMapDataExport(mapDataConfig.DataType, mapDataConfig.ConfId, mapData.Position, mapData.Rotation,
                                                     groupId, monsterGroupMapData.MonsterCreateRadius, monsterGroupMapData.MonsterActiveRadius);
         }
 
@@ -533,64 +514,45 @@ namespace MapEditor
         /// 获取指定地图埋点数据的地图埋点怪物导出数据
         /// </summary>
         /// <param name="mapData"></param>
-        /// <param name="basePosition"></param>
-        /// <param name="baseRotation"></param>
-        /// <param name="mapTemplateStrategyData"></param>
         /// <returns></returns>
-        private static MonsterMapDataExport GetMonsterMapDataExport(MapData mapData, Vector3? basePosition = null,
-                                                                    Vector3? baseRotation = null, MapTemplateStrategyData mapTemplateStrategyData = null)
+        private static MonsterMapDataExport GetMonsterMapDataExport(MapData mapData)
         {
             if (mapData == null)
             {
                 Debug.LogError("不允许获取空地图埋点数据的地图埋点怪物导出数据失败！");
                 return null;
             }
-            var replaceUIDData = mapTemplateStrategyData != null ? mapTemplateStrategyData.GetUIDReplaceData(mapData.UID) : null;
-            var mapDataUID = replaceUIDData != null ? replaceUIDData.NewData : mapData.UID;
+            var mapDataUID = mapData.UID;
             var mapDataConfig = MapSetting.GetEditorInstance().DataSetting.GetMapDataConfigByUID(mapDataUID);
             if (mapDataConfig == null)
             {
                 Debug.LogError($"找不到地图埋点UID:{mapDataUID}的配置，获取地图埋点怪物导出数据失败！");
                 return null;
             }
-            var finalBasePosition = basePosition != null ? (Vector3)basePosition : Vector3.zero;
-            var finalBaseRotation = baseRotation != null ? (Vector3)baseRotation : Vector3.zero;
             var monsterMapData = mapData as MonsterMapData;
-            var replaceGroupIdData = mapTemplateStrategyData != null ? mapTemplateStrategyData.GetMonsterGroupIdReplaceData(monsterMapData.GroupId) : null;
-            var groupId = replaceGroupIdData != null ? replaceGroupIdData.NewData : monsterMapData.GroupId;
-            var finalPosition = finalBasePosition + mapData.Position;
-            var finalRotation = finalBaseRotation + mapData.Rotation;
-            return new MonsterMapDataExport(mapDataConfig.DataType, mapDataConfig.ConfId, finalPosition, finalRotation, groupId);
+            var groupId = monsterMapData.GroupId;
+            return new MonsterMapDataExport(mapDataConfig.DataType, mapDataConfig.ConfId, mapData.Position, mapData.Rotation, groupId);
         }
 
         /// <summary>
         /// 获取指定地图埋点数据的地图埋点基础导出数据
         /// </summary>
         /// <param name="mapData"></param>
-        /// <param name="basePosition"></param>
-        /// <param name="baseRotation"></param>
-        /// <param name="mapTemplateStrategyData"></param>
         /// <returns></returns>
-        private static BaseMapDataExport GetBaseMapDataExport(MapData mapData, Vector3? basePosition = null,
-                                                                Vector3? baseRotation = null, MapTemplateStrategyData mapTemplateStrategyData = null)
+        private static BaseMapDataExport GetBaseMapDataExport(MapData mapData)
         {
             if (mapData == null)
             {
                 Debug.LogError("不允许获取空地图埋点数据的地图埋点基础导出数据失败！");
                 return null;
             }
-            var replaceUIDData = mapTemplateStrategyData != null ? mapTemplateStrategyData.GetUIDReplaceData(mapData.UID) : null;
-            var mapDataUID = replaceUIDData != null ? replaceUIDData.NewData : mapData.UID;
+            var mapDataUID = mapData.UID;
             var mapDataConfig = MapSetting.GetEditorInstance().DataSetting.GetMapDataConfigByUID(mapDataUID);
             if (mapDataConfig == null)
             {
                 Debug.LogError($"找不到地图埋点UID:{mapDataUID}的配置，获取地图埋点基础导出数据失败！");
                 return null;
             }
-            var finalBasePosition = basePosition != null ? (Vector3)basePosition : Vector3.zero;
-            var finalBaseRotation = baseRotation != null ? (Vector3)baseRotation : Vector3.zero;
-            var finalPosition = finalBasePosition + mapData.Position;
-            var finalRotation = finalBaseRotation + mapData.Rotation;
             return new BaseMapDataExport(mapDataConfig.DataType, mapDataConfig.ConfId, mapData.Position, mapData.Rotation);
         }
 

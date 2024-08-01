@@ -7,6 +7,9 @@
 using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Threading.Tasks;
+using UnityEditor;
+using UnityEngine;
 
 namespace MapEditor
 {
@@ -26,7 +29,7 @@ namespace MapEditor
         /// <returns></returns>
         public static MapObjectData DoAddMapObjectData(this Map map, int uid, int insertIndex = -1, bool copyRotation = false)
         {
-            if (!MapEditorUtilities.CheckOperationAvalible(gameObject))
+            if (!MapEditorUtilities.CheckOperationAvalible(map.gameObject))
             {
                 return null;
             }
@@ -96,7 +99,7 @@ namespace MapEditor
         /// <returns></returns>
         public static MapObjectData GetMapObjectDataByIndex(this Map map, int index)
         {
-            if (index < 0 || index >= map.MapObjectDataList..Count)
+            if (index < 0 || index >= map.MapObjectDataList.Count)
             {
                 return null;
             }
@@ -151,7 +154,7 @@ namespace MapEditor
                 mapObjectData.Position = Vector3.zero;
                 GameObject.DestroyImmediate(mapObjectData.Go);
             }
-            map.MapObjectDataList..RemoveAt(index);
+            map.MapObjectDataList.RemoveAt(index);
             map.UpdateMapObjectDataLogicDatas();
             return true;
         }
@@ -242,7 +245,7 @@ namespace MapEditor
             if (instanceGo != null)
             {
                 var mapObjectType = mapObjectConfig.ObjectType;
-                var parentNodeTransform = MapEditorUtilities.GetOrCreateMapObjectTypeParentNode(gameObject, mapObjectType);
+                var parentNodeTransform = MapEditorUtilities.GetOrCreateMapObjectTypeParentNode(map.gameObject, mapObjectType);
                 instanceGo.transform.SetParent(parentNodeTransform);
                 instanceGo.transform.position = map.MapStartPos;
                 var instanceGoName = instanceGo.name.RemoveSubStr("(Clone)");
@@ -280,14 +283,14 @@ namespace MapEditor
             {
                 return false;
             }
-            var navMeshSurface = MapEditorUtilities.GetOrCreateNavMeshSurface(gameObject);
+            var navMeshSurface = MapEditorUtilities.GetOrCreateNavMeshSurface(map.gameObject);
             var bakePathTask = MapEditorUtilities.BakePathTask(navMeshSurface);
             var bakePathResult = await bakePathTask;
             if (!bakePathResult)
             {
                 return false;
             }
-            var copyNavMeshAssetResult = await MapEditorUtilities.CopyNavMeshAsset(gameObject);
+            var copyNavMeshAssetResult = await MapEditorUtilities.CopyNavMeshAsset(map.gameObject);
             if (!copyNavMeshAssetResult)
             {
                 return false;
@@ -364,7 +367,7 @@ namespace MapEditor
                 Debug.LogError($"地图:{map.gameObject.name}恢复动态地图对象失败！");
                 return false;
             }
-            for (int i = 0; i < map.MapObjectDataList..Count; i++)
+            for (int i = 0; i < map.MapObjectDataList.Count; i++)
             {
                 var mapObjectData = map.MapObjectDataList[i];
                 var mapObjectConfig = MapSetting.GetEditorInstance().ObjectSetting.GetMapObjectConfigByUID(mapObjectData.UID);

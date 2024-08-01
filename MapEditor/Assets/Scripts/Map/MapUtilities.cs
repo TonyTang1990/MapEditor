@@ -154,5 +154,35 @@ namespace MapEditor
             }
             return true;
         }
+
+        /// <summary>
+        /// 创建指定地图埋点数据类型，指定uid和指定位置的埋点数据
+        /// </summary>
+        /// <param name="mapDataType"></param>
+        /// <param name="uid"></param>
+        /// <param name="position"></param>
+        /// <param name="rotation"></param>
+        /// <returns></returns>
+        public static MapData CreateMapDataByType(MapDataType mapDataType, int uid, Vector3 position, Vector3 rotation)
+        {
+            if (mapDataType == MapDataType.Monster)
+            {
+                return new MonsterMapData(uid, position, rotation);
+            }
+            else if (mapDataType == MapDataType.MonsterGroup)
+            {
+                return new MonsterGroupMapData(uid, position, rotation);
+            }
+            else if (mapDataType == MapDataType.PlayerSpawn)
+            {
+                return new PlayerSpawnMapData(uid, position, rotation);
+            }
+            else
+            {
+                Debug.LogWarning($"地图埋点类型:{mapDataType}没有创建自定义类型数据，可能不方便未来扩展！");
+                return new MapData(uid, position, rotation);
+            }
+        }
+
     }
 }

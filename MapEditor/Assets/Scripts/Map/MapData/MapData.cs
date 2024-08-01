@@ -40,6 +40,12 @@ namespace MapEditor
         [Header("批量操作开关")]
         public bool BatchOperationSwitch;
 
+        /// <summary>
+        /// GUI关闭开关
+        /// </summary>
+        [Header("GUI关闭开关")]
+        public bool GUISwitchOff = false;
+
         public MapData(int uid)
         {
             UID = uid;
@@ -70,6 +76,7 @@ namespace MapEditor
             Position = sourceMapData.Position;
             Rotation = sourceMapData.Rotation;
             BatchOperationSwitch = sourceMapData.BatchOperationSwitch;
+            GUISwitchOff = sourceMapData.GUISwitchOff;
             return true;
         }
     }

@@ -170,6 +170,11 @@ namespace MapEditor
         public const float InspectorObjectConfIdUIWidth = 100f;
 
         /// <summary>
+        /// 面板地图对象GUI关闭的UI宽度
+        /// </summary>
+        public const float InspectorObjectGUISwitchOffUIWidth = 60f;
+
+        /// <summary>
         /// 面板地图对象实体对象的UI宽度
         /// </summary>
         public const float InspectorObjectInstanceUIWidth = 100f;
@@ -245,9 +250,9 @@ namespace MapEditor
         public const float InspectorDataMonsterActiveRediusUIWidth = 60f;
 
         /// <summary>
-        /// 面板地图埋点怪物组GUI关闭开关的UI宽度
+        /// 面板地图埋点GUI关闭开关的UI宽度
         /// </summary>
-        public const float InspectorDataMonsterGroupGUISwitchOffUIWidth = 60f;
+        public const float InspectorDataGUISwitchOffUIWidth = 60f;
 
         /// <summary>
         /// 面板地图埋点位置的UI宽度
