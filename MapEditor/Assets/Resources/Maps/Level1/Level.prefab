@@ -323,6 +323,10 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 6358738826224427226}
     m_Modifications:
+    - target: {fileID: 736940331429359264, guid: 6456d9519735b0246905a885936cd11a, type: 3}
+      propertyPath: m_Enabled
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 736940331429359266, guid: 6456d9519735b0246905a885936cd11a, type: 3}
       propertyPath: m_Name
       value: MapTerrian
