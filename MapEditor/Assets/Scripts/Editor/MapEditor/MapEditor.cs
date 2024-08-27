@@ -1927,6 +1927,101 @@ namespace MapEditor
         }
 
         /// <summary>
+        /// 执行指定埋点索引，指定属性名和指定值数据更新(含批量更新)
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="mapDataIndex"></param>
+        /// <param name="propertyName"></param>
+        /// <param name="newValue"></param>
+        private void DoChangeMapDataProperty<T>(int mapDataIndex, string propertyName, T newValue)
+        {
+            if(!MapEditorUtilities.CheckOperationAvalible(mTarget?.gameObject))
+            {
+                return;
+            }
+            var targetMapDataProperty = GetMapDataSerializedPropertyByIndex(mapDataIndex);
+            var targetProperty = targetMapDataProperty.FindPropertyRelative(propertyName);
+            if(targetProperty == null)
+            {
+                Debug.LogError($"地图埋点索引:{mapDataIndex}的目标属性:{propertyName}找不到，更新指定埋点索引和属性名值失败！");
+                return;
+            }
+            var targetUidProperty = targetMapDataProperty.FindPropertyRelative("UID");
+            var targetUid = targetUidProperty.intValue;
+            var targetMapDataConfig = MapSetting.GetEditorInstance().DataSetting.GetMapDataConfigByUID(targetUid);
+            var targetMapDataType = targetMapDataConfig.DataType;
+            var targetBatchOperationSwitchProeprty = targetMapDataProperty.FindPropertyRelative("BatchOperationSwitch");
+            UpdatePropertyByValue<T>(targetProperty, newValue);
+            if(targetBatchOperationSwitchProeprty.boolValue)
+            {
+                List<int> mapDataTypeIndexs = GetMapDataTypeIndexs(targetMapDataType);
+                if(mapDataTypeIndexs == null)
+                {
+                    return;
+                }
+                foreach(var mapDataTypeIndex in mapDataTypeIndexs)
+                {
+                    if(mapDataIndex == mapDataTypeIndex)
+                    {
+                        continue;
+                    }
+                    var mapDataProperty = GetMapDataSerializedPropertyByIndex(mapDataTypeIndex);
+                    var batchOperationProperty = mapDataProperty.FindPropertyRelative("BatchOperationSwitch");
+                    if(batchOperationProperty.boolValue)
+                    {
+                        var property = mapDataProperty.FindPropertyRelative(propertyName);
+                        UpdatePropertyByValue<T>(property, newValue);
+                    }
+                }
+            }
+        }
+
+        /// <summary>
+        /// 更新指定属性到指定值
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="property"></param>
+        /// <param name="newValue"></param>
+        private bool UpdatePropertyByValue<T>(SerializedProperty property, T newValue)
+        {
+            if(property == null)
+            {
+                Debug.LogError($"不允许更新空属性的值！");
+                return false;
+            }
+            if (newValue is int newIntValue)
+            {
+                property.intValue = newIntValue;
+                return true;
+            }
+            else if (newValue is float newFloatValue)
+            {
+                property.floatValue = newFloatValue;
+                return true;
+            }
+            else if (newValue is double newDoubleValue)
+            {
+                property.doubleValue = newDoubleValue;
+                return true;
+            }
+            else if (newValue is string newStringValue)
+            {
+                property.stringValue = newStringValue;
+                return true;
+            }
+            else if (newValue is bool newBoolValue)
+            {
+                property.boolValue = newBoolValue;
+                return true;
+            }
+            else
+            {
+                Debug.LogError($"不支持的属性类型:{newValue.GetType().Name}，更新属性值失败！");
+                return false;
+            }
+        }
+
+        /// <summary>
         /// 执行地图埋点数据UID批量变化(排除指定地图数据索引)
         /// Note:
         /// 只允许批量修改相同埋点类型的UID数据
@@ -2767,12 +2862,18 @@ namespace MapEditor
             //}
             if (MapEditorUtilities.IsShowMapUI(mapDataType, MapDataUIType.GUISwitchOff))
             {
-                var guiSwitchOffProperty = mapDataProperty.FindPropertyRelative("GUISwitchOff");
+                var propertyName = "GUISwitchOff";
+                var guiSwitchOffProperty = mapDataProperty.FindPropertyRelative(propertyName);
                 if (guiSwitchOffProperty != null)
                 {
                     var space = 20f;
                     EditorGUILayout.Space(space, false);
-                    guiSwitchOffProperty.boolValue = EditorGUILayout.Toggle(guiSwitchOffProperty.boolValue, GUILayout.Width(MapEditorConst.InspectorDataGUISwitchOffUIWidth - space));
+                    EditorGUI.BeginChangeCheck();
+                    var newGuiSwitchOffPropertyValue = EditorGUILayout.Toggle(guiSwitchOffProperty.boolValue, GUILayout.Width(MapEditorConst.InspectorDataGUISwitchOffUIWidth - space));
+                    if(EditorGUI.EndChangeCheck())
+                    {
+                        DoChangeMapDataProperty(mapDataIndex, propertyName, newGuiSwitchOffPropertyValue);
+                    }
                 }
             }
             if (MapEditorUtilities.IsShowMapUI(mapDataType, MapDataUIType.Position))
@@ -2811,26 +2912,44 @@ namespace MapEditor
             }
             if (MapEditorUtilities.IsShowMapUI(mapDataType, MapDataUIType.MonsterGroupId))
             {
-                var groupIdProperty = mapDataProperty.FindPropertyRelative("GroupId");
+                var propertyName = "GroupId";
+                var groupIdProperty = mapDataProperty.FindPropertyRelative(propertyName);
                 if (groupIdProperty != null)
                 {
-                    groupIdProperty.intValue = EditorGUILayout.IntField(groupIdProperty.intValue, GUILayout.Width(MapEditorConst.InspectorDataGroupIdUIWidth));
+                    EditorGUI.BeginChangeCheck();
+                    var newGroupId = EditorGUILayout.IntField(groupIdProperty.intValue, GUILayout.Width(MapEditorConst.InspectorDataGroupIdUIWidth));
+                    if (EditorGUI.EndChangeCheck())
+                    {
+                        DoChangeMapDataProperty(mapDataIndex, propertyName, newGroupId);
+                    }
                 }
             }
             if (MapEditorUtilities.IsShowMapUI(mapDataType, MapDataUIType.MonsterCreateRadius))
             {
-                var monsterCreateRadiusProperty = mapDataProperty.FindPropertyRelative("MonsterCreateRadius");
+                var propertyName = "MonsterCreateRadius";
+                var monsterCreateRadiusProperty = mapDataProperty.FindPropertyRelative(propertyName);
                 if (monsterCreateRadiusProperty != null)
                 {
-                    monsterCreateRadiusProperty.floatValue = EditorGUILayout.FloatField(monsterCreateRadiusProperty.floatValue, GUILayout.Width(MapEditorConst.InspectorDataMonsterCreateRadiusUIWidth));
+                    EditorGUI.BeginChangeCheck();
+                    var newMonsterCreateRadius = EditorGUILayout.FloatField(monsterCreateRadiusProperty.floatValue, GUILayout.Width(MapEditorConst.InspectorDataMonsterCreateRadiusUIWidth));
+                    if (EditorGUI.EndChangeCheck())
+                    {
+                        DoChangeMapDataProperty(mapDataIndex, propertyName, newMonsterCreateRadius);
+                    }
                 }
             }
             if (MapEditorUtilities.IsShowMapUI(mapDataType, MapDataUIType.MonsterActiveRadius))
             {
-                var monsterActiveRadiusProperty = mapDataProperty.FindPropertyRelative("MonsterActiveRadius");
+                var propertyName = "MonsterActiveRadius";
+                var monsterActiveRadiusProperty = mapDataProperty.FindPropertyRelative(propertyName);
                 if (monsterActiveRadiusProperty != null)
                 {
-                    monsterActiveRadiusProperty.floatValue = EditorGUILayout.FloatField(monsterActiveRadiusProperty.floatValue, GUILayout.Width(MapEditorConst.InspectorDataMonsterActiveRediusUIWidth));
+                    EditorGUI.BeginChangeCheck();
+                    var newMonsterActiveRadius = EditorGUILayout.FloatField(monsterActiveRadiusProperty.floatValue, GUILayout.Width(MapEditorConst.InspectorDataMonsterActiveRediusUIWidth));
+                    if (EditorGUI.EndChangeCheck())
+                    {
+                        DoChangeMapDataProperty(mapDataIndex, propertyName, newMonsterActiveRadius);
+                    }
                 }
             }
             if (MapEditorUtilities.IsShowMapUI(mapDataType, MapDataUIType.MoveUp))
