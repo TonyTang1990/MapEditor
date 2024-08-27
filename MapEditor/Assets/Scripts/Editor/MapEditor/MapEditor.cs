@@ -245,9 +245,14 @@ namespace MapEditor
         private Dictionary<MapDataType, int[]> mMapDataChoiceValuesMap = new Dictionary<MapDataType, int[]>();
 
         /// <summary>
-        /// 按键按下Map<按键值， 是否按下>
+        /// 场景按键按下Map<按键值， 是否按下>
         /// </summary>
-        private Dictionary<KeyCode, bool> mKeyCodeDownMap = new Dictionary<KeyCode, bool>();
+        private Dictionary<KeyCode, bool> mSceneKeyCodeDownMap = new Dictionary<KeyCode, bool>();
+
+        /// <summary>
+        /// Inspector按键按下Map<按键值， 是否按下>
+        /// </summary>
+        private Dictionary<KeyCode, bool> mInspectorKeyCodeDownMap = new Dictionary<KeyCode, bool>();
 
         /// <summary>
         /// 埋点数据属性缓存Map<索引, 属性>
@@ -1156,58 +1161,117 @@ namespace MapEditor
         }
 
         /// <summary>
-        /// 标记指定按键按下
+        /// 标记场景指定按键按下
         /// </summary>
         /// <param name="keyCode"></param>
-        private void MarkKeyDown(KeyCode keyCode)
+        private void MarkSceneKeyDown(KeyCode keyCode)
         {
-            if (!mKeyCodeDownMap.ContainsKey(keyCode))
+            if (!mSceneKeyCodeDownMap.ContainsKey(keyCode))
             {
-                mKeyCodeDownMap.Add(keyCode, true);
+                mSceneKeyCodeDownMap.Add(keyCode, true);
             }
             else
             {
-                mKeyCodeDownMap[keyCode] = true;
+                mSceneKeyCodeDownMap[keyCode] = true;
             }
         }
 
         /// <summary>
-        /// 标记指定按键释放
+        /// 标记场景指定按键释放
         /// </summary>
         /// <param name="keyCode"></param>
-        private void MarkKeyUp(KeyCode keyCode)
+        private void MarkSceneKeyUp(KeyCode keyCode)
         {
-            if (!mKeyCodeDownMap.ContainsKey(keyCode))
+            if (!mSceneKeyCodeDownMap.ContainsKey(keyCode))
             {
-                mKeyCodeDownMap.Add(keyCode, false);
+                mSceneKeyCodeDownMap.Add(keyCode, false);
             }
             else
             {
-                mKeyCodeDownMap[keyCode] = false;
+                mSceneKeyCodeDownMap[keyCode] = false;
             }
         }
 
         /// <summary>
-        /// 标记所有按键释放
+        /// 标记所有场景按键释放
         /// </summary>
-        private void UnmarkAllKeyUp()
+        private void UnmarkAllSceneKeyUp()
         {
-            if (mKeyCodeDownMap.Count == 0)
+            if (mSceneKeyCodeDownMap.Count == 0)
             {
                 return;
             }
-            mKeyCodeDownMap.Clear();
+            mSceneKeyCodeDownMap.Clear();
         }
 
         /// <summary>
-        /// 指定按键是否按下
+        /// 指定场景按键是否按下
         /// </summary>
         /// <param name="keyCode"></param>
         /// <returns></returns>
-        private bool IsKeyCodeDown(KeyCode keyCode)
+        private bool IsSceneKeyCodeDown(KeyCode keyCode)
         {
             bool result = false;
-            if (mKeyCodeDownMap.TryGetValue(keyCode, out result))
+            if (mSceneKeyCodeDownMap.TryGetValue(keyCode, out result))
+            {
+                return result;
+            }
+            return false;
+        }
+
+        /// <summary>
+        /// 标记Inspector指定按键按下
+        /// </summary>
+        /// <param name="keyCode"></param>
+        private void MarkInspectorKeyDown(KeyCode keyCode)
+        {
+            if (!mInspectorKeyCodeDownMap.ContainsKey(keyCode))
+            {
+                mInspectorKeyCodeDownMap.Add(keyCode, true);
+            }
+            else
+            {
+                mInspectorKeyCodeDownMap[keyCode] = true;
+            }
+        }
+
+        /// <summary>
+        /// 标记Inspector指定按键释放
+        /// </summary>
+        /// <param name="keyCode"></param>
+        private void MarkInspectorKeyUp(KeyCode keyCode)
+        {
+            if (!mInspectorKeyCodeDownMap.ContainsKey(keyCode))
+            {
+                mInspectorKeyCodeDownMap.Add(keyCode, false);
+            }
+            else
+            {
+                mInspectorKeyCodeDownMap[keyCode] = false;
+            }
+        }
+
+        /// <summary>
+        /// 标记所有Inspector按键释放
+        /// </summary>
+        private void UnmarkAllInspectorKeyUp()
+        {
+            if (mInspectorKeyCodeDownMap.Count == 0)
+            {
+                return;
+            }
+            mInspectorKeyCodeDownMap.Clear();
+        }
+
+        /// <summary>
+        /// 指定Inspector按键是否按下
+        /// </summary>
+        /// <param name="keyCode"></param>
+        /// <returns></returns>
+        private bool IsInspectorKeyCodeDown(KeyCode keyCode)
+        {
+            bool result = false;
+            if (mInspectorKeyCodeDownMap.TryGetValue(keyCode, out result))
             {
                 return result;
             }
@@ -1228,6 +1292,22 @@ namespace MapEditor
             ClearMapDataSerializedPropertyCache();
             UpdateMapDataTypeIndexDatas();
             Debug.Log($"检测到地图埋点数据长度变化，相关缓存数据更新重置！");
+        }
+
+        /// <summary>
+        /// 检查面板按键事件
+        /// </summary>
+        private void CheckInspectorKeyCodeEvent()
+        {
+            var currentEvent = Event.current;
+            if(currentEvent.type == EventType.KeyDown)
+            {
+                MarkInspectorKeyDown(currentEvent.keyCode);
+            }
+            if(currentEvent.type == EventType.KeyUp)
+            {
+                MarkInspectorKeyUp(currentEvent.keyCode);
+            }
         }
 
         /// <summary>
@@ -2269,6 +2349,8 @@ namespace MapEditor
 
             CheckMapDataLengthChange();
 
+            CheckInspectorKeyCodeEvent();
+
             // 确保对SerializedObjec和SerializedProperty的数据修改每帧同步
             serializedObject.Update();
 
@@ -2577,6 +2659,29 @@ namespace MapEditor
             var batchSpace = 10f;
             EditorGUILayout.Space(batchSpace, false);
             batchOperationSwitchProperty.boolValue = EditorGUILayout.Toggle(batchOperationSwitchProperty.boolValue, GUILayout.Width(MapEditorConst.InspectorObjectBatchUIWidth - batchSpace));
+            var currentEvent = Event.current;
+            if(IsInspectorKeyCodeDown(KeyCode.LeftShift) || IsInspectorKeyCodeDown(keyCode.RightShift))
+            {
+                if(GUILayoutUtility.GetLastRect().Contains(currentEvent.mousePosition))
+                {
+                    //Debug.Log($"按住Shift并处于埋点对象数据索引:{mapObjectDataIndex}的批量勾选区域！")；
+                    if(!batchOperationSwitchProperty.boolValue)
+                    {
+                        batchOperationSwitchProperty.boolValue = true;
+                    }
+                }
+            }
+            else if (IsInspectorKeyCodeDown(KeyCode.LeftAlt) || IsInspectorKeyCodeDown(keyCode.RightAlt))
+            {
+                if (GUILayoutUtility.GetLastRect().Contains(currentEvent.mousePosition))
+                {
+                    //Debug.Log($"按住Alt并处于埋点对象数据索引:{mapObjectDataIndex}的批量勾选区域！")；
+                    if (batchOperationSwitchProperty.boolValue)
+                    {
+                        batchOperationSwitchProperty.boolValue = false;
+                    }
+                }
+            }
             var uidProperty = mapObjectDataProperty.FindPropertyRelative("UID");
             var uid = uidProperty.intValue;
             var goProperty = mapObjectDataProperty.FindPropertyRelative("Go");
@@ -2811,6 +2916,29 @@ namespace MapEditor
                 var space = 10f;
                 EditorGUILayout.Space(space, false);
                 batchOperationSwitchProperty.boolValue = EditorGUILayout.Toggle(batchOperationSwitchProperty.boolValue, GUILayout.Width(MapEditorConst.InspectorDataBatchUIWidth - space));
+                var currentEvent = Event.current;
+                if (IsInspectorKeyCodeDown(KeyCode.LeftShift) || IsInspectorKeyCodeDown(keyCode.RightShift))
+                {
+                    if (GUILayoutUtility.GetLastRect().Contains(currentEvent.mousePosition))
+                    {
+                        //Debug.Log($"按住Shift并处于埋点数据索引:{mapObjectDataIndex}的批量勾选区域！")；
+                        if (!batchOperationSwitchProperty.boolValue)
+                        {
+                            batchOperationSwitchProperty.boolValue = true;
+                        }
+                    }
+                }
+                else if (IsInspectorKeyCodeDown(KeyCode.LeftAlt) || IsInspectorKeyCodeDown(keyCode.RightAlt))
+                {
+                    if (GUILayoutUtility.GetLastRect().Contains(currentEvent.mousePosition))
+                    {
+                        //Debug.Log($"按住Alt并处于埋点数据索引:{mapObjectDataIndex}的批量勾选区域！")；
+                        if (batchOperationSwitchProperty.boolValue)
+                        {
+                            batchOperationSwitchProperty.boolValue = false;
+                        }
+                    }
+                }
             }
             if (MapEditorUtilities.IsShowMapUI(mapDataType, MapDataUIType.Index))
             {
@@ -3013,31 +3141,17 @@ namespace MapEditor
 
                 if(currentEvent.type == EventType.KeyDown)
                 {
-                    if(currentEvent.keyCode == KeyCode.W)
-                    {
-                        MarkKeyDown(KeyCode.W);
-                    }
-                    if(currentEvent.keyCode == KeyCode.E)
-                    {
-                        MarkKeyDown(KeyCode.E);
-                    }
+                    MarkSceneKeyDown(currentEvent.keyCode);
                 }
                 if(currentEvent.type == EventType.KeyUp)
                 {
-                    if (currentEvent.keyCode == KeyCode.W)
-                    {
-                        MarkKeyUp(KeyCode.W);
-                    }
-                    if (currentEvent.keyCode == KeyCode.E)
-                    {
-                        MarkKeyUp(KeyCode.E);
-                    }
+                    MarkSceneKeyUp(currentEvent.keyCode);
                 }
-                if(IsKeyCodeDown(KeyCode.W))
+                if(IsSceneKeyCodeDown(KeyCode.W))
                 {
                     OnWKeyboardClick();
                 }
-                if(IsKeyCodeDown(KeyCode.E))
+                if(IsSceneKeyCodeDown(KeyCode.E))
                 {
                     OnEKeyboardClick();
                 }
