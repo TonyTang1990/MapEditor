@@ -1433,6 +1433,25 @@ namespace MapEditor
         }
 
         /// <summary>
+        /// 更新指定地图对象类型的批量选择
+        /// </summary>
+        /// <param name="isOn"></param>
+        /// <param name="mapObjectType"></param>
+        private void UpdateMapObjectDataBatchOperationByType(bool isOn, MapObjectType mapObjectType)
+        {
+            for (int i = 0, length = mMapObjectDataListProperty.arraySize; i < length; i++)
+            {
+                var mapObjectProperty = mMapObjectDataListProperty.GetArrayElementAtIndex(i);
+                var uid = mapObjectProperty.FindPropertyRelative("UID").intValue;
+                var mapObjectConfig = MapSetting.GetEditorInstance().ObjectSetting.GetMapObjectConfigByUID(uid);
+                if(mapObjectConfig.ObjectType == mapObjectType)
+                {
+                    UpdateMapObjectDataBatchOperationByIndex(i, isOn);
+                }
+            }
+        }
+
+        /// <summary>
         /// 更新所有地图埋点批量选择
         /// </summary>
         /// <param name="isOn"></param>
@@ -1441,6 +1460,25 @@ namespace MapEditor
             for (int i = 0, length = mMapDataListProperty.arraySize; i < length; i++)
             {
                 UpdateMapDataBatchOperationByIndex(i, isOn);
+            }
+        }
+
+        /// <summary>
+        /// 更新指定地图埋点类型的批量选择
+        /// </summary>
+        /// <param name="isOn"></param>
+        /// <param name="mapDataType"></param>
+        private void UpdateMapDataBatchOperationByType(bool isOn, MapDataType mapDataType)
+        {
+            for (int i = 0, length = mMapDataListProperty.arraySize; i < length; i++)
+            {
+                var mapDataProperty = GetMapDataSerializedPropertyByIndex(i);
+                var uid = mapDataProperty.FindPropertyRelative("UID").intValue;
+                var mapDataConfig = MapSetting.GetEditorInstance().DataSetting.GetMapDataConfigByUID(uid);
+                if (mapDataConfig.DataType == mapDataType)
+                {
+                    UpdateMapDataBatchOperationByIndex(i, isOn);
+                }
             }
         }
 
@@ -2401,6 +2439,8 @@ namespace MapEditor
 
             EditorGUILayout.EndVertical();
 
+            CheckShortcuts();
+
             // 确保对SerializedObject和SerializedProperty的数据修改写入生效
             serializedObject.ApplyModifiedProperties();
         }
@@ -2494,11 +2534,11 @@ namespace MapEditor
         {
             EditorGUILayout.BeginVertical("box");
             EditorGUILayout.BeginHorizontal();
-            if (GUILayout.Button("一键勾选批量", GUILayout.ExpandWidth(true)))
+            if (GUILayout.Button("一键勾选批量(快捷键:Shift+Alt+S)", GUILayout.ExpandWidth(true)))
             {
                 OneKeySwitchBatchOperation(true);
             }
-            if (GUILayout.Button("一键清除批量勾选", GUILayout.ExpandWidth(true)))
+            if (GUILayout.Button("一键清除批量勾选(快捷键:Shift+Alt+C)", GUILayout.ExpandWidth(true)))
             {
                 OneKeySwitchBatchOperation(false);
             }
@@ -2828,18 +2868,27 @@ namespace MapEditor
                 return;
             }
             var mapFoldType = MapEditorUtilities.GetMapDataFoldType(mapDataType);
-            DrawMapDataOneKeyFoldAreaByType(mapFoldType);
+            DrawMapDataOneKeyArea(mapDataType, mapFoldType);
             MapEditorUtilities.DrawMapDataTitleAreaByType(mapDataType);
             DrawMapDataDetailByType(mapDataType);
         }
 
         /// <summary>
-        /// 绘制指定地图埋点类型的一键折叠区域
+        /// 绘制指定地图埋点类型的一键区域
         /// </summary>
+        /// <param name="mapDataType"></param>
         /// <param name="mapFoldType"></param>
-        private void DrawMapDataOneKeyFoldAreaByType(MapFoldType mapFoldType)
+        private void DrawMapDataOneKeyArea(MapDataType mapDataType, MapFoldType mapFoldType)
         {
-            EditorGUILayout.BeginHorizontal("box");
+            EditorGUILayout.BeginHorizontal();
+            if (GUILayout.Button("一键勾选批量", GUILayout.ExpandWidth(true)))
+            {
+                UpdateMapDataBatchOperationByType(true, mapDataType);
+            }
+            if (GUILayout.Button("一键清除批量勾选", GUILayout.ExpandWidth(true)))
+            {
+                UpdateMapDataBatchOperationByType(false, mapDataType);
+            }
             var unfoldTitle = MapEditorUtilities.GetMapOneKeyUnfoldTitle(mapFoldType);
             if (GUILayout.Button($"{unfoldTitle}", GUILayout.ExpandWidth(true)))
             {
@@ -3436,6 +3485,33 @@ namespace MapEditor
                 {
                     mapDataRotationProperty.vector3Value = newTargetRotation.eulerAngles;
                     serializedObject.ApplyModifiedProperties();
+                }
+            }
+        }
+
+        /// <summary>
+        /// 检查快捷键
+        /// </summary>
+        private void CheckShortcuts()
+        {
+            CheckOnekeyBatchShortcuts();
+        }
+
+        /// <summary>
+        /// 检查一键批量快捷键
+        /// </summary>
+        private void CheckOnekeyBatchShortcuts()
+        {
+            if ((IsInspectorKeyCodeDown(KeyCode.LeftShift) || IsInspectorKeyCodeDown(KeyCode.RightShift)) &&
+                (IsInspectorKeyCodeDown(KeyCode.LeftAlt) || IsInspectorKeyCodeDown(KeyCode.RightAlt)))
+            {
+                if(IsInspectorKeyCodeDown(KeyCode.S))
+                {
+                    OneKeySwitchBatchOperation(true);
+                }
+                else if(IsInspectorKeyCodeDown(KeyCode.C))
+                {
+                    OneKeySwitchBatchOperation(false);
                 }
             }
         }
