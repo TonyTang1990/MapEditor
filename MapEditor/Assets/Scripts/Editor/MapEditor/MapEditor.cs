@@ -240,9 +240,14 @@ namespace MapEditor
         private Dictionary<MapDataType, int[]> mMapDataChoiceValuesMap = new Dictionary<MapDataType, int[]>();
 
         /// <summary>
-        /// 按键按下Map<按键值， 是否按下>
+        /// 场景按键按下Map<按键值， 是否按下>
         /// </summary>
-        private Dictionary<KeyCode, bool> mKeyCodeDownMap = new Dictionary<KeyCode, bool>();
+        private Dictionary<KeyCode, bool> mSceneKeyCodeDownMap = new Dictionary<KeyCode, bool>();
+
+        /// <summary>
+        /// Inspector按键按下Map<按键值， 是否按下>
+        /// </summary>
+        private Dictionary<KeyCode, bool> mInspectorKeyCodeDownMap = new Dictionary<KeyCode, bool>();
 
         /// <summary>
         /// 埋点数据属性缓存Map<索引, 属性>
@@ -1136,58 +1141,117 @@ namespace MapEditor
         }
 
         /// <summary>
-        /// 标记指定按键按下
+        /// 标记场景指定按键按下
         /// </summary>
         /// <param name="keyCode"></param>
-        private void MarkKeyDown(KeyCode keyCode)
+        private void MarkSceneKeyDown(KeyCode keyCode)
         {
-            if (!mKeyCodeDownMap.ContainsKey(keyCode))
+            if (!mSceneKeyCodeDownMap.ContainsKey(keyCode))
             {
-                mKeyCodeDownMap.Add(keyCode, true);
+                mSceneKeyCodeDownMap.Add(keyCode, true);
             }
             else
             {
-                mKeyCodeDownMap[keyCode] = true;
+                mSceneKeyCodeDownMap[keyCode] = true;
             }
         }
 
         /// <summary>
-        /// 标记指定按键释放
+        /// 标记场景指定按键释放
         /// </summary>
         /// <param name="keyCode"></param>
-        private void MarkKeyUp(KeyCode keyCode)
+        private void MarkSceneKeyUp(KeyCode keyCode)
         {
-            if (!mKeyCodeDownMap.ContainsKey(keyCode))
+            if (!mSceneKeyCodeDownMap.ContainsKey(keyCode))
             {
-                mKeyCodeDownMap.Add(keyCode, false);
+                mSceneKeyCodeDownMap.Add(keyCode, false);
             }
             else
             {
-                mKeyCodeDownMap[keyCode] = false;
+                mSceneKeyCodeDownMap[keyCode] = false;
             }
         }
 
         /// <summary>
-        /// 标记所有按键释放
+        /// 标记所有场景按键释放
         /// </summary>
-        private void UnmarkAllKeyUp()
+        private void UnmarkAllSceneKeyUp()
         {
-            if (mKeyCodeDownMap.Count == 0)
+            if (mSceneKeyCodeDownMap.Count == 0)
             {
                 return;
             }
-            mKeyCodeDownMap.Clear();
+            mSceneKeyCodeDownMap.Clear();
         }
 
         /// <summary>
-        /// 指定按键是否按下
+        /// 指定场景按键是否按下
         /// </summary>
         /// <param name="keyCode"></param>
         /// <returns></returns>
-        private bool IsKeyCodeDown(KeyCode keyCode)
+        private bool IsSceneKeyCodeDown(KeyCode keyCode)
         {
             bool result = false;
-            if (mKeyCodeDownMap.TryGetValue(keyCode, out result))
+            if (mSceneKeyCodeDownMap.TryGetValue(keyCode, out result))
+            {
+                return result;
+            }
+            return false;
+        }
+
+        /// <summary>
+        /// 标记Inspector指定按键按下
+        /// </summary>
+        /// <param name="keyCode"></param>
+        private void MarkInspectorKeyDown(KeyCode keyCode)
+        {
+            if (!mInspectorKeyCodeDownMap.ContainsKey(keyCode))
+            {
+                mInspectorKeyCodeDownMap.Add(keyCode, true);
+            }
+            else
+            {
+                mInspectorKeyCodeDownMap[keyCode] = true;
+            }
+        }
+
+        /// <summary>
+        /// 标记Inspector指定按键释放
+        /// </summary>
+        /// <param name="keyCode"></param>
+        private void MarkInspectorKeyUp(KeyCode keyCode)
+        {
+            if (!mInspectorKeyCodeDownMap.ContainsKey(keyCode))
+            {
+                mInspectorKeyCodeDownMap.Add(keyCode, false);
+            }
+            else
+            {
+                mInspectorKeyCodeDownMap[keyCode] = false;
+            }
+        }
+
+        /// <summary>
+        /// 标记所有Inspector按键释放
+        /// </summary>
+        private void UnmarkAllInspectorKeyUp()
+        {
+            if (mInspectorKeyCodeDownMap.Count == 0)
+            {
+                return;
+            }
+            mInspectorKeyCodeDownMap.Clear();
+        }
+
+        /// <summary>
+        /// 指定Inspector按键是否按下
+        /// </summary>
+        /// <param name="keyCode"></param>
+        /// <returns></returns>
+        private bool IsInspectorKeyCodeDown(KeyCode keyCode)
+        {
+            bool result = false;
+            if (mInspectorKeyCodeDownMap.TryGetValue(keyCode, out result))
             {
                 return result;
             }
@@ -1208,6 +1272,22 @@ namespace MapEditor
             ClearMapDataSerializedPropertyCache();
             UpdateMapDataTypeIndexDatas();
             Debug.Log($"检测到地图埋点数据长度变化，相关缓存数据更新重置！");
+        }
+
+        /// <summary>
+        /// 检查面板按键事件
+        /// </summary>
+        private void CheckInspectorKeyCodeEvent()
+        {
+            var currentEvent = Event.current;
+            if(currentEvent.type == EventType.KeyDown)
+            {
+                MarkInspectorKeyDown(currentEvent.keyCode);
+            }
+            if(currentEvent.type == EventType.KeyUp)
+            {
+                MarkInspectorKeyUp(currentEvent.keyCode);
+            }
         }
 
         /// <summary>
@@ -1333,6 +1413,25 @@ namespace MapEditor
         }
 
         /// <summary>
+        /// 更新指定地图对象类型的批量选择
+        /// </summary>
+        /// <param name="isOn"></param>
+        /// <param name="mapObjectType"></param>
+        private void UpdateMapObjectDataBatchOperationByType(bool isOn, MapObjectType mapObjectType)
+        {
+            for (int i = 0, length = mMapObjectDataListProperty.arraySize; i < length; i++)
+            {
+                var mapObjectProperty = mMapObjectDataListProperty.GetArrayElementAtIndex(i);
+                var uid = mapObjectProperty.FindPropertyRelative("UID").intValue;
+                var mapObjectConfig = MapSetting.GetEditorInstance().ObjectSetting.GetMapObjectConfigByUID(uid);
+                if(mapObjectConfig.ObjectType == mapObjectType)
+                {
+                    UpdateMapObjectDataBatchOperationByIndex(i, isOn);
+                }
+            }
+        }
+
+        /// <summary>
         /// 更新所有地图埋点批量选择
         /// </summary>
         /// <param name="isOn"></param>
@@ -1341,6 +1440,25 @@ namespace MapEditor
             for (int i = 0, length = mMapDataListProperty.arraySize; i < length; i++)
             {
                 UpdateMapDataBatchOperationByIndex(i, isOn);
+            }
+        }
+
+        /// <summary>
+        /// 更新指定地图埋点类型的批量选择
+        /// </summary>
+        /// <param name="isOn"></param>
+        /// <param name="mapDataType"></param>
+        private void UpdateMapDataBatchOperationByType(bool isOn, MapDataType mapDataType)
+        {
+            for (int i = 0, length = mMapDataListProperty.arraySize; i < length; i++)
+            {
+                var mapDataProperty = GetMapDataSerializedPropertyByIndex(i);
+                var uid = mapDataProperty.FindPropertyRelative("UID").intValue;
+                var mapDataConfig = MapSetting.GetEditorInstance().DataSetting.GetMapDataConfigByUID(uid);
+                if (mapDataConfig.DataType == mapDataType)
+                {
+                    UpdateMapDataBatchOperationByIndex(i, isOn);
+                }
             }
         }
 
@@ -1849,6 +1967,101 @@ namespace MapEditor
         }
 
         /// <summary>
+        /// 执行指定埋点索引，指定属性名和指定值数据更新(含批量更新)
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="mapDataIndex"></param>
+        /// <param name="propertyName"></param>
+        /// <param name="newValue"></param>
+        private void DoChangeMapDataProperty<T>(int mapDataIndex, string propertyName, T newValue)
+        {
+            if(!MapEditorUtilities.CheckOperationAvalible(mTarget?.gameObject))
+            {
+                return;
+            }
+            var targetMapDataProperty = GetMapDataSerializedPropertyByIndex(mapDataIndex);
+            var targetProperty = targetMapDataProperty.FindPropertyRelative(propertyName);
+            if(targetProperty == null)
+            {
+                Debug.LogError($"地图埋点索引:{mapDataIndex}的目标属性:{propertyName}找不到，更新指定埋点索引和属性名值失败！");
+                return;
+            }
+            var targetUidProperty = targetMapDataProperty.FindPropertyRelative("UID");
+            var targetUid = targetUidProperty.intValue;
+            var targetMapDataConfig = MapSetting.GetEditorInstance().DataSetting.GetMapDataConfigByUID(targetUid);
+            var targetMapDataType = targetMapDataConfig.DataType;
+            var targetBatchOperationSwitchProeprty = targetMapDataProperty.FindPropertyRelative("BatchOperationSwitch");
+            UpdatePropertyByValue<T>(targetProperty, newValue);
+            if(targetBatchOperationSwitchProeprty.boolValue)
+            {
+                List<int> mapDataTypeIndexs = GetMapDataTypeIndexs(targetMapDataType);
+                if(mapDataTypeIndexs == null)
+                {
+                    return;
+                }
+                foreach(var mapDataTypeIndex in mapDataTypeIndexs)
+                {
+                    if(mapDataIndex == mapDataTypeIndex)
+                    {
+                        continue;
+                    }
+                    var mapDataProperty = GetMapDataSerializedPropertyByIndex(mapDataTypeIndex);
+                    var batchOperationProperty = mapDataProperty.FindPropertyRelative("BatchOperationSwitch");
+                    if(batchOperationProperty.boolValue)
+                    {
+                        var property = mapDataProperty.FindPropertyRelative(propertyName);
+                        UpdatePropertyByValue<T>(property, newValue);
+                    }
+                }
+            }
+        }
+
+        /// <summary>
+        /// 更新指定属性到指定值
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="property"></param>
+        /// <param name="newValue"></param>
+        private bool UpdatePropertyByValue<T>(SerializedProperty property, T newValue)
+        {
+            if(property == null)
+            {
+                Debug.LogError($"不允许更新空属性的值！");
+                return false;
+            }
+            if (newValue is int newIntValue)
+            {
+                property.intValue = newIntValue;
+                return true;
+            }
+            else if (newValue is float newFloatValue)
+            {
+                property.floatValue = newFloatValue;
+                return true;
+            }
+            else if (newValue is double newDoubleValue)
+            {
+                property.doubleValue = newDoubleValue;
+                return true;
+            }
+            else if (newValue is string newStringValue)
+            {
+                property.stringValue = newStringValue;
+                return true;
+            }
+            else if (newValue is bool newBoolValue)
+            {
+                property.boolValue = newBoolValue;
+                return true;
+            }
+            else
+            {
+                Debug.LogError($"不支持的属性类型:{newValue.GetType().Name}，更新属性值失败！");
+                return false;
+            }
+        }
+
+        /// <summary>
         /// 执行地图埋点数据UID批量变化(排除指定地图数据索引)
         /// Note:
         /// 只允许批量修改相同埋点类型的UID数据
@@ -2096,6 +2309,8 @@ namespace MapEditor
 
             CheckMapDataLengthChange();
 
+            CheckInspectorKeyCodeEvent();
+
             // 确保对SerializedObjec和SerializedProperty的数据修改每帧同步
             serializedObject.Update();
 
@@ -2138,6 +2353,8 @@ namespace MapEditor
             DrawMapOperationInspectorArea();
 
             EditorGUILayout.EndVertical();
+
+            CheckShortcuts();
 
             // 确保对SerializedObject和SerializedProperty的数据修改写入生效
             serializedObject.ApplyModifiedProperties();
@@ -2236,11 +2453,11 @@ namespace MapEditor
         {
             EditorGUILayout.BeginVertical("box");
             EditorGUILayout.BeginHorizontal();
-            if (GUILayout.Button("一键勾选批量", GUILayout.ExpandWidth(true)))
+            if (GUILayout.Button("一键勾选批量(快捷键:Shift+Alt+S)", GUILayout.ExpandWidth(true)))
             {
                 OneKeySwitchBatchOperation(true);
             }
-            if (GUILayout.Button("一键清除批量勾选", GUILayout.ExpandWidth(true)))
+            if (GUILayout.Button("一键清除批量勾选(快捷键:Shift+Alt+C)", GUILayout.ExpandWidth(true)))
             {
                 OneKeySwitchBatchOperation(false);
             }
@@ -2401,6 +2618,29 @@ namespace MapEditor
             var batchSpace = 10f;
             EditorGUILayout.Space(batchSpace, false);
             batchOperationSwitchProperty.boolValue = EditorGUILayout.Toggle(batchOperationSwitchProperty.boolValue, GUILayout.Width(MapEditorConst.InspectorObjectBatchUIWidth - batchSpace));
+            var currentEvent = Event.current;
+            if(IsInspectorKeyCodeDown(KeyCode.LeftShift) || IsInspectorKeyCodeDown(keyCode.RightShift))
+            {
+                if(GUILayoutUtility.GetLastRect().Contains(currentEvent.mousePosition))
+                {
+                    //Debug.Log($"按住Shift并处于埋点对象数据索引:{mapObjectDataIndex}的批量勾选区域！")；
+                    if(!batchOperationSwitchProperty.boolValue)
+                    {
+                        batchOperationSwitchProperty.boolValue = true;
+                    }
+                }
+            }
+            else if (IsInspectorKeyCodeDown(KeyCode.LeftAlt) || IsInspectorKeyCodeDown(keyCode.RightAlt))
+            {
+                if (GUILayoutUtility.GetLastRect().Contains(currentEvent.mousePosition))
+                {
+                    //Debug.Log($"按住Alt并处于埋点对象数据索引:{mapObjectDataIndex}的批量勾选区域！")；
+                    if (batchOperationSwitchProperty.boolValue)
+                    {
+                        batchOperationSwitchProperty.boolValue = false;
+                    }
+                }
+            }
             var uidProperty = mapObjectDataProperty.FindPropertyRelative("UID");
             var uid = uidProperty.intValue;
             var goProperty = mapObjectDataProperty.FindPropertyRelative("Go");
@@ -2547,18 +2787,27 @@ namespace MapEditor
                 return;
             }
             var mapFoldType = MapEditorUtilities.GetMapDataFoldType(mapDataType);
-            DrawMapDataOneKeyFoldAreaByType(mapFoldType);
+            DrawMapDataOneKeyArea(mapDataType, mapFoldType);
             MapEditorUtilities.DrawMapDataTitleAreaByType(mapDataType);
             DrawMapDataDetailByType(mapDataType);
         }
 
         /// <summary>
-        /// 绘制指定地图埋点类型的一键折叠区域
+        /// 绘制指定地图埋点类型的一键区域
         /// </summary>
+        /// <param name="mapDataType"></param>
         /// <param name="mapFoldType"></param>
-        private void DrawMapDataOneKeyFoldAreaByType(MapFoldType mapFoldType)
+        private void DrawMapDataOneKeyArea(MapDataType mapDataType, MapFoldType mapFoldType)
         {
-            EditorGUILayout.BeginHorizontal("box");
+            EditorGUILayout.BeginHorizontal();
+            if (GUILayout.Button("一键勾选批量", GUILayout.ExpandWidth(true)))
+            {
+                UpdateMapDataBatchOperationByType(true, mapDataType);
+            }
+            if (GUILayout.Button("一键清除批量勾选", GUILayout.ExpandWidth(true)))
+            {
+                UpdateMapDataBatchOperationByType(false, mapDataType);
+            }
             var unfoldTitle = MapEditorUtilities.GetMapOneKeyUnfoldTitle(mapFoldType);
             if (GUILayout.Button($"{unfoldTitle}", GUILayout.ExpandWidth(true)))
             {
@@ -2635,6 +2884,29 @@ namespace MapEditor
                 var space = 10f;
                 EditorGUILayout.Space(space, false);
                 batchOperationSwitchProperty.boolValue = EditorGUILayout.Toggle(batchOperationSwitchProperty.boolValue, GUILayout.Width(MapEditorConst.InspectorDataBatchUIWidth - space));
+                var currentEvent = Event.current;
+                if (IsInspectorKeyCodeDown(KeyCode.LeftShift) || IsInspectorKeyCodeDown(keyCode.RightShift))
+                {
+                    if (GUILayoutUtility.GetLastRect().Contains(currentEvent.mousePosition))
+                    {
+                        //Debug.Log($"按住Shift并处于埋点数据索引:{mapObjectDataIndex}的批量勾选区域！")；
+                        if (!batchOperationSwitchProperty.boolValue)
+                        {
+                            batchOperationSwitchProperty.boolValue = true;
+                        }
+                    }
+                }
+                else if (IsInspectorKeyCodeDown(KeyCode.LeftAlt) || IsInspectorKeyCodeDown(keyCode.RightAlt))
+                {
+                    if (GUILayoutUtility.GetLastRect().Contains(currentEvent.mousePosition))
+                    {
+                        //Debug.Log($"按住Alt并处于埋点数据索引:{mapObjectDataIndex}的批量勾选区域！")；
+                        if (batchOperationSwitchProperty.boolValue)
+                        {
+                            batchOperationSwitchProperty.boolValue = false;
+                        }
+                    }
+                }
             }
             if (MapEditorUtilities.IsShowMapUI(mapDataType, MapDataUIType.Index))
             {
@@ -2686,12 +2958,18 @@ namespace MapEditor
             //}
             if (MapEditorUtilities.IsShowMapUI(mapDataType, MapDataUIType.GUISwitchOff))
             {
-                var guiSwitchOffProperty = mapDataProperty.FindPropertyRelative("GUISwitchOff");
+                var propertyName = "GUISwitchOff";
+                var guiSwitchOffProperty = mapDataProperty.FindPropertyRelative(propertyName);
                 if (guiSwitchOffProperty != null)
                 {
                     var space = 20f;
                     EditorGUILayout.Space(space, false);
-                    guiSwitchOffProperty.boolValue = EditorGUILayout.Toggle(guiSwitchOffProperty.boolValue, GUILayout.Width(MapEditorConst.InspectorDataGUISwitchOffUIWidth - space));
+                    EditorGUI.BeginChangeCheck();
+                    var newGuiSwitchOffPropertyValue = EditorGUILayout.Toggle(guiSwitchOffProperty.boolValue, GUILayout.Width(MapEditorConst.InspectorDataGUISwitchOffUIWidth - space));
+                    if(EditorGUI.EndChangeCheck())
+                    {
+                        DoChangeMapDataProperty(mapDataIndex, propertyName, newGuiSwitchOffPropertyValue);
+                    }
                 }
             }
             if (MapEditorUtilities.IsShowMapUI(mapDataType, MapDataUIType.Position))
@@ -2730,26 +3008,44 @@ namespace MapEditor
             }
             if (MapEditorUtilities.IsShowMapUI(mapDataType, MapDataUIType.MonsterGroupId))
             {
-                var groupIdProperty = mapDataProperty.FindPropertyRelative("GroupId");
+                var propertyName = "GroupId";
+                var groupIdProperty = mapDataProperty.FindPropertyRelative(propertyName);
                 if (groupIdProperty != null)
                 {
-                    groupIdProperty.intValue = EditorGUILayout.IntField(groupIdProperty.intValue, GUILayout.Width(MapEditorConst.InspectorDataGroupIdUIWidth));
+                    EditorGUI.BeginChangeCheck();
+                    var newGroupId = EditorGUILayout.IntField(groupIdProperty.intValue, GUILayout.Width(MapEditorConst.InspectorDataGroupIdUIWidth));
+                    if (EditorGUI.EndChangeCheck())
+                    {
+                        DoChangeMapDataProperty(mapDataIndex, propertyName, newGroupId);
+                    }
                 }
             }
             if (MapEditorUtilities.IsShowMapUI(mapDataType, MapDataUIType.MonsterCreateRadius))
             {
-                var monsterCreateRadiusProperty = mapDataProperty.FindPropertyRelative("MonsterCreateRadius");
+                var propertyName = "MonsterCreateRadius";
+                var monsterCreateRadiusProperty = mapDataProperty.FindPropertyRelative(propertyName);
                 if (monsterCreateRadiusProperty != null)
                 {
-                    monsterCreateRadiusProperty.floatValue = EditorGUILayout.FloatField(monsterCreateRadiusProperty.floatValue, GUILayout.Width(MapEditorConst.InspectorDataMonsterCreateRadiusUIWidth));
+                    EditorGUI.BeginChangeCheck();
+                    var newMonsterCreateRadius = EditorGUILayout.FloatField(monsterCreateRadiusProperty.floatValue, GUILayout.Width(MapEditorConst.InspectorDataMonsterCreateRadiusUIWidth));
+                    if (EditorGUI.EndChangeCheck())
+                    {
+                        DoChangeMapDataProperty(mapDataIndex, propertyName, newMonsterCreateRadius);
+                    }
                 }
             }
             if (MapEditorUtilities.IsShowMapUI(mapDataType, MapDataUIType.MonsterActiveRadius))
             {
-                var monsterActiveRadiusProperty = mapDataProperty.FindPropertyRelative("MonsterActiveRadius");
+                var propertyName = "MonsterActiveRadius";
+                var monsterActiveRadiusProperty = mapDataProperty.FindPropertyRelative(propertyName);
                 if (monsterActiveRadiusProperty != null)
                 {
-                    monsterActiveRadiusProperty.floatValue = EditorGUILayout.FloatField(monsterActiveRadiusProperty.floatValue, GUILayout.Width(MapEditorConst.InspectorDataMonsterActiveRediusUIWidth));
+                    EditorGUI.BeginChangeCheck();
+                    var newMonsterActiveRadius = EditorGUILayout.FloatField(monsterActiveRadiusProperty.floatValue, GUILayout.Width(MapEditorConst.InspectorDataMonsterActiveRediusUIWidth));
+                    if (EditorGUI.EndChangeCheck())
+                    {
+                        DoChangeMapDataProperty(mapDataIndex, propertyName, newMonsterActiveRadius);
+                    }
                 }
             }
             if (MapEditorUtilities.IsShowMapUI(mapDataType, MapDataUIType.MoveUp))
@@ -2813,31 +3109,17 @@ namespace MapEditor
 
                 if(currentEvent.type == EventType.KeyDown)
                 {
-                    if(currentEvent.keyCode == KeyCode.W)
-                    {
-                        MarkKeyDown(KeyCode.W);
-                    }
-                    if(currentEvent.keyCode == KeyCode.E)
-                    {
-                        MarkKeyDown(KeyCode.E);
-                    }
+                    MarkSceneKeyDown(currentEvent.keyCode);
                 }
                 if(currentEvent.type == EventType.KeyUp)
                 {
-                    if (currentEvent.keyCode == KeyCode.W)
-                    {
-                        MarkKeyUp(KeyCode.W);
-                    }
-                    if (currentEvent.keyCode == KeyCode.E)
-                    {
-                        MarkKeyUp(KeyCode.E);
-                    }
+                    MarkSceneKeyUp(currentEvent.keyCode);
                 }
-                if(IsKeyCodeDown(KeyCode.W))
+                if(IsSceneKeyCodeDown(KeyCode.W))
                 {
                     OnWKeyboardClick();
                 }
-                if(IsKeyCodeDown(KeyCode.E))
+                if(IsSceneKeyCodeDown(KeyCode.E))
                 {
                     OnEKeyboardClick();
                 }
@@ -3122,6 +3404,33 @@ namespace MapEditor
                 {
                     mapDataRotationProperty.vector3Value = newTargetRotation.eulerAngles;
                     serializedObject.ApplyModifiedProperties();
+                }
+            }
+        }
+
+        /// <summary>
+        /// 检查快捷键
+        /// </summary>
+        private void CheckShortcuts()
+        {
+            CheckOnekeyBatchShortcuts();
+        }
+
+        /// <summary>
+        /// 检查一键批量快捷键
+        /// </summary>
+        private void CheckOnekeyBatchShortcuts()
+        {
+            if ((IsInspectorKeyCodeDown(KeyCode.LeftShift) || IsInspectorKeyCodeDown(KeyCode.RightShift)) &&
+                (IsInspectorKeyCodeDown(KeyCode.LeftAlt) || IsInspectorKeyCodeDown(KeyCode.RightAlt)))
+            {
+                if(IsInspectorKeyCodeDown(KeyCode.S))
+                {
+                    OneKeySwitchBatchOperation(true);
+                }
+                else if(IsInspectorKeyCodeDown(KeyCode.C))
+                {
+                    OneKeySwitchBatchOperation(false);
                 }
             }
         }
