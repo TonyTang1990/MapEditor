@@ -85,12 +85,6 @@ namespace MapEditor
         public float GridSize;
 
         /// <summary>
-        /// 自定义地形Asset
-        /// </summary>
-        [Header("自定义地形Asset")]
-        public GameObject MapTerrianAsset;
-
-        /// <summary>
         /// 地图对象数据列表
         /// </summary>
         [Header("地图对象数据列表")]

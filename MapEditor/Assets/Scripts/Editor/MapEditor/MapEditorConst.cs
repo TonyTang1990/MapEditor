@@ -27,7 +27,7 @@ namespace MapEditor
         /// <summary>
         /// 关卡地图数据保存路径
         /// </summary>
-        public const string LevelMapDataSaveFolder = "Asset/Editor/Map/Level/LevelMapData/";
+        public const string LevelMapDataSaveFolder = "Assets/Editor/Map/Level/LevelMapData/";
 
         /// <summary>
         /// 地图对象类型配置UI显示宽度

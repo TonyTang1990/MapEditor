@@ -1,0 +1,59 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c4dbb7da33633c346bfabfc415d76033, type: 3}
+  m_Name: MapTemplateData
+  m_EditorClassIdentifier: 
+  MapDataList:
+  - rid: 1673489113762758671
+  - rid: 1673489113762758672
+  - rid: 1673489113762758673
+  - rid: 1673489113762758674
+  references:
+    version: 2
+    RefIds:
+    - rid: 1673489113762758671
+      type: {class: PlayerSpawnMapData, ns: MapEditor, asm: Assembly-CSharp}
+      data:
+        UID: 1
+        Position: {x: 3, y: 0, z: 2}
+        Rotation: {x: 0, y: 0, z: 0}
+        BatchOperationSwitch: 0
+        GUISwitchOff: 0
+    - rid: 1673489113762758672
+      type: {class: MonsterMapData, ns: MapEditor, asm: Assembly-CSharp}
+      data:
+        UID: 2
+        Position: {x: 2, y: 0, z: 10}
+        Rotation: {x: 0, y: 0, z: 0}
+        BatchOperationSwitch: 0
+        GUISwitchOff: 0
+        GroupId: 1
+    - rid: 1673489113762758673
+      type: {class: MonsterMapData, ns: MapEditor, asm: Assembly-CSharp}
+      data:
+        UID: 4
+        Position: {x: 4, y: 0, z: 15}
+        Rotation: {x: 0, y: 0, z: 0}
+        BatchOperationSwitch: 0
+        GUISwitchOff: 0
+        GroupId: 1
+    - rid: 1673489113762758674
+      type: {class: MonsterGroupMapData, ns: MapEditor, asm: Assembly-CSharp}
+      data:
+        UID: 3
+        Position: {x: 3, y: 0, z: 13}
+        Rotation: {x: 0, y: 0, z: 0}
+        BatchOperationSwitch: 0
+        GUISwitchOff: 0
+        GroupId: 1
+        MonsterCreateRadius: 4
+        MonsterActiveRadius: 3

@@ -90,11 +90,6 @@ namespace MapEditor
         private SerializedProperty mGridSizeProperty;
 
         /// <summary>
-        /// MapTerrianAsset属性
-        /// </summary>
-        private SerializedProperty mMapTerrianAssetProperty;
-
-        /// <summary>
         /// MapObjectDataList属性
         /// </summary>
         private SerializedProperty mMapObjectDataListProperty;
@@ -313,7 +308,6 @@ namespace MapEditor
             mMapHeightProperty ??= serializedObject.FindProperty("MapHeight");
             mMapStartPosProperty ??= serializedObject.FindProperty("MapStartPos");
             mGridSizeProperty ??= serializedObject.FindProperty("GridSize");
-            mMapTerrianAssetProperty ??= serializedObject.FindProperty("MapTerrianAsset");
             mMapObjectDataListProperty ??= serializedObject.FindProperty("MapObjectDataList");
             mMapDataListProperty ??= serializedObject.FindProperty("MapDataList");
             mAddMapObjectTypeProperty ??= serializedObject.FindProperty("AddMapObjectType");
@@ -451,30 +445,11 @@ namespace MapEditor
             {
                 return;
             }
-            var customAsset = mMapTerrianAssetProperty.objectReferenceValue as GameObject;
-            var mapTerrianTransform = MapEditorUtilities.GetOrCreateMapTerrianNode(mTarget?.gameObject, customAsset);
+            var mapTerrianTransform = MapEditorUtilities.GetOrCreateMapTerrianNode(mTarget?.gameObject);
             if (mapTerrianTransform != null)
             {
                 mapTerrianTransform.localPosition = Vector3.zero;
             }
-        }
-
-        /// <summary>
-        /// 重新创建地形节点
-        /// </summary>
-        private void RecreateMapTerrianNode()
-        {
-            if (!MapEditorUtilities.CheckOperationAvalible(mTarget?.gameObject))
-            {
-                return;
-            }
-            var mapTerrianTransform = MapEditorUtilities.GetOrCreateMapTerrianNode(mTarget?.gameObject);
-            if (mapTerrianTransform != null)
-            {
-                GameObject.DestroyImmediate(mapTerrianTransform.gameObject);
-            }
-            CreateMapTerrianNode();
-            UpdateTerrianSizeAndPos();
         }
 
         /// <summary>
@@ -971,6 +946,11 @@ namespace MapEditor
                 mapObjectPosition = insertMapObjectData.Go != null ? insertMapObjectData.Go.transform.position : insertMapObjectData.Position;
             }
             var instanceGo = mTarget?.CreateGameObjectByUID(uid);
+            if(instanceGo == null)
+            {
+                Debug.LogError($"地图对象UID:{uid}未绑定实体对象，创建地图对象失败！");
+                return null;
+            }
             if (instanceGo != null && mMapObjectAddedAutoFocusProperty.boolValue)
             {
                 Selection.SetActiveObjectWithContext(instanceGo, instanceGo);
@@ -1412,11 +1392,6 @@ namespace MapEditor
             {
                 result = false;
             }
-            // 确保静态物体没有碰撞器保留在场景中
-            if(!ClearStaticMapObjectColliders())
-            {
-                result = false;
-            }
             if (!result)
             {
                 Debug.LogError($"地图:{mTarget?.gameObject.name}清除动态地图数据失败！");
@@ -1454,55 +1429,6 @@ namespace MapEditor
                 }
             }
             serializedObject.ApplyModifiedProperties();
-            return true;
-        }
-
-        /// <summary>
-        /// 清除静态地图对象的碰撞器组件
-        /// </summary>
-        /// <returns></returns>
-        private bool ClearStaticMapObjectColliders()
-        {
-            if(!MapEditorUtilities.CheckOperationAvalible(mTarget?.gameObject))
-            {
-                Debug.LogError($"地图:{mTarget?.gameObject.name}清除静态地图对象的碰撞器组件失败！");
-                return false;
-            }
-            for(int i = 0, length = mMapObjectDataListProperty.arraySize; i < length; i++)
-            {
-                var mapObjectDataProperty = mMapObjectDataListProperty.GetArrayElementAtIndex(i);
-                if(mapObjectDataProperty == null)
-                {
-                    continue;
-                }
-                var uidProperty = mapObjectDataProperty.FindPropertyRelative("UID");
-                var mapObjectUID = uidProperty.intValue;
-                var mapObjectConfig = MapSetting.GetEditorInstance().ObjectSetting.GetMapObjectConfigByUID(mapObjectUID);
-                if(mapObjectConfig == null)
-                {
-                    continue;
-                }
-                var goProperty = mapObjectDataProperty.FindPropertyRelative("Go");
-                if(goProperty == null || goProperty.objectReferenceValue == null)
-                {
-                    continue;
-                }
-                var isDynamic = MapSetting.GetEditorInstance().ObjectSetting.IsDynamicMapObjectType(mapObjectConfig.ObjectType);
-                if(isDynamic)
-                {
-                    continue;
-                }
-                var go = goProperty.objectReferenceValue as GameObject;
-                var colliders = go.GetComponentsInChildren<Collider>();
-                if(colliders == null)
-                {
-                    continue;
-                }
-                foreach(var collider in colliders)
-                {
-                    GameObject.DestroyImmediate(collider);
-                }
-            }
             return true;
         }
 
@@ -1600,14 +1526,6 @@ namespace MapEditor
             }
             serializedObject.ApplyModifiedProperties();
             return true;
-        }
-
-        /// <summary>
-        /// 拷贝寻路数据Asset
-        /// </summary>
-        private void CopyNavMeshAsset()
-        {
-            MapEditorUtilities.CopyNavMeshAsset(mTarget?.gameObject);
         }
 
         /// <summary>
@@ -1730,9 +1648,13 @@ namespace MapEditor
                 Debug.LogError($"地图:{mTarget?.gameObject.name}恢复动态地图数据失败，一键烘焙导出地图数据失败！");
                 return false;
             }
+            // 寻路地形烘焙时打开，烘完隐藏，避免运行时被错误看到问题
+            var mapTerrian = MapEditorUtilities.GetOrCreateMapTerrianNode(mTarget?.gameObject);
+            mapTerrian.gameObject.SetActive(true);
             var navMeshSurface = MapEditorUtilities.GetOrCreateNavMeshSurface(mTarget?.gameObject);
             var bakePathTask = MapEditorUtilities.BakePathTask(navMeshSurface);
             var bakePathResult = await bakePathTask;
+            mapTerrian.gameObject.SetActive(false);
             if (!bakePathResult)
             {
                 Debug.LogError($"地图:{mTarget?.gameObject.name}寻路烘焙失败，一键烘焙导出地图数据失败！");
@@ -2212,13 +2134,6 @@ namespace MapEditor
                 UpdateGridSizeDrawDatas();
             }
 
-            EditorGUI.BeginChangeCheck();
-            EditorGUILayout.PropertyField(mMapTerrianAssetProperty);
-            if (EditorGUI.EndChangeCheck())
-            {
-                RecreateMapTerrianNode();
-            }
-
             DrawGameMapButtonArea();
             DrawMapOperationInspectorArea();
 
@@ -2234,57 +2149,61 @@ namespace MapEditor
         private void DrawGameMapButtonArea()
         {
             EditorGUILayout.BeginVertical("box");
-            EditorGUILayout.BeginHorizontal();
-            if (GUILayout.Button("清除动态数据", GUILayout.ExpandWidth(true)))
             {
-                CleanDynamicMapDatas();
+                EditorGUILayout.BeginHorizontal();
+                if (GUILayout.Button("清除动态数据", GUILayout.ExpandWidth(true)))
+                {
+                    CleanDynamicMapDatas();
+                }
+                if (GUILayout.Button("恢复动态数据", GUILayout.ExpandWidth(true)))
+                {
+                    RecoverDynamicMapDatas();
+                }
+                if (GUILayout.Button("一键重创地图对象", GUILayout.ExpandWidth(true)))
+                {
+                    OneKeyRecreateMapObjectGos();
+                }
+                if (GUILayout.Button("清除无效UID配置", GUILayout.ExpandWidth(true)))
+                {
+                    RemoveAllInvalideUIDDatas();
+                }
+                EditorGUILayout.EndHorizontal();
             }
-            if (GUILayout.Button("恢复动态数据", GUILayout.ExpandWidth(true)))
             {
-                RecoverDynamicMapDatas();
+                EditorGUILayout.BeginHorizontal();
+                EditorGUILayout.LabelField("导出类型:", GUILayout.Width(60f));
+                mExportTypeProperty.intValue = (int)(ExportType)EditorGUILayout.EnumPopup((ExportType)mExportTypeProperty.intValue, GUILayout.Width(80f));
+                EditorGUILayout.LabelField("自定义导出文件名:", GUILayout.Width(100f));
+                mCustomExportFileNameProperty.stringValue = EditorGUILayout.TextField(mCustomExportFileNameProperty.stringValue, GUILayout.Width(115f));
+                if (GUILayout.Button("导出地图数据", GUILayout.ExpandWidth(true)))
+                {
+                    ExportMapData();
+                }
+                EditorGUILayout.EndHorizontal();
             }
-            if (GUILayout.Button("拷贝NavMesh Asset", GUILayout.ExpandWidth(true)))
             {
-                CopyNavMeshAsset();
+                EditorGUILayout.BeginHorizontal();
+                EditorGUILayout.LabelField("关卡数据Asset:", GUILayout.Width(90f));
+                EditorGUI.BeginChangeCheck();
+                mLevelMapDataProperty.objectReferenceValue = EditorGUILayout.ObjectField(mLevelMapDataProperty.objectReferenceValue, MapConst.LevelMapDataType, GUILayout.Width(270f));
+                if (EditorGUI.EndChangeCheck())
+                {
+                    OnLevelMapDataAssetChange();
+                }
+                if (GUILayout.Button("保存关卡数据", GUILayout.ExpandWidth(true)))
+                {
+                    DoSaveToLevelMapDataAsset();
+                }
+                EditorGUILayout.EndHorizontal();
             }
-            if (GUILayout.Button("一键重创地图对象", GUILayout.ExpandWidth(true)))
             {
-                OneKeyRecreateMapObjectGos();
+                EditorGUILayout.BeginHorizontal();
+                if (GUILayout.Button("一键烘焙拷贝导出", GUILayout.ExpandWidth(true)))
+                {
+                    OneKeyBakeAndExport();
+                }
+                EditorGUILayout.EndHorizontal();
             }
-            if (GUILayout.Button("清除无效UID配置", GUILayout.ExpandWidth(true)))
-            {
-                RemoveAllInvalideUIDDatas();
-            }
-            EditorGUILayout.EndHorizontal();
-            EditorGUILayout.BeginHorizontal();
-            EditorGUILayout.LabelField("导出类型:", GUILayout.Width(60f));
-            mExportTypeProperty.intValue = (int)(ExportType)EditorGUILayout.EnumPopup((ExportType)mExportTypeProperty.intValue, GUILayout.Width(80f));
-            EditorGUILayout.LabelField("自定义导出文件名:", GUILayout.Width(100f));
-            mCustomExportFileNameProperty.stringValue = EditorGUILayout.TextField(mCustomExportFileNameProperty.stringValue, GUILayout.Width(115f));
-            if (GUILayout.Button("导出地图数据", GUILayout.ExpandWidth(true)))
-            {
-                ExportMapData();
-            }
-            EditorGUILayout.EndHorizontal();
-            EditorGUILayout.BeginHorizontal();
-            EditorGUILayout.LabelField("关卡数据Asset:", GUILayout.Width(90f));
-            EditorGUI.BeginChangeCheck();
-            mLevelMapDataProperty.objectReferenceValue = EditorGUILayout.ObjectField(mLevelMapDataProperty.objectReferenceValue, MapConst.LevelMapDataType, GUILayout.Width(270f));
-            if (EditorGUI.EndChangeCheck())
-            {
-                OnLevelMapDataAssetChange();
-            }
-            if(GUILayout.Button("保存关卡数据", GUILayout.ExpandWidth(true)))
-            {
-                DoSaveToLevelMapDataAsset();
-            }
-            EditorGUILayout.EndHorizontal();
-            EditorGUILayout.BeginHorizontal();
-            if (GUILayout.Button("一键烘焙拷贝导出", GUILayout.ExpandWidth(true)))
-            {
-                OneKeyBakeAndExport();
-            }
-            EditorGUILayout.EndHorizontal();
             EditorGUILayout.EndVertical();
         }
 

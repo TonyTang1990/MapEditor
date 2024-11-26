@@ -21,10 +21,12 @@ MonoBehaviour:
     - rid: 1875189631230672896
     - rid: 1875189631230672897
     - rid: 1875189631230672898
+    - rid: 1673489113762758656
     AllMapObjectConfigs:
     - rid: 3718244341701672961
     - rid: 3718244341701672962
     - rid: 3718244341701672963
+    - rid: 1673489113762758657
   DataSetting:
     AllMapDataConfigs:
     - rid: 1875189631230672899
@@ -34,6 +36,20 @@ MonoBehaviour:
   references:
     version: 2
     RefIds:
+    - rid: 1673489113762758656
+      type: {class: MapObjectTypeConfig, ns: MapEditor, asm: Assembly-CSharp}
+      data:
+        ObjectType: 3
+        IsDynamic: 0
+        Des: "\u573A\u666F"
+    - rid: 1673489113762758657
+      type: {class: MapObjectConfig, ns: MapEditor, asm: Assembly-CSharp}
+      data:
+        UID: 4
+        ObjectType: 3
+        ConfId: 0
+        Asset: {fileID: 5014015757715748101, guid: ec7d3a1ba97ba544cbe93751cd6cdd47, type: 3}
+        Des: "\u573A\u666F\u5730\u9762"
     - rid: 1875189631230672896
       type: {class: MapObjectTypeConfig, ns: MapEditor, asm: Assembly-CSharp}
       data:

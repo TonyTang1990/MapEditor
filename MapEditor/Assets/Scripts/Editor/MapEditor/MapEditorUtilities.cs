@@ -572,9 +572,8 @@ namespace MapEditor
         /// 获取或创建指定地图地形节点
         /// </summary>
         /// <param name="mapGO"></param>
-        /// <param name="customAsset"></param>
         /// <returns></returns>
-        public static Transform GetOrCreateMapTerrianNode(GameObject mapGO, GameObject customAsset = null)
+        public static Transform GetOrCreateMapTerrianNode(GameObject mapGO)
         {
             if (mapGO == null)
             {
@@ -585,7 +584,7 @@ namespace MapEditor
             var mapTerrianNodeTransform = mapGO.transform.Find(mapTerrianNodeName);
             if (mapTerrianNodeTransform == null)
             {
-                var mapTerrianPrefab = customAsset != null ? customAsset : AssetDatabase.LoadAssetAtPath<GameObject>(MapConst.DetaulMapTerrianPrefabPath);
+                var mapTerrianPrefab = AssetDatabase.LoadAssetAtPath<GameObject>(MapConst.DetaulMapTerrianPrefabPath);
                 if(mapTerrianPrefab == null)
                 {
                     return null;
@@ -594,6 +593,8 @@ namespace MapEditor
                 mapTerrianNodeTransform = mapTerrianNodeGo.transform;
                 mapTerrianNodeTransform.name = mapTerrianNodeName;
                 mapTerrianNodeTransform.SetParent(mapGO.transform);
+                // 默认隐藏创建，寻路烘焙时显示，烘焙完再隐藏，避免地形被错误看到问题
+                mapTerrianNodeGo.SetActive(false);
             }
             return mapTerrianNodeTransform;
         }

@@ -36,6 +36,26 @@
                 "z": 0.10000000149011612
             },
             "OwnerGridUIDs": []
+        },
+        {
+            "MapObjectType": 3,
+            "ConfId": 0,
+            "Position": {
+                "x": 3.0,
+                "y": 0.0,
+                "z": 15.0
+            },
+            "Rotation": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
+            },
+            "LocalScale": {
+                "x": 0.6000000238418579,
+                "y": 1.0,
+                "z": 3.0
+            },
+            "OwnerGridUIDs": []
         }
     ],
     "AllColliderMapDynamicExportDatas": [
