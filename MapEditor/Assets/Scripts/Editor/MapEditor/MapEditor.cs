@@ -2619,7 +2619,7 @@ namespace MapEditor
             EditorGUILayout.Space(batchSpace, false);
             batchOperationSwitchProperty.boolValue = EditorGUILayout.Toggle(batchOperationSwitchProperty.boolValue, GUILayout.Width(MapEditorConst.InspectorObjectBatchUIWidth - batchSpace));
             var currentEvent = Event.current;
-            if(IsInspectorKeyCodeDown(KeyCode.LeftShift) || IsInspectorKeyCodeDown(keyCode.RightShift))
+            if(IsInspectorKeyCodeDown(KeyCode.LeftShift) || IsInspectorKeyCodeDown(KeyCode.RightShift))
             {
                 if(GUILayoutUtility.GetLastRect().Contains(currentEvent.mousePosition))
                 {
@@ -2630,7 +2630,7 @@ namespace MapEditor
                     }
                 }
             }
-            else if (IsInspectorKeyCodeDown(KeyCode.LeftAlt) || IsInspectorKeyCodeDown(keyCode.RightAlt))
+            else if (IsInspectorKeyCodeDown(KeyCode.LeftAlt) || IsInspectorKeyCodeDown(KeyCode.RightAlt))
             {
                 if (GUILayoutUtility.GetLastRect().Contains(currentEvent.mousePosition))
                 {
@@ -2885,7 +2885,7 @@ namespace MapEditor
                 EditorGUILayout.Space(space, false);
                 batchOperationSwitchProperty.boolValue = EditorGUILayout.Toggle(batchOperationSwitchProperty.boolValue, GUILayout.Width(MapEditorConst.InspectorDataBatchUIWidth - space));
                 var currentEvent = Event.current;
-                if (IsInspectorKeyCodeDown(KeyCode.LeftShift) || IsInspectorKeyCodeDown(keyCode.RightShift))
+                if (IsInspectorKeyCodeDown(KeyCode.LeftShift) || IsInspectorKeyCodeDown(KeyCode.RightShift))
                 {
                     if (GUILayoutUtility.GetLastRect().Contains(currentEvent.mousePosition))
                     {
@@ -2896,7 +2896,7 @@ namespace MapEditor
                         }
                     }
                 }
-                else if (IsInspectorKeyCodeDown(KeyCode.LeftAlt) || IsInspectorKeyCodeDown(keyCode.RightAlt))
+                else if (IsInspectorKeyCodeDown(KeyCode.LeftAlt) || IsInspectorKeyCodeDown(KeyCode.RightAlt))
                 {
                     if (GUILayoutUtility.GetLastRect().Contains(currentEvent.mousePosition))
                     {
