@@ -95,7 +95,7 @@ public class CameraAreaVisualizationMono : MonoBehaviour
     }
 
 
-    private void OnDrawGizmosSelected()
+    private void OnDrawGizmos()
     {
         DrawAreaInfoGUI();
         DrawAreaGUI();

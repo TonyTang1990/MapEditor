@@ -57,7 +57,7 @@ public class CameraRayCastVisualizationMono : MonoBehaviour
         }
     }
 
-    private void OnDrawGizmosSelected()
+    private void OnDrawGizmos()
     {
         DrawRayCastLinesGUI();
     }
