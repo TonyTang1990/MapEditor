@@ -47,6 +47,11 @@ public class CameraAreaVisualizationMono : MonoBehaviour
     /// </summary>
     private List<KeyValuePair<Vector3, Vector3>> mRayCastDataList = new List<KeyValuePair<Vector3, Vector3>>();
 
+    /// <summary>
+    /// Gizmos球体大小
+    /// </summary>
+    private const float SphereSize = 0.5f;
+
     void Awake()
     {
         UpdateCameraComponent();
@@ -94,11 +99,15 @@ public class CameraAreaVisualizationMono : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// Gizmos绘制
+    /// </summary>
 
     private void OnDrawGizmos()
     {
         DrawAreaInfoGUI();
         DrawAreaGUI();
+        DrawCameraGUI();
     }
 
     /// <summary>
@@ -108,7 +117,7 @@ public class CameraAreaVisualizationMono : MonoBehaviour
     {
         var preGizmosColor = Gizmos.color;
         Gizmos.color = Color.green;
-        Gizmos.DrawSphere(AreaPoint, 1);
+        Gizmos.DrawSphere(AreaPoint, SphereSize);
         var areaPointTo = AreaPoint + AreaNormal * 5;
         Gizmos.DrawLine(AreaPoint, areaPointTo);
         Gizmos.color = preGizmosColor;
@@ -121,18 +130,71 @@ public class CameraAreaVisualizationMono : MonoBehaviour
     {
         var preGizmosColor = Gizmos.color;
         Gizmos.color = Color.green;
-        foreach (var areaData in mAreaPointsList)
+        if(mAreaLinesList.Count > 0)
         {
-            if(areaData == null)
-            {
-                continue;
-            }
-            Gizmos.DrawSphere(AreaPoint, 0.5f);
+            Gizmos.DrawLine(mAreaLinesList[0].Key, mAreaLinesList[0].Value);
+            Gizmos.DrawLine(mAreaLinesList[1].Key, mAreaLinesList[1].Value);
+            Gizmos.DrawLine(mAreaLinesList[2].Key, mAreaLinesList[2].Value);
+            Gizmos.DrawLine(mAreaLinesList[3].Key, mAreaLinesList[3].Value);
         }
-        foreach(var areaLine in mAreaLinesList)
+        if(mAreaPointsList.Count > 0)
         {
-            Gizmos.DrawLine(areaLine.Key, areaLine.Value);
+            preGizmosColor.DrawSphere(mAreaPointsList[4], SphereSize);
         }
         Gizmos.color = preGizmosColor;
+    }
+
+    /// <summary>
+    /// 绘制摄像机Gizmos
+    /// </summary>
+    private void DrawCameraGUI()
+    {
+        if(mCameraComponent == null)
+        {
+            return;
+        }
+
+        // 摄像机位置
+        var preGizmosColor = Gizmos.color;
+        Gizmos.color = Color.red;
+        Gizmos.DrawSphere(mCameraComponent.transform.position, SphereSize);
+        Gizmos.color = preGizmosColor;
+        
+        // 摄像机近截面
+        var rayCastDataNum = mRayCastDataList.Count;
+        if(rayCastDataNum > 0)
+        {
+            preGizmosColor = Gizmos.color;
+            Gizmos.color = Color.yellow;
+            Gizmos.DrawLine(mRayCastDataList[0].Key, mRayCastDataList[1].Key);
+            Gizmos.DrawLine(mRayCastDataList[1].Key, mRayCastDataList[2].Key);
+            Gizmos.DrawLine(mRayCastDataList[2].Key, mRayCastDataList[3].Key);
+            Gizmos.DrawLine(mRayCastDataList[3].Key, mRayCastDataList[0].Key);
+            Gizmos.color = preGizmosColor;
+        }
+
+        // 摄像机远截面
+        if(rayCastDataNum > 0)
+        {
+            preGizmosColor = Gizmos.color;
+            Gizmos.color = Color.yellow;
+            Gizmos.DrawLine(mRayCastDataList[0].Value, mRayCastDataList[1].Value);
+            Gizmos.DrawLine(mRayCastDataList[1].Value, mRayCastDataList[2].Value);
+            Gizmos.DrawLine(mRayCastDataList[2].Value, mRayCastDataList[3].Value);
+            Gizmos.DrawLine(mRayCastDataList[3].Value, mRayCastDataList[0].Value);
+            Gizmos.color = preGizmosColor;
+        }
+
+        // 摄像机射线
+        if(rayCastDataNum > 0)
+        {
+            preGizmosColor = Gizmos.color;
+            Gizmos.color = Color.red;
+                Gizmos.DrawLine(mRayCastDataList[0].Key, mRayCastDataList[0].Value);
+                Gizmos.DrawLine(mRayCastDataList[1].Key, mRayCastDataList[1].Value);
+                Gizmos.DrawLine(mRayCastDataList[2].Key, mRayCastDataList[2].Value);
+                Gizmos.DrawLine(mRayCastDataList[3].Key, mRayCastDataList[3].Value);
+            Gizmos.color = preGizmosColor;
+        }
     }
 }
