@@ -24,9 +24,8 @@ namespace MapEditor
         MoveDown = 9,                           // 下移UI
         Add = 10,                               // 添加UI
         Remove = 11,                            // 移除UI
-        MonsterGroupId = 12,                    // 怪物组Id
-        MonsterCreateRadius = 13,               // 怪物创建半径UI
-        MonsterActiveRadius = 14,               // 怪物警戒半径UI
-        GUISwitchOff = 15,                      // GUI关闭开关UI
+        MonsterCreateRadius = 12,               // 怪物创建半径UI
+        MonsterActiveRadius = 13,               // 怪物警戒半径UI
+        GUISwitchOff = 14,                      // GUI关闭开关UI
     }
 }

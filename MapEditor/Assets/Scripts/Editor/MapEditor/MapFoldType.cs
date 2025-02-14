@@ -15,6 +15,7 @@ namespace MapEditor
         MapObjectDataFold = 0,          // 地图对象数据折叠
         PlayerSpawnMapDataFold = 1,     // 地图玩家出生点数据折叠
         MonsterMapDataFold = 2,         // 地图怪物数据折叠
-        MonsterGroupMapDataFold = 3,    // 地图怪物组数据折叠
+        TreasureBoxMapDataFold = 3,    // 地图宝箱组数据折叠
+        TrapMapDataFold = 4,            // 地图陷阱数据折叠
     }
 }

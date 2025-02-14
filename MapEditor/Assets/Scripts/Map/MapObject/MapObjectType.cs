@@ -12,9 +12,7 @@ namespace MapEditor
     /// </summary>
     public enum MapObjectType
     {
-        TreasureBox = 0,            // 宝箱
-        Trap = 1,                   // 陷阱
-        Door = 2,                   // 门
-        Scene = 3,                  // 场景
+        Scene = 0,                  // 场景
+        Door = 1,                   // 门
     }
 }

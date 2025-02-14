@@ -1,5 +1,5 @@
 ﻿/*
- * Description:             BaseMapDynamicExport.cs
+ * Description:             MapObjectExport.cs
  * Author:                  TONYTANG
  * Create Date:             2024/04/19
  */
@@ -11,11 +11,11 @@ using UnityEngine;
 namespace MapEditor
 {
     /// <summary>
-    /// BaseMapDynamicExport.cs
-    /// 地图动态物体数据基类导出定义
+    /// MapObjectExport.cs
+    /// 地图动态物体数据导出定义
     /// </summary>
     [Serializable]
-    public class BaseMapDynamicExport
+    public class MapObjectExport
     {
         /// <summary>
         /// 地图对象类型
@@ -47,7 +47,7 @@ namespace MapEditor
         /// </summary>
         public List<int> OwnerGridUIDs;
 
-        public BaseMapDynamicExport(MapObjectType mapObjectType, int confId, Vector3 position, Vector3 rotation, Vector3 localScale, List<int> ownerGridUIDs = null) 
+        public MapObjectExport(MapObjectType mapObjectType, int confId, Vector3 position, Vector3 rotation, Vector3 localScale, List<int> ownerGridUIDs = null) 
         {
             MapObjectType = mapObjectType;
             ConfId = confId;

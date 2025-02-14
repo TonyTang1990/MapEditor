@@ -17,14 +17,20 @@ namespace MapEditor
     public class MonsterMapDataExport : BaseMapDataExport
     {
         /// <summary>
-        /// 怪物组Id
+        /// 怪物创建半径
         /// </summary>
-        public int GroupId;
+        public float MonsterCreateRadius;
 
-        public MonsterMapDataExport(MapDataType mapDataType, int confId, Vector3 position,  Vector3 rotation, int groupId)
+        /// <summary>
+        /// 怪物警戒半径
+        /// </summary>
+        public float MonsterActiveRadius;
+
+        public MonsterMapDataExport(MapDataType mapDataType, int confId, Vector3 position,  Vector3 rotation, float monsterCreateRadius, flo)
                                         : base(mapDataType, confId, position, rotation)
         {
-            GroupId = groupId;
+            MonsterCreateRadius = monsterCreateRadius;
+            MonsterActiveRadius = monsterActiveRadius;
         }
     }
 }

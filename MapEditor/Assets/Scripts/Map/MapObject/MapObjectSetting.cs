@@ -38,30 +38,18 @@ namespace MapEditor
         public List<MapObjectConfig> AllMapObjectConfigs = new List<MapObjectConfig>();
 
         /// <summary>
-        /// 指定地图对象类型是否是动态类型
-        /// </summary>
-        /// <param name="mapObjectType"></param>
-        /// <returns></returns>
-        public bool IsDynamicMapObjectType(MapObjectType mapObjectType)
-        {
-            var findMapObjectTypeConfig = AllMapObjectTypeConfigs.Find(mapObjectTypeConfig => mapObjectTypeConfig.ObjectType == mapObjectType);
-            return findMapObjectTypeConfig != null ? findMapObjectTypeConfig.IsDynamic : false;
-        }
-
-        /// <summary>
         /// 添加指定地图对象类型配置
         /// </summary>
         /// <param name="mapObjectType"></param>
-        /// <param name="isDynamic"></param>
         /// <returns></returns>
-        public bool AddMapObjectTypeConfig(MapObjectType mapObjectType, bool isDynamic = false)
+        public bool AddMapObjectTypeConfig(MapObjectType mapObjectType)
         {
             if(ExistMapObjectTypeConfigByType(mapObjectType))
             {
                 Debug.LogError($"已存在地图对象类型:{mapObjectType}的地图对象类型配置数据，添加地图对象类型配置数据失败！");
                 return false;
             }
-            var mapObjectTypeConfig = new MapObjectTypeConfig(mapObjectType, isDynamic);
+            var mapObjectTypeConfig = new MapObjectTypeConfig(mapObjectType);
             AllMapObjectTypeConfigs.Add(mapObjectTypeConfig);
             return true;
         }

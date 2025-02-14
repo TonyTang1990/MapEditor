@@ -17,20 +17,27 @@ namespace MapEditor
     public class MonsterMapData : MapData
     {
         /// <summary>
-        /// 组Id(目前用于怪物分组归属)
+        /// 怪物创建半径
         /// </summary>
-        [Header("组Id")]
-        public int GroupId = 1;
+        [Header("怪物创建半径")]
+        public float MonsterCreateRadius = 4;
+
+        /// <summary>
+        /// 怪物警戒半径
+        /// </summary>
+        [Header("怪物警戒半径")]
+        public float MonsterActiveRadius = 3;
 
         public MonsterMapData(int uid) : base(uid)
         {
 
         }
 
-        public MonsterMapData(int uid, Vector3 position, Vector3 rotation)
+        public MonsterMapData(int uid, Vector3 position, Vector3 rotation, float monsterCreateRadius, float monsterCreateRadius, float monsterActiveRadius)
                                 : base(uid, position, rotation)
         {
-
+            MonsterCreateRadius = monsterCreateRadius;
+            MonsterActiveRadius = monsterActiveRadius;
         }
 
         /// <summary>
@@ -45,7 +52,8 @@ namespace MapEditor
                 return false;
             }
             var realSourceMapData = sourceMapData as MonsterMapData;
-            GroupId = realSourceMapData.GroupId;
+            MonsterCreateRadius = realSourceMapData.MonsterCreateRadius;
+            MonsterActiveRadius = realSourceMapData.MonsterActiveRadius;
             return true;
         }
     }

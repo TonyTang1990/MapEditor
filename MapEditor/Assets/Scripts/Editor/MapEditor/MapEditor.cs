@@ -155,9 +155,14 @@ namespace MapEditor
         private SerializedProperty mMonsterMapGroupUnfoldDataListProperty;
 
         /// <summary>
-        /// MonsterGroupMapGroupUnfoldDataList属性
+        /// TreasureBoxMapGroupUnfoldDataList属性
         /// </summary>
-        private SerializedProperty mMonsterGroupMapGroupUnfoldDataListProperty;
+        private SerializedProperty mTreasureBoxMapGroupUnfoldDataListProperty;
+        
+        /// <summary>
+        /// TrapMapGroupUnfoldDataList属性
+        /// </summary>
+        private SerializedProperty mTrapMapGroupUnfoldDataListProperty;
 
         /// <summary>
         /// BatchTickRangeStartIndex属性
@@ -326,7 +331,8 @@ namespace MapEditor
             mMapDataUnfoldDataProperty ??= serializedObject.FindProperty("MapDataUnfoldData");
             mPlayerSpawnMapGroupUnfoldDataListProperty ??= serializedObject.FindProperty("PlayerSpawnMapGroupUnfoldDataList");
             mMonsterMapGroupUnfoldDataListProperty ??= serializedObject.FindProperty("MonsterMapGroupUnfoldDataList");
-            mMonsterGroupMapGroupUnfoldDataListProperty ??= serializedObject.FindProperty("MonsterGroupMapGroupUnfoldDataList");
+            mTreasureBoxMapGroupUnfoldDataListProperty ??= serializedObject.FindProperty("TreasureBoxMapGroupUnfoldDataList");
+            mTrapMapGroupUnfoldDataListProperty ??= serializedObject.FindProperty("TrapMapGroupUnfoldDataList");
             mBatchTickRangeStartIndexProperty ??= serializedObject.FindProperty("BatchTickRangeStartIndex");
             mBatchTickRangeEndIndexProperty ??= serializedObject.FindProperty("BatchTickRangeEndIndex");
             mLevelMapDataProperty ??= serializedObject.FindProperty("LevelMapData");
@@ -1060,7 +1066,9 @@ namespace MapEditor
                 var insertMapData = insertMapDataProperty.managedReferenceValue as MapData;
                 mapDataPosition = insertMapData != null ? insertMapData.Position : mapDataPosition;
             }
-            var newMapData = MapUtilities.CreateMapDataByType(mapDataType, uid, mapDataPosition, mapDataConfig.Rotation);
+            var defaultMonsterCreateRadius = MapConst.DefaultMonsterCreateRadius;
+            var defaultMonsterActiveRadius = MapConst.DefaultMonsterActiveRadius;
+            var newMapData = MapUtilities.CreateMapDataByType(mapDataType, uid, mapDataPosition, mapDataConfig.Rotation, defaultMonsterCreateRadius, defaultMonsterActiveRadius);
             mMapDataListProperty.InsertArrayElementAtIndex(insertPos);
             var newMapDataProperty = GetMapDataSerializedPropertyByIndex(insertPos);
             newMapDataProperty.managedReferenceValue = newMapData;
@@ -1504,49 +1512,7 @@ namespace MapEditor
                 Debug.LogError($"地图:{mTarget?.gameObject.name}清除动态地图数据失败！");
                 return false;
             }
-            bool result = true;
             UpdateMapObjectDataLogicDatas();
-            if (!CleanDynamicMapObjects())
-            {
-                result = false;
-            }
-            if (!result)
-            {
-                Debug.LogError($"地图:{mTarget?.gameObject.name}清除动态地图数据失败！");
-            }
-            return result;
-        }
-
-        /// <summary>
-        /// 清除动态地图对象GameObjects
-        /// </summary>
-        private bool CleanDynamicMapObjects()
-        {
-            if (!MapEditorUtilities.CheckOperationAvalible(mTarget?.gameObject))
-            {
-                Debug.LogError($"地图:{mTarget?.gameObject.name}清除动态地图对象失败！");
-                return false;
-            }
-            for (int i = 0; i < mMapObjectDataListProperty.arraySize; i++)
-            {
-                var mapObjectDataProperty = mMapObjectDataListProperty.GetArrayElementAtIndex(i);
-                var uidProperty = mapObjectDataProperty.FindPropertyRelative("UID");
-                var mapObjectUID = uidProperty.intValue;
-                var mapObjectConfig = MapSetting.GetEditorInstance().ObjectSetting.GetMapObjectConfigByUID(mapObjectUID);
-                if (mapObjectConfig == null)
-                {
-                    continue;
-                }
-                var goProperty = mapObjectDataProperty.FindPropertyRelative("Go");
-                var isDynamic = MapSetting.GetEditorInstance().ObjectSetting.IsDynamicMapObjectType(mapObjectConfig.ObjectType);
-                if (isDynamic && goProperty.objectReferenceValue != null)
-                {
-                    var go = goProperty.objectReferenceValue as GameObject;
-                    GameObject.DestroyImmediate(go);
-                    goProperty.objectReferenceValue = null;
-                }
-            }
-            serializedObject.ApplyModifiedProperties();
             return true;
         }
 
@@ -1609,41 +1575,7 @@ namespace MapEditor
             var result = true;
             // 逻辑相关数据在动态物体清理前保存即可，正确预制件操作保存流程一定会走清理动态数据流程
             //UpdateMapObjectDataLogicDatas();
-            if (!RecoverDynamicMapObjects())
-            {
-                result = false;
-            }
             return result;
-        }
-
-        /// <summary>
-        /// 恢复动态地图对象GameObjects
-        /// </summary>
-        private bool RecoverDynamicMapObjects()
-        {
-            if (!MapEditorUtilities.CheckOperationAvalible(mTarget?.gameObject))
-            {
-                return false;
-            }
-            for (int i = 0; i < mMapObjectDataListProperty.arraySize; i++)
-            {
-                var mapObjectDataProperty = mMapObjectDataListProperty.GetArrayElementAtIndex(i);
-                var uidProperty = mapObjectDataProperty.FindPropertyRelative("UID");
-                var mapObjectUID = uidProperty.intValue;
-                var mapObjectConfig = MapSetting.GetEditorInstance().ObjectSetting.GetMapObjectConfigByUID(mapObjectUID);
-                if (mapObjectConfig == null)
-                {
-                    continue;
-                }
-                var goProperty = mapObjectDataProperty.FindPropertyRelative("Go");
-                var isDynamic = MapSetting.GetEditorInstance().ObjectSetting.IsDynamicMapObjectType(mapObjectConfig.ObjectType);
-                if (isDynamic && goProperty.objectReferenceValue == null)
-                {
-                    RecreateMapObjectGo(mapObjectDataProperty);
-                }
-            }
-            serializedObject.ApplyModifiedProperties();
-            return true;
         }
 
         /// <summary>
@@ -2186,9 +2118,13 @@ namespace MapEditor
             {
                 return mMonsterMapGroupUnfoldDataListProperty;
             }
-            else if (mapFoldType == MapFoldType.MonsterGroupMapDataFold)
+            else if (mapFoldType == MapFoldType.TreasureBoxMapDataFold)
             {
-                return mMonsterGroupMapGroupUnfoldDataListProperty;
+                return mTreasureBoxMapGroupUnfoldDataListProperty;
+            }
+            else if (mapFoldType == MapFoldType.TrapMapDataFold)
+            {
+                return mTrapMapGroupUnfoldDataListProperty;
             }
             else
             {
@@ -2593,7 +2529,6 @@ namespace MapEditor
             EditorGUILayout.LabelField("索引", MapStyles.TabMiddleStyle, GUILayout.Width(MapEditorConst.InspectorObjectIndexUIWidth));
             EditorGUILayout.LabelField("UID", MapStyles.TabMiddleStyle, GUILayout.Width(MapEditorConst.InspectorObjectUIDUIWidth));
             EditorGUILayout.LabelField("对象类型", MapStyles.TabMiddleStyle, GUILayout.Width(MapEditorConst.InspectorObjectTypeUIWidth));
-            EditorGUILayout.LabelField("是否动态", MapStyles.TabMiddleStyle, GUILayout.Width(MapEditorConst.InspectorObjectDynamicUIWidth));
             EditorGUILayout.LabelField("配置Id", MapStyles.TabMiddleStyle, GUILayout.Width(MapEditorConst.InspectorObjectConfIdUIWidth));
             EditorGUILayout.LabelField("GUI关闭", MapStyles.TabMiddleStyle, GUILayout.Width(MapEditorConst.InspectorObjectGUISwitchOffUIWidth));
             EditorGUILayout.LabelField("实体对象", MapStyles.TabMiddleStyle, GUILayout.Width(MapEditorConst.InspectorObjectInstanceUIWidth));
@@ -2658,16 +2593,11 @@ namespace MapEditor
             if (mapObjectConfig != null)
             {
                 EditorGUILayout.LabelField(mapObjectConfig.ObjectType.ToString(), MapStyles.TabMiddleStyle, GUILayout.Width(MapEditorConst.InspectorObjectTypeUIWidth));
-                var dynamicSpace = 20f;
-                EditorGUILayout.Space(dynamicSpace, false);
-                var isDynamic = MapSetting.GetEditorInstance().ObjectSetting.IsDynamicMapObjectType(mapObjectConfig.ObjectType);
-                EditorGUILayout.Toggle(isDynamic, GUILayout.Width(MapEditorConst.InspectorObjectDynamicUIWidth - dynamicSpace));
                 EditorGUILayout.IntField(mapObjectConfig.ConfId, MapStyles.TabMiddleStyle, GUILayout.Width(MapEditorConst.InspectorObjectConfIdUIWidth));
             }
             else
             {
                 EditorGUILayout.LabelField("找不到对象类型数据", MapStyles.TabMiddleStyle, GUILayout.Width(MapEditorConst.InspectorObjectTypeUIWidth));
-                EditorGUILayout.LabelField("找不到是否动态数据", MapStyles.TabMiddleStyle, GUILayout.Width(MapEditorConst.InspectorObjectDynamicUIWidth));
                 EditorGUILayout.LabelField("找不到关联Id数据", MapStyles.TabMiddleStyle, GUILayout.Width(MapEditorConst.InspectorObjectConfIdUIWidth));
             }
             var guiSwitchOffProperty = mapObjectDataProperty.FindPropertyRelative("GUISwitchOff");
@@ -2772,7 +2702,8 @@ namespace MapEditor
             {
                 DrawMapDataAreaByType(MapDataType.PlayerSpawn);
                 DrawMapDataAreaByType(MapDataType.Monster);
-                DrawMapDataAreaByType(MapDataType.MonsterGroup);
+                DrawMapDataAreaByType(MapDataType.TreasureBox);
+                DrawMapDataAreaByType(MapDataType.Trap);
             }
         }
 

@@ -73,5 +73,15 @@ namespace MapEditor
         /// 默认地图地形预制件路径
         /// </summary>
         public const string DetaulMapTerrianPrefabPath = "Assets/Resources/Terrian/Terrian.prefab";
+
+        /// <summary>
+        /// 默认怪物创建半径
+        /// </summary>
+        public const float DefaultMonsterCreateRadius = 8f;
+
+        /// <summary>
+        /// 默认怪物警戒半径
+        /// </summary>
+        public const float DefaultMonsterActiveRadius = 5f;
     }
 }

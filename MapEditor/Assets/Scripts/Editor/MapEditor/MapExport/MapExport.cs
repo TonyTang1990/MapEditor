@@ -23,14 +23,9 @@ namespace MapEditor
         public MapDataExport MapData = new MapDataExport();
 
         /// <summary>
-        /// 所有只包含基础数据的动态物体导出数据成员
+        /// 所有地图对象导出数据成员
         /// </summary>
-        public List<BaseMapDynamicExport> AllBaseMapObjectExportDatas = new List<BaseMapDynamicExport>();
-
-        /// <summary>
-        /// 所有包含碰撞数据的动态物体导出数据成员
-        /// </summary>
-        public List<ColliderMapDynamicExport> AllColliderMapDynamicExportDatas = new List<ColliderMapDynamicExport>();
+        public List<MapObjectExport> AllMapObjectExportDatas = new List<MapObjectExport>();
 
         /// <summary>
         /// 所有怪物组的怪物组导出数据列表
@@ -38,30 +33,23 @@ namespace MapEditor
         public List<MonsterGroupMapDataExport> AllMonsterGroupMapDatas = new List<MonsterGroupMapDataExport>();
 
         /// <summary>
-        /// 所有没有怪物组的怪物导出数据列表
+        /// 所有怪物导出数据列表
         /// </summary>
-        public List<MonsterMapDataExport> ALlNoGroupMonsterMapDatas = new List<MonsterMapDataExport>();
+        public List<MonsterMapDataExport> ALlMonsterMapDatas = new List<MonsterMapDataExport>();
 
         /// <summary>
-        /// 剩余其他(不含怪物和怪物组和出生点)地图埋点导出数据成员
+        /// 所有宝箱导出数据列表
+        /// </summary>
+        public List<TreasureBoxMapDataExport> AllTreasureBoxMapDatas = new List<TreasureBoxMapDataExport>();
+
+        /// <summary>
+        /// 所有陷阱导出数据列表
+        /// </summary>
+        public List<TrapMapDataExport> AllTrapMapDatas = new List<TrapMapDataExport>();
+
+        /// <summary>
+        /// 剩余其他地图埋点导出数据成员
         /// </summary>
         public List<BaseMapDataExport> AllOtherMapDatas = new List<BaseMapDataExport>();
-
-        /// <summary>
-        /// 获取指定怪物组id的怪物组导出数据
-        /// </summary>
-        /// <param name="monsterGroupId"></param>
-        /// <returns></returns>
-        public MonsterGroupMapDataExport GetMonsterGroupMapDataExportByGroupId(int monsterGroupId)
-        {
-            foreach(var monsterGroupMapData in AllMonsterGroupMapDatas)
-            {
-                if (monsterGroupMapData.GroupId == monsterGroupId)
-                {
-                    return monsterGroupMapData;
-                }
-            }
-            return null;
-        }
     }
 }

@@ -162,12 +162,14 @@ namespace MapEditor
         /// <param name="uid"></param>
         /// <param name="position"></param>
         /// <param name="rotation"></param>
+        /// <param name="monsterCreateRadius"></param>
+        /// <param name="monsterActiveRadius"></param>
         /// <returns></returns>
-        public static MapData CreateMapDataByType(MapDataType mapDataType, int uid, Vector3 position, Vector3 rotation)
+        public static MapData CreateMapDataByType(MapDataType mapDataType, int uid, Vector3 position, Vector3 rotation, float monsterCreateRadius, float monsterActiveRadius)
         {
             if (mapDataType == MapDataType.Monster)
             {
-                return new MonsterMapData(uid, position, rotation);
+                return new MonsterMapData(uid, position, rotation, monsterCreateRadius, monsterActiveRadius);
             }
             else if (mapDataType == MapDataType.MonsterGroup)
             {
@@ -176,6 +178,14 @@ namespace MapEditor
             else if (mapDataType == MapDataType.PlayerSpawn)
             {
                 return new PlayerSpawnMapData(uid, position, rotation);
+            }
+            else if (mapDataType == MapDataType.TreasureBox)
+            {
+                return new TreasureBoxMapData(uid, position, rotation);
+            }
+            else if (mapDataType == MapDataType.Trap)
+            {
+                return new TrapMapData(uid, position, rotation);
             }
             else
             {

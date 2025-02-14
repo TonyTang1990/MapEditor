@@ -317,10 +317,6 @@ namespace MapEditor
                 return false;
             }
             map.UpdateMapObjectDataLogicDatas();
-            if (!map.RecoverDynamicMapObjects())
-            {
-                return false;
-            }
             return true;
         }
 
@@ -355,34 +351,6 @@ namespace MapEditor
             }
         }
 
-        /// <summary>
-        /// 恢复动态地图对象
-        /// </summary>
-        /// <param name="map"></param>
-        /// <returns></returns>
-        private static bool RecoverDynamicMapObjects(this Map map)
-        {
-            if (!MapEditorUtilities.CheckOperationAvalible(map.gameObject))
-            {
-                Debug.LogError($"地图:{map.gameObject.name}恢复动态地图对象失败！");
-                return false;
-            }
-            for (int i = 0; i < map.MapObjectDataList.Count; i++)
-            {
-                var mapObjectData = map.MapObjectDataList[i];
-                var mapObjectConfig = MapSetting.GetEditorInstance().ObjectSetting.GetMapObjectConfigByUID(mapObjectData.UID);
-                if (mapObjectConfig == null)
-                {
-                    continue;
-                }
-                var isDynamic = MapSetting.GetEditorInstance().ObjectSetting.IsDynamicMapObjectType(mapObjectConfig.ObjectType);
-                if (isDynamic && mapObjectData.Go == null)
-                {
-                    map.RecreateMapObjectGo(mapObjectData);
-                }
-            }
-            return true;
-        }
 
         /// <summary>
         /// 恢复指定MapObject属性地图对象
@@ -433,40 +401,6 @@ namespace MapEditor
                 return false;
             }
             map.UpdateMapObjectDataLogicDatas();
-            if (!map.CleanDynamicMapObjects())
-            {
-                Debug.LogError($"地图:{map.gameObject.name}清除动态地图对象失败！");
-                return false;
-            }
-            return true;
-        }
-
-        /// <summary>
-        /// 清除动态地图对象GameObjects
-        /// </summary>
-        /// <param name="map"></param>
-        private static bool CleanDynamicMapObjects(this Map map)
-        {
-            if (!MapEditorUtilities.CheckOperationAvalible(map.gameObject))
-            {
-                Debug.LogError($"地图:{map.gameObject.name}清除动态地图对象失败！");
-                return false;
-            }
-            for (int i = 0; i < map.MapObjectDataList.Count; i++)
-            {
-                var mapObjectData = map.MapObjectDataList[i];
-                var mapObjectConfig = MapSetting.GetEditorInstance().ObjectSetting.GetMapObjectConfigByUID(mapObjectData.UID);
-                if (mapObjectConfig == null)
-                {
-                    continue;
-                }
-                var isDynamic = MapSetting.GetEditorInstance().ObjectSetting.IsDynamicMapObjectType(mapObjectConfig.ObjectType);
-                if (isDynamic && mapObjectData.Go != null)
-                {
-                    GameObject.DestroyImmediate(mapObjectData.Go);
-                    mapObjectData.Go = null;
-                }
-            }
             return true;
         }
 

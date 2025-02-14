@@ -24,21 +24,14 @@ namespace MapEditor
         public MapObjectType ObjectType;
 
         /// <summary>
-        /// 是否是动态地图对象
-        /// </summary>
-        [Header("是否是动态地图对象")]
-        public bool IsDynamic;
-
-        /// <summary>
         /// 地图对象类型描述
         /// </summary>
         [Header("地图对象类型描述")]
         public string Des;
 
-        public MapObjectTypeConfig(MapObjectType mapObjectType, bool isDynamic = false)
+        public MapObjectTypeConfig(MapObjectType mapObjectType)
         {
             ObjectType = mapObjectType;
-            IsDynamic = isDynamic;
         }
     }
 }

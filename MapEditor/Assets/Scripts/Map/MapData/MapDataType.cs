@@ -14,6 +14,7 @@ namespace MapEditor
     {
         PlayerSpawn = 0,           // 玩家出生点位置数据
         Monster = 1,               // 怪物数据
-        MonsterGroup = 2,          // 怪物组数据
+        TreasureBox = 2,           // 宝箱数据
+        Trap = 3,                  // 陷阱数据
     }
 }

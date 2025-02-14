@@ -15,7 +15,7 @@ namespace MapEditor
     /// 碰撞体场景动态物体数据导出
     /// </summary>
     [Serializable]
-    public class ColliderMapDynamicExport : BaseMapDynamicExport
+    public class ColliderMapDynamicExport : MapObjectExport
     {
         /// <summary>
         /// 碰撞体中心

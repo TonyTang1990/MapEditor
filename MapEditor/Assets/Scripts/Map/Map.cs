@@ -159,16 +159,23 @@ namespace MapEditor
         public List<bool> PlayerSpawnMapGroupUnfoldDataList = new List<bool>();
 
         /// <summary>
-        /// 地图怪物埋点组是否展开数据列表
+        /// 地图怪物组埋点组是否展开数据列表
         /// </summary>
         [HideInInspector]
         public List<bool> MonsterMapGroupUnfoldDataList = new List<bool>();
 
         /// <summary>
-        /// 地图怪物组埋点组是否展开数据列表
+        /// 地图宝箱组埋点组是否展开数据列表
         /// </summary>
         [HideInInspector]
-        public List<bool> MonsterGroupMapGroupUnfoldDataList = new List<bool>();
+        public List<bool> TreasureBoxMapGroupUnfoldDataList = new List<bool>();
+
+
+        /// <summary>
+        /// 地图陷阱组埋点组是否展开数据列表
+        /// </summary>
+        [HideInInspector]
+        public List<bool> TrapMapGroupUnfoldDataList = new List<bool>();
 
         /// <summary>
         /// 批量勾选起始索引

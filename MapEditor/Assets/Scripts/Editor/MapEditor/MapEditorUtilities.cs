@@ -436,18 +436,8 @@ namespace MapEditor
             {
                 return "非数组地图属性";
             }
-            var mapDataProperty = mapDataPropertyList.GetArrayElementAtIndex(index);
             var mapDataDes = mapDataConfig.Des;
-            var mapDataType = mapDataConfig.DataType;
-            if(mapDataType == MapDataType.Monster || mapDataType == MapDataType.MonsterGroup)
-            {
-                var groupIdProperty = mapDataProperty.FindPropertyRelative("GroupId");
-                return $"[{index}]{mapDataDes}({groupIdProperty.intValue}组)";
-            }
-            else
-            {
-                return $"[{index}]{mapDataDes}";
-            }
+            return $"[{index}]{mapDataDes}";
         }
 
         /// <summary>
@@ -469,23 +459,7 @@ namespace MapEditor
                 return $"未知的UID:{uid}";
             }
             var mapDataDes = mapDataConfig.Des;
-            var mapDataType = mapDataConfig.DataType;
-            if (mapDataType == MapDataType.Monster)
-            {
-                var monsterMapData = mapData as MonsterMapData;
-                var groupId = monsterMapData.GroupId;
-                return $"[{index}]{mapDataDes}({groupId}组)";
-            }
-            else if(mapDataType == MapDataType.MonsterGroup)
-            {
-                var monsterGroupMapData = mapData as MonsterGroupMapData;
-                var groupId = monsterGroupMapData.GroupId;
-                return $"[{index}]{mapDataDes}({groupId}组)";
-            }
-            else
-            {
-                return $"[{index}]{mapDataDes}";
-            }
+            return $"[{index}]{mapDataDes}";
         }
 
         /// <summary>
@@ -1237,7 +1211,8 @@ namespace MapEditor
         {
             {MapDataType.PlayerSpawn, MapFoldType.PlayerSpawnMapDataFold},
             {MapDataType.Monster, MapFoldType.MonsterMapDataFold},
-            {MapDataType.MonsterGroup, MapFoldType.MonsterGroupMapDataFold},
+            {MapDataType.TreasureBox, MapFoldType.TreasureBoxMapDataFold},
+            {MapDataType.Trap, MapFoldType.TrapMapDataFold},
         };
 
         /// <summary>
@@ -1248,7 +1223,8 @@ namespace MapEditor
             {MapFoldType.MapObjectDataFold, "一键折叠所有(通用对象数据)"},
             {MapFoldType.PlayerSpawnMapDataFold, "一键折叠所有(玩家出生点埋点数据)"},
             {MapFoldType.MonsterMapDataFold, "一键折叠所有(怪物埋点数据)"},
-            {MapFoldType.MonsterGroupMapDataFold, "一键折叠所有(怪物组埋点数据)"},
+            {MapFoldType.TreasureBoxMapDataFold, "一键折叠所有(宝箱埋点数据)"},
+            {MapFoldType.TrapMapDataFold, "一键折叠所有(陷阱埋点数据)"},
         };
 
         /// <summary>
@@ -1259,7 +1235,8 @@ namespace MapEditor
             {MapFoldType.MapObjectDataFold, "一键展开所有(通用对象数据)"},
             {MapFoldType.PlayerSpawnMapDataFold, "一键展开所有(玩家出生点埋点数据)"},
             {MapFoldType.MonsterMapDataFold, "一键展开所有(怪物埋点数据)"},
-            {MapFoldType.MonsterGroupMapDataFold, "一键展开所有(怪物组埋点数据)"},
+            {MapFoldType.TreasureBoxMapDataFold, "一键展开所有(宝箱埋点数据)"},
+            {MapFoldType.TrapMapDataFold, "一键展开所有(陷阱埋点数据)"},
         };
 
         /// <summary>
@@ -1297,7 +1274,8 @@ namespace MapEditor
                     {MapDataUIType.GUISwitchOff, true},
                     {MapDataUIType.Position, true},
                     {MapDataUIType.Rotation, true},
-                    {MapDataUIType.MonsterGroupId, true},
+                    {MapDataUIType.MonsterCreateRadius, true},
+                    {MapDataUIType.MonsterActiveRadius, true},
                     {MapDataUIType.MoveUp, true},
                     {MapDataUIType.MoveDown, true},
                     {MapDataUIType.Add, true},
@@ -1305,7 +1283,7 @@ namespace MapEditor
                 }
             },
             {
-                MapDataType.MonsterGroup, new Dictionary<MapDataUIType, bool>()
+                MapDataType.TreasureBox, new Dictionary<MapDataUIType, bool>()
                 {
                     {MapDataUIType.Batch, true},
                     {MapDataUIType.Index, true},
@@ -1316,9 +1294,24 @@ namespace MapEditor
                     {MapDataUIType.GUISwitchOff, true},
                     {MapDataUIType.Position, true},
                     {MapDataUIType.Rotation, true},
-                    {MapDataUIType.MonsterGroupId, true},
-                    {MapDataUIType.MonsterCreateRadius, true},
-                    {MapDataUIType.MonsterActiveRadius, true},
+                    {MapDataUIType.MoveUp, true},
+                    {MapDataUIType.MoveDown, true},
+                    {MapDataUIType.Add, true},
+                    {MapDataUIType.Remove, true},
+                }
+            },
+            {
+                MapDataType.Trap, new Dictionary<MapDataUIType, bool>()
+                {
+                    {MapDataUIType.Batch, true},
+                    {MapDataUIType.Index, true},
+                    {MapDataUIType.UID, true},
+                    {MapDataUIType.MapDataType, true},
+                    {MapDataUIType.ConfId, true},
+                    {MapDataUIType.Des, true},
+                    {MapDataUIType.GUISwitchOff, true},
+                    {MapDataUIType.Position, true},
+                    {MapDataUIType.Rotation, true},
                     {MapDataUIType.MoveUp, true},
                     {MapDataUIType.MoveDown, true},
                     {MapDataUIType.Add, true},
