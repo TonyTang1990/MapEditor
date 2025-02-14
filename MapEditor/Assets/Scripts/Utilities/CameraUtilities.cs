@@ -97,4 +97,35 @@ public static class CameraUtilities
         }
         return true;
     }
+
+    /// <summary>
+    /// 获取指定摄像机指定区域顶点和法线的的可视区域顶点数据
+    /// </summary>
+    /// <param name="camera"></param>
+    /// <param name="center"></param>
+    /// <param name="up"></param>
+    /// <param name="areaPointsList"></param>
+    /// <returns></returns>
+    public static bool GetCameraVisibleArea(Camera camera, Vector3 center, Vector3 up, ref List<Vector3> areaPointsList)
+    {
+        areaPointsList.Clear();
+        if(camera == null)
+        {
+            Debug.LogError($"不允许传递空摄像机组件，获取摄像机的可视区域顶点数据失败！");
+            return false;
+        }
+        
+        RayCastDataList.Clear();
+        GetCameraRayCastDataList(camera, ref RayCastDataList);
+        foreach(var rayCastData in RayCastDataList)
+        {
+            var rayCastDirection = rayCastData.Value - rayCastData.Key;
+            var areaData = Vector3Utilities.GetRayAndPlaneIntersect(rayCastData.Key, rayCastDirection, areaPoint, areaNormal);
+            if(areaData != null)
+            {
+                areaPointsList.Add(areaData.Item1);
+            }
+        }
+        return true;
+    }
 }
