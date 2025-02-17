@@ -107,7 +107,29 @@ public class GameLauncher : MonoBehaviour
     private void UpdateCameraAreaInfoss()
     {
         CameraUtilities.GetCameraVisibleArea(MainCamera, Vector3.zero, Vector3.up, ref mCameraAreaPointsList);
-        
+        if(mCameraAreaPointsList.Count > 0)
+        {
+            if(LeftBottomPointTxt != null)
+            {
+                LeftBottomPointTxt.text = $"左下角顶点坐标:{mCameraAreaPointsList[0].ToString()}";;
+            }
+            if(LeftTopPointTxt != null)
+            {
+                LeftTopPointTxt.text = $"左上角顶点坐标:{mCameraAreaPointsList[1].ToString()}";
+            }
+            if(RightTopPointTxt != null)
+            {
+                RightTopPointTxt.text = $"右上角顶点坐标:{mCameraAreaPointsList[2].ToString()}";
+            }
+            if(RightBottomPointTxt != null)
+            {
+                RightBottomPointTxt.text = $"右下角顶点坐标:{mCameraAreaPointsList[3].ToString()}";
+            }
+            if(CenterPointTxt != null)
+            {
+                CenterPointTxt.text = $"中间顶点坐标:{mCameraAreaPointsList[4].ToString()}";
+            }
+        }
     }
 
     /// <summary>
@@ -115,6 +137,13 @@ public class GameLauncher : MonoBehaviour
     /// </summary>
     private void UpdateGameInfos()
     {
-
+        if(FPSTxt != null)
+        {
+            FPSTxt.text = $"FPS:{GameManager.Singleton.FPS}";
+        }
+        if(LogicFrameTxt != null)
+        {
+            LogicFrameTxt.text = $"逻辑帧:{GameManager.Singleton.LogicFrame}";
+        }
     }
 }
