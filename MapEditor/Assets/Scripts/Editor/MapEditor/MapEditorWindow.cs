@@ -71,7 +71,7 @@ namespace MapEditor
         /// <summary>
         /// 当前选中添加的地图对象类型配置
         /// </summary>
-        private MapObjectType mAddMapObjectTypeConfigType = MapObjectType.TreasureBox;
+        private MapObjectType mAddMapObjectTypeConfigType = MapObjectType.Scene;
 
         /// <summary>
         /// 当前选中地图对象类型配置类型添加的是否是动态对象

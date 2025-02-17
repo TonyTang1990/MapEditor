@@ -139,7 +139,7 @@ public class CameraAreaVisualizationMono : MonoBehaviour
         }
         if(mAreaPointsList.Count > 0)
         {
-            preGizmosColor.DrawSphere(mAreaPointsList[4], SphereSize);
+            Gizmos.DrawSphere(mAreaPointsList[4], SphereSize);
         }
         Gizmos.color = preGizmosColor;
     }

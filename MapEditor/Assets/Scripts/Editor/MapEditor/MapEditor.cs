@@ -50,11 +50,6 @@ namespace MapEditor
         private SerializedProperty mMapLineGUISwitchProperty;
 
         /// <summary>
-        /// MapAreaGUISwitch属性
-        /// </summary>
-        private SerializedProperty mMapAreaGUISwitchProperty;
-
-        /// <summary>
         /// MapObjectSceneGUISwitch属性
         /// </summary>
         private SerializedProperty mMapObjectSceneGUISwitchProperty;
@@ -83,11 +78,6 @@ namespace MapEditor
         /// MapStartPos属性
         /// </summary>
         private SerializedProperty mMapStartPosProperty;
-
-        /// <summary>
-        /// GridSize属性
-        /// </summary>
-        private SerializedProperty mGridSizeProperty;
 
         /// <summary>
         /// MapObjectDataList属性
@@ -278,7 +268,6 @@ namespace MapEditor
             InitGUIStyles();
             mMapWidthProperty.intValue = mMapWidthProperty.intValue == 0 ? MapSetting.GetEditorInstance().DefaultMapWidth : mMapWidthProperty.intValue;
             mMapHeightProperty.intValue = mMapHeightProperty.intValue == 0 ? MapSetting.GetEditorInstance().DefaultMapHeight : mMapHeightProperty.intValue;
-            mGridSizeProperty.floatValue = Mathf.Approximately(mGridSizeProperty.floatValue, 0f) ? MapSetting.GetEditorInstance().DefaultGridSize : mGridSizeProperty.floatValue;
             UpdateMapDataTypeIndexDatas();
             CreateAllNodes();
             UpdateMapObjectDataChoiceDatas();
@@ -289,7 +278,6 @@ namespace MapEditor
             UpdateMapGOPosition();
             UpdateTerrianSizeAndPos();
             UpdateMapObjectDataLogicDatas();
-            UpdateGridSizeDrawDatas();
             CorrectAddMapObjectIndexValue();
             CorrectAddMapDataIndexValue();
             serializedObject.ApplyModifiedProperties();
@@ -310,14 +298,12 @@ namespace MapEditor
         {
             mSceneGUISwitchProperty ??= serializedObject.FindProperty("SceneGUISwitch");
             mMapLineGUISwitchProperty ??= serializedObject.FindProperty("MapLineGUISwitch");
-            mMapAreaGUISwitchProperty ??= serializedObject.FindProperty("MapAreaGUISwitch");
             mMapObjectSceneGUISwitchProperty ??= serializedObject.FindProperty("MapObjectSceneGUISwitch");
             mMapDataSceneGUISwitchProperty ??= serializedObject.FindProperty("MapDataSceneGUISwitch");
             mMapObjectAddedAutoFocusProperty ??= serializedObject.FindProperty("MapObjectAddedAutoFocus");
             mMapWidthProperty ??= serializedObject.FindProperty("MapWidth");
             mMapHeightProperty ??= serializedObject.FindProperty("MapHeight");
             mMapStartPosProperty ??= serializedObject.FindProperty("MapStartPos");
-            mGridSizeProperty ??= serializedObject.FindProperty("GridSize");
             mMapObjectDataListProperty ??= serializedObject.FindProperty("MapObjectDataList");
             mMapDataListProperty ??= serializedObject.FindProperty("MapDataList");
             mAddMapObjectTypeProperty ??= serializedObject.FindProperty("AddMapObjectType");
@@ -809,50 +795,6 @@ namespace MapEditor
                 var toPos = fromPos;
                 toPos.z = toPos.z + totalMapHeight;
                 mVDrawLinesDataList.Add(new KeyValuePair<Vector3, Vector3>(fromPos, toPos));
-            }
-        }
-
-        /// <summary>
-        /// 更新地图区域九宫格大小绘制数据
-        /// </summary>
-        private void UpdateGridSizeDrawDatas()
-        {
-            mGridDataList.Clear();
-            var gridSize = mGridSizeProperty.floatValue;
-            var mapWidth = mMapWidthProperty.intValue;
-            var mapHeight = mMapHeightProperty.intValue;
-            var startPos = mMapStartPosProperty.vector3Value;
-            var mapStartGridXZ = MapExportEditorUtilities.GetGridXZByPosition(startPos, gridSize);
-            var maxMapPos = startPos;
-            maxMapPos.x = maxMapPos.x + mapWidth;
-            maxMapPos.z = maxMapPos.z + mapHeight;
-            var mapMaxGridXZ = MapExportEditorUtilities.GetGridXZByPosition(maxMapPos, gridSize);
-            var gridMinX = mapStartGridXZ.Key;
-            var gridMinZ = mapStartGridXZ.Value;
-            var gridMaxX = mapMaxGridXZ.Key;
-            var gridMaxZ = mapMaxGridXZ.Value;
-            for (int i = 0; i < mMapObjectDataListProperty.arraySize; i++)
-            {
-                var mapObjectDataProperty = mMapObjectDataListProperty.GetArrayElementAtIndex(i);
-                var positionProperty = mapObjectDataProperty.FindPropertyRelative("Position");
-                var position = positionProperty.vector3Value;
-                var gridXZ = MapExportEditorUtilities.GetGridXZByPosition(position, gridSize);
-                gridMinX = Mathf.Min(gridMinX, gridXZ.Key);
-                gridMinZ = Mathf.Min(gridMinZ, gridXZ.Value);
-                gridMaxX = Mathf.Max(gridMaxX, gridXZ.Key);
-                gridMaxZ = Mathf.Max(gridMaxZ, gridXZ.Value);
-            }
-            var gridVector3Size = new Vector3(gridSize, 0, gridSize);
-            var halfGridVector3Size = gridVector3Size / 2;
-            for (int gridX = gridMinX; gridX <= gridMaxX; gridX++)
-            {
-                for (int gridZ = gridMinZ; gridZ <= gridMaxZ; gridZ++)
-                {
-                    var gridCenterData = new Vector3(gridX * gridSize + halfGridVector3Size.x, 0, gridZ * gridSize + halfGridVector3Size.z);
-                    var gridUID = MapExportEditorUtilities.GetGridUID(gridX, gridZ);
-                    var gridData = new KeyValuePair<Vector3, int>(gridCenterData, gridUID);
-                    mGridDataList.Add(gridData);
-                }
             }
         }
 
@@ -1503,20 +1445,6 @@ namespace MapEditor
         }
 
         /// <summary>
-        /// 清除动态数据
-        /// </summary>
-        private async Task<bool> CleanDynamicMapDatas()
-        {
-            if (!MapEditorUtilities.CheckOperationAvalible(mTarget?.gameObject))
-            {
-                Debug.LogError($"地图:{mTarget?.gameObject.name}清除动态地图数据失败！");
-                return false;
-            }
-            UpdateMapObjectDataLogicDatas();
-            return true;
-        }
-
-        /// <summary>
         /// 恢复指定MapObject属性地图对象
         /// </summary>
         /// <param name="mapObjectDataProperty"></param>
@@ -1561,21 +1489,6 @@ namespace MapEditor
                 //    MapUtilities.UpdateColliderByColliderData(instanceGo, colliderCenterProperty.vector3Value, colliderSizeProperty.vector3Value, colliderRadiusProperty.floatValue);
                 //}
             }
-        }
-
-        /// <summary>
-        /// 恢复动态数据
-        /// </summary>
-        private async Task<bool> RecoverDynamicMapDatas()
-        {
-            if (!MapEditorUtilities.CheckOperationAvalible(mTarget?.gameObject))
-            {
-                return false;
-            }
-            var result = true;
-            // 逻辑相关数据在动态物体清理前保存即可，正确预制件操作保存流程一定会走清理动态数据流程
-            //UpdateMapObjectDataLogicDatas();
-            return result;
         }
 
         /// <summary>
@@ -1668,6 +1581,8 @@ namespace MapEditor
         /// </summary>
         private void ExportMapData()
         {
+            // 导出地图数据前确保地图对象数据逻辑更新保存一下
+            UpdateMapObjectDataLogicDatas();
             // 流程上说场景给客户端使用一定会经历导出流程
             // 在导出时确保MapObjectDataMono和地图对象配置数据一致
             // 从而确保场景资源被使用时挂在数据和配置匹配
@@ -1692,12 +1607,6 @@ namespace MapEditor
             {
                 return false;
             }
-            var recoverResult = await RecoverDynamicMapDatas();
-            if (!recoverResult)
-            {
-                Debug.LogError($"地图:{mTarget?.gameObject.name}恢复动态地图数据失败，一键烘焙导出地图数据失败！");
-                return false;
-            }
             // 寻路地形烘焙时打开，烘完隐藏，避免运行时被错误看到问题
             var mapTerrian = MapEditorUtilities.GetOrCreateMapTerrianNode(mTarget?.gameObject);
             mapTerrian.gameObject.SetActive(true);
@@ -1714,12 +1623,6 @@ namespace MapEditor
             if (!copyNavMeshAssetResult)
             {
                 Debug.LogError($"地图:{mTarget?.gameObject.name}拷贝寻路Asset失败，一键烘焙导出地图数据失败！");
-                return false;
-            }
-            var cleanDynamicMapDatasResult = await CleanDynamicMapDatas();
-            if (!cleanDynamicMapDatasResult)
-            {
-                Debug.LogError($"地图:{mTarget?.gameObject.name}清除动态地图数据失败，一键烘焙导出地图数据失败！");
                 return false;
             }
             ExportMapData();
@@ -2253,7 +2156,6 @@ namespace MapEditor
             EditorGUILayout.BeginVertical();
             EditorGUILayout.PropertyField(mSceneGUISwitchProperty);
             EditorGUILayout.PropertyField(mMapLineGUISwitchProperty);
-            EditorGUILayout.PropertyField(mMapAreaGUISwitchProperty);
             EditorGUILayout.PropertyField(mMapObjectSceneGUISwitchProperty);
             EditorGUILayout.PropertyField(mMapDataSceneGUISwitchProperty);
             EditorGUILayout.PropertyField(mMapObjectAddedAutoFocusProperty);
@@ -2266,7 +2168,6 @@ namespace MapEditor
                 UpdateMapSizeDrawDatas();
                 UpdateMapGOPosition();
                 UpdateTerrianSizeAndPos();
-                UpdateGridSizeDrawDatas();
             }
 
             EditorGUI.BeginChangeCheck();
@@ -2274,15 +2175,7 @@ namespace MapEditor
             if (EditorGUI.EndChangeCheck())
             {
                 UpdateMapSizeDrawDatas();
-                UpdateGridSizeDrawDatas();
                 UpdateMapGOPosition();
-            }
-
-            EditorGUI.BeginChangeCheck();
-            EditorGUILayout.PropertyField(mGridSizeProperty);
-            if (EditorGUI.EndChangeCheck())
-            {
-                UpdateGridSizeDrawDatas();
             }
 
             DrawGameMapButtonArea();
@@ -2304,14 +2197,6 @@ namespace MapEditor
             EditorGUILayout.BeginVertical("box");
             {
                 EditorGUILayout.BeginHorizontal();
-                if (GUILayout.Button("清除动态数据", GUILayout.ExpandWidth(true)))
-                {
-                    CleanDynamicMapDatas();
-                }
-                if (GUILayout.Button("恢复动态数据", GUILayout.ExpandWidth(true)))
-                {
-                    RecoverDynamicMapDatas();
-                }
                 if (GUILayout.Button("一键重创地图对象", GUILayout.ExpandWidth(true)))
                 {
                     OneKeyRecreateMapObjectGos();
@@ -2473,6 +2358,10 @@ namespace MapEditor
         private void DrawMapObjectDataListArea()
         {
             mMapObjectDataUnfoldDataProperty.boolValue = EditorGUILayout.Foldout(mMapObjectDataUnfoldDataProperty.boolValue, "地图对象数据列表");
+            if (mMapObjectDataListProperty.arraySize == 0)
+            {
+                return;
+            }
             if (mMapObjectDataUnfoldDataProperty.boolValue)
             {
                 DrawMapObjectOneKeyFoldArea();
@@ -2582,7 +2471,7 @@ namespace MapEditor
             EditorGUILayout.LabelField($"{mapObjectDataIndex}", MapStyles.TabMiddleStyle, GUILayout.Width(MapEditorConst.InspectorObjectIndexUIWidth));
             var mapObjectConfig = MapSetting.GetEditorInstance().ObjectSetting.GetMapObjectConfigByUID(uid);
             EditorGUI.BeginChangeCheck();
-            var mapObjectType = mapObjectConfig != null ? mapObjectConfig.ObjectType : MapObjectType.TreasureBox;
+            var mapObjectType = mapObjectConfig != null ? mapObjectConfig.ObjectType : MapObjectType.Scene;
             var mapObjectDataChoiceOptions = GetMapObjectDataChoiceOptionsByType(mapObjectType);
             var mapObjectDataChoiceValues = GetMapObjectDataChoiceValuesByType(mapObjectType);
             uid = EditorGUILayout.IntPopup(uid, mapObjectDataChoiceOptions, mapObjectDataChoiceValues, GUILayout.Width(MapEditorConst.InspectorObjectUIDUIWidth));
@@ -2713,6 +2602,11 @@ namespace MapEditor
         /// <param name="mapDataType"></param>
         private void DrawMapDataAreaByType(MapDataType mapDataType)
         {
+            var mapDataIndexs = GetMapDataTypeIndexs(mapDataType);
+            if (mapDataIndexs == null || mapDataIndexs.Count == 0)
+            {
+                return;
+            }
             if (!MapEditorUtilities.IsShowMapDataFoldType(mapDataType))
             {
                 return;
@@ -2937,20 +2831,6 @@ namespace MapEditor
                     rotationProperty.vector3Value = newRotationVector3Value;
                 }
             }
-            if (MapEditorUtilities.IsShowMapUI(mapDataType, MapDataUIType.MonsterGroupId))
-            {
-                var propertyName = "GroupId";
-                var groupIdProperty = mapDataProperty.FindPropertyRelative(propertyName);
-                if (groupIdProperty != null)
-                {
-                    EditorGUI.BeginChangeCheck();
-                    var newGroupId = EditorGUILayout.IntField(groupIdProperty.intValue, GUILayout.Width(MapEditorConst.InspectorDataGroupIdUIWidth));
-                    if (EditorGUI.EndChangeCheck())
-                    {
-                        DoChangeMapDataProperty(mapDataIndex, propertyName, newGroupId);
-                    }
-                }
-            }
             if (MapEditorUtilities.IsShowMapUI(mapDataType, MapDataUIType.MonsterCreateRadius))
             {
                 var propertyName = "MonsterCreateRadius";
@@ -3022,10 +2902,6 @@ namespace MapEditor
                     {
                         DrawMapLines();
                     }
-                    if (mMapAreaGUISwitchProperty.boolValue)
-                    {
-                        DrawMapGridRects();
-                    }
                     if (mMapObjectSceneGUISwitchProperty != null && mMapObjectSceneGUISwitchProperty.boolValue)
                     {
                         DrawMapObjectDataLabels();
@@ -3092,23 +2968,6 @@ namespace MapEditor
             {
                 Handles.DrawLine(verticalLineData.Key, verticalLineData.Value, 2f);
             }
-        }
-
-        /// <summary>
-        /// 绘制九宫格Rect
-        /// </summary>
-        private void DrawMapGridRects()
-        {
-            var preHandlesColor = Handles.color;
-            Handles.color = Color.red;
-            var gridSize = mGridSizeProperty.floatValue;
-            var gridVector3Size = new Vector3(gridSize, 0, gridSize);
-            for(int i = 0; i < mGridDataList.Count; i++)
-            {
-                Handles.DrawWireCube(mGridDataList[i].Key, gridVector3Size);
-                Handles.Label(mGridDataList[i].Key, $"区域{mGridDataList[i].Value}");
-            }
-            Handles.color = preHandlesColor;
         }
 
         /// <summary>
@@ -3259,33 +3118,6 @@ namespace MapEditor
             {
                 return;
             }
-            var mapDataType = mapDataConfig.DataType;
-            if(mapDataType == MapDataType.MonsterGroup)
-            {
-                var monsterGroupMapData = mapData as MonsterGroupMapData;
-                DrawMapMonsterGroupCustomDataHandles(monsterGroupMapData);
-            }
-        }
-
-        /// <summary>
-        /// 绘制怪物组自定义Handles
-        /// </summary>
-        /// <param name="monsterGroupMapData"></param>
-        private void DrawMapMonsterGroupCustomDataHandles(MonsterGroupMapData monsterGroupMapData)
-        {
-            if (monsterGroupMapData == null)
-            {
-                return;
-            }
-            var preHandlesColor = Handles.color;
-            Handles.color = Color.green;
-            Handles.DrawWireDisc(monsterGroupMapData.Position, Vector3.up, monsterGroupMapData.MonsterCreateRadius);
-            Handles.color = preHandlesColor;
-
-            preHandlesColor = Handles.color;
-            Handles.color = Color.red;
-            Handles.DrawWireDisc(monsterGroupMapData.Position, Vector3.up, monsterGroupMapData.MonsterActiveRadius);
-            Handles.color = preHandlesColor;
         }
 
         /// <summary>

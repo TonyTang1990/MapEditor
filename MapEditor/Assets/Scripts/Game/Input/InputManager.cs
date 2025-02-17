@@ -13,7 +13,7 @@ using UnityEngine;
 /// MapInputManager.cs
 /// 输入管理单例类
 /// </summary>
-public class InputManager : SinglentonTemplate<InputManager>
+public class InputManager : SingletonTemplate<InputManager>
 {
 
 }

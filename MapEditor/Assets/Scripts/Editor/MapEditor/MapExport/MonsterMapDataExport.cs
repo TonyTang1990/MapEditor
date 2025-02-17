@@ -26,7 +26,7 @@ namespace MapEditor
         /// </summary>
         public float MonsterActiveRadius;
 
-        public MonsterMapDataExport(MapDataType mapDataType, int confId, Vector3 position,  Vector3 rotation, float monsterCreateRadius, flo)
+        public MonsterMapDataExport(MapDataType mapDataType, int confId, Vector3 position,  Vector3 rotation, float monsterCreateRadius, float monsterActiveRadius)
                                         : base(mapDataType, confId, position, rotation)
         {
             MonsterCreateRadius = monsterCreateRadius;

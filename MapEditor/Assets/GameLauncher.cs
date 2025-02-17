@@ -8,6 +8,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 /// <summary>
 /// GameLauncher.cs
@@ -24,43 +25,43 @@ public class GameLauncher : MonoBehaviour
     /// <summary>
     /// 左下区域顶点坐标文本
     /// </summary>
-    [Headre("左下区域顶点坐标文本")]
+    [Header("左下区域顶点坐标文本")]
     public Text LeftBottomPointTxt;
 
     /// <summary>
     /// 左上区域顶点坐标文本
     /// </summary>
-    [Headre("左上区域顶点坐标文本")]
+    [Header("左上区域顶点坐标文本")]
     public Text LeftTopPointTxt;
 
     /// <summary>
     /// 右上区域顶点坐标文本
     /// </summary>
-    [Headre("右上区域顶点坐标文本")]
+    [Header("右上区域顶点坐标文本")]
     public Text RightTopPointTxt;
 
     /// <summary>
     /// 右下区域顶点坐标文本
     /// </summary>
-    [Headre("右下区域顶点坐标文本")]
+    [Header("右下区域顶点坐标文本")]
     public Text RightBottomPointTxt;
 
     /// <summary>
     /// 中间区域顶点坐标文本
     /// </summary>
-    [Headre("中间区域顶点坐标文本")]
+    [Header("中间区域顶点坐标文本")]
     public Text CenterPointTxt;
 
     /// <summary>
     /// FPS文本
     /// </summary>
-    [Headre("FPS文本")]
+    [Header("FPS文本")]
     public Text FPSTxt;
 
     /// <summary>
     /// 逻辑帧率文本
     /// </summary>
-    [Headre("逻辑帧率文本")]
+    [Header("逻辑帧率文本")]
     public Text LogicFrameTxt;
 
     /// <summary>
@@ -81,7 +82,7 @@ public class GameLauncher : MonoBehaviour
     {
         GameManager.Singleton.Update();
         UpdateCameraAreaInfoss();
-        UpdateGameInfos()
+        UpdateGameInfos();
     }
 
     /// <summary>

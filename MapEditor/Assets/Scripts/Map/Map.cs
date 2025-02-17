@@ -34,12 +34,6 @@ namespace MapEditor
         public bool MapLineGUISwitch = true;
 
         /// <summary>
-        /// 区域GUI开关
-        /// </summary>
-        [Header("区域GUI开关")]
-        public bool MapAreaGUISwitch = false;
-
-        /// <summary>
         /// 地图对象场景GUI开关
         /// </summary>
         [Header("地图对象场景GUI开关")]
@@ -78,13 +72,6 @@ namespace MapEditor
         public Vector3 MapStartPos = Vector3.zero;
 
         /// <summary>
-        /// 区域九宫格大小
-        /// </summary>
-        [Header("区域九宫格大小")]
-        [Range(1f, 100f)]
-        public float GridSize;
-
-        /// <summary>
         /// 地图对象数据列表
         /// </summary>
         [Header("地图对象数据列表")]
@@ -102,7 +89,7 @@ namespace MapEditor
         /// 当前选中需要新增的地图对象类型
         /// </summary>
         [HideInInspector]
-        public int AddMapObjectType = (int)MapObjectType.TreasureBox;
+        public int AddMapObjectType = (int)MapObjectType.Scene;
 
         /// <summary>
         /// 当前选中需要新增的地图对象索引

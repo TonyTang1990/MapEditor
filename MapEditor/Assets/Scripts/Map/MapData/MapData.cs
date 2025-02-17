@@ -11,7 +11,7 @@ namespace MapEditor
 {
     /// <summary>
     /// MapData.cs
-    /// 地图数据买点数据
+    /// 地图数据埋点数据
     /// </summary>
     [Serializable]
     public class MapData

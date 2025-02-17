@@ -220,11 +220,6 @@ namespace MapEditor
         public const float InspectorDataConfIdUIWidth = 100f;
 
         /// <summary>
-        /// 面板地图埋点组Id的UI宽度
-        /// </summary>
-        public const float InspectorDataGroupIdUIWidth = 40f;
-
-        /// <summary>
         /// 面板地图埋点怪物创建半径的UI宽度
         /// </summary>
         public const float InspectorDataMonsterCreateRadiusUIWidth = 60f;

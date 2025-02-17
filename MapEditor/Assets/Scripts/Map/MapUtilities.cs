@@ -108,7 +108,9 @@ namespace MapEditor
             {
                 mapDataPosition += (Vector3)positionOffset;
             }
-            var newMapData = CreateMapDataByType(mapDataType, uid, mapDataPosition, mapDataRotation);
+            var defaultMonsterCreateRadius = MapConst.DefaultMonsterCreateRadius;
+            var defaultMonsterActiveRadius = MapConst.DefaultMonsterActiveRadius;
+            var newMapData = CreateMapDataByType(mapDataType, uid, mapDataPosition, mapDataRotation, defaultMonsterCreateRadius, defaultMonsterActiveRadius);
             mapDataList.Insert(insertPos, newMapData);
             return newMapData;
         }
@@ -170,10 +172,6 @@ namespace MapEditor
             if (mapDataType == MapDataType.Monster)
             {
                 return new MonsterMapData(uid, position, rotation, monsterCreateRadius, monsterActiveRadius);
-            }
-            else if (mapDataType == MapDataType.MonsterGroup)
-            {
-                return new MonsterGroupMapData(uid, position, rotation);
             }
             else if (mapDataType == MapDataType.PlayerSpawn)
             {

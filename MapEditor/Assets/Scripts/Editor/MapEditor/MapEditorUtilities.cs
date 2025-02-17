@@ -514,7 +514,8 @@ namespace MapEditor
         {
             { MapDataType.PlayerSpawn, Color.yellow },
             { MapDataType.Monster, Color.magenta },
-            { MapDataType.MonsterGroup, Color.red },
+            { MapDataType.TreasureBox, Color.green },
+            { MapDataType.Trap, Color.red },
         };
 
         /// <summary>
@@ -677,10 +678,6 @@ namespace MapEditor
             if (MapEditorUtilities.IsShowMapUI(mapDataType, MapDataUIType.Rotation))
             {
                 EditorGUILayout.LabelField("旋转", MapStyles.TabMiddleStyle, GUILayout.Width(MapEditorConst.InspectorDataRotationUIWidth));
-            }
-            if (MapEditorUtilities.IsShowMapUI(mapDataType, MapDataUIType.MonsterGroupId))
-            {
-                EditorGUILayout.LabelField("组Id", MapStyles.TabMiddleStyle, GUILayout.Width(MapEditorConst.InspectorDataGroupIdUIWidth));
             }
             if (MapEditorUtilities.IsShowMapUI(mapDataType, MapDataUIType.MonsterCreateRadius))
             {

@@ -20,53 +20,28 @@ MonoBehaviour:
     AllMapObjectTypeConfigs:
     - rid: 1875189631230672896
     - rid: 1875189631230672897
-    - rid: 1875189631230672898
-    - rid: 1673489113762758656
     AllMapObjectConfigs:
-    - rid: 3718244341701672961
+    - rid: 8403303842407514115
     - rid: 3718244341701672962
-    - rid: 3718244341701672963
-    - rid: 1673489113762758657
   DataSetting:
     AllMapDataConfigs:
     - rid: 1875189631230672899
     - rid: 1875189631230672900
-    - rid: 1875189631230672901
-    - rid: 1875189631230672902
+    - rid: 8403303842407514112
+    - rid: 8403303842407514113
+    - rid: 8403303842407514114
   references:
     version: 2
     RefIds:
-    - rid: 1673489113762758656
-      type: {class: MapObjectTypeConfig, ns: MapEditor, asm: Assembly-CSharp}
-      data:
-        ObjectType: 3
-        IsDynamic: 0
-        Des: "\u573A\u666F"
-    - rid: 1673489113762758657
-      type: {class: MapObjectConfig, ns: MapEditor, asm: Assembly-CSharp}
-      data:
-        UID: 4
-        ObjectType: 3
-        ConfId: 0
-        Asset: {fileID: 5014015757715748101, guid: ec7d3a1ba97ba544cbe93751cd6cdd47, type: 3}
-        Des: "\u573A\u666F\u5730\u9762"
     - rid: 1875189631230672896
       type: {class: MapObjectTypeConfig, ns: MapEditor, asm: Assembly-CSharp}
       data:
         ObjectType: 0
-        IsDynamic: 1
-        Des: "\u5B9D\u7BB1"
+        Des: "\u573A\u666F"
     - rid: 1875189631230672897
       type: {class: MapObjectTypeConfig, ns: MapEditor, asm: Assembly-CSharp}
       data:
         ObjectType: 1
-        IsDynamic: 1
-        Des: "\u9677\u9631"
-    - rid: 1875189631230672898
-      type: {class: MapObjectTypeConfig, ns: MapEditor, asm: Assembly-CSharp}
-      data:
-        ObjectType: 2
-        IsDynamic: 0
         Des: "\u95E8"
     - rid: 1875189631230672899
       type: {class: MapDataConfig, ns: MapEditor, asm: Assembly-CSharp}
@@ -86,45 +61,46 @@ MonoBehaviour:
         SceneSphereColor: {r: 1, g: 0, b: 1, a: 1}
         Rotation: {x: 0, y: 0, z: 0}
         Des: "\u602A\u72691"
-    - rid: 1875189631230672901
-      type: {class: MapDataConfig, ns: MapEditor, asm: Assembly-CSharp}
-      data:
-        UID: 3
-        DataType: 2
-        ConfId: 0
-        SceneSphereColor: {r: 1, g: 0, b: 0, a: 1}
-        Rotation: {x: 0, y: 0, z: 0}
-        Des: "\u602A\u7269\u7EC4"
-    - rid: 1875189631230672902
-      type: {class: MapDataConfig, ns: MapEditor, asm: Assembly-CSharp}
-      data:
-        UID: 4
-        DataType: 1
-        ConfId: 2
-        SceneSphereColor: {r: 1, g: 0, b: 1, a: 1}
-        Rotation: {x: 0, y: 0, z: 0}
-        Des: "\u602A\u72692"
-    - rid: 3718244341701672961
-      type: {class: MapObjectConfig, ns: MapEditor, asm: Assembly-CSharp}
-      data:
-        UID: 1
-        ObjectType: 2
-        ConfId: 1
-        Asset: {fileID: 314933842123915321, guid: 02f4e8e5fd6b8a14db50fb565d03032d, type: 3}
-        Des: "\u95E8"
     - rid: 3718244341701672962
       type: {class: MapObjectConfig, ns: MapEditor, asm: Assembly-CSharp}
       data:
         UID: 2
         ObjectType: 1
         ConfId: 2
-        Asset: {fileID: 1276204567218273734, guid: 83e17cb4c5fc71d4d9b8d5fce4eedbda, type: 3}
-        Des: "\u9677\u9631"
-    - rid: 3718244341701672963
-      type: {class: MapObjectConfig, ns: MapEditor, asm: Assembly-CSharp}
+        Asset: {fileID: 314933842123915321, guid: 02f4e8e5fd6b8a14db50fb565d03032d, type: 3}
+        Des: "\u95E8"
+    - rid: 8403303842407514112
+      type: {class: MapDataConfig, ns: MapEditor, asm: Assembly-CSharp}
       data:
         UID: 3
-        ObjectType: 0
-        ConfId: 3
-        Asset: {fileID: 4864366610927410093, guid: de0f3a20960abdd44bf5cceadae7d629, type: 3}
+        DataType: 1
+        ConfId: 2
+        SceneSphereColor: {r: 1, g: 0, b: 1, a: 1}
+        Rotation: {x: 0, y: 0, z: 0}
+        Des: "\u602A\u72692"
+    - rid: 8403303842407514113
+      type: {class: MapDataConfig, ns: MapEditor, asm: Assembly-CSharp}
+      data:
+        UID: 4
+        DataType: 2
+        ConfId: 4
+        SceneSphereColor: {r: 0, g: 1, b: 0, a: 1}
+        Rotation: {x: 0, y: 0, z: 0}
         Des: "\u5B9D\u7BB1"
+    - rid: 8403303842407514114
+      type: {class: MapDataConfig, ns: MapEditor, asm: Assembly-CSharp}
+      data:
+        UID: 5
+        DataType: 3
+        ConfId: 5
+        SceneSphereColor: {r: 1, g: 0, b: 0, a: 1}
+        Rotation: {x: 0, y: 0, z: 0}
+        Des: "\u9677\u9631"
+    - rid: 8403303842407514115
+      type: {class: MapObjectConfig, ns: MapEditor, asm: Assembly-CSharp}
+      data:
+        UID: 1
+        ObjectType: 0
+        ConfId: 1
+        Asset: {fileID: 5014015757715748101, guid: ec7d3a1ba97ba544cbe93751cd6cdd47, type: 3}
+        Des: "\u573A\u666F"

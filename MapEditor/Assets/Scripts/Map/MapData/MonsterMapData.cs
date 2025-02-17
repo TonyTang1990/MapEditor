@@ -33,7 +33,7 @@ namespace MapEditor
 
         }
 
-        public MonsterMapData(int uid, Vector3 position, Vector3 rotation, float monsterCreateRadius, float monsterCreateRadius, float monsterActiveRadius)
+        public MonsterMapData(int uid, Vector3 position, Vector3 rotation, float monsterCreateRadius, float monsterActiveRadius)
                                 : base(uid, position, rotation)
         {
             MonsterCreateRadius = monsterCreateRadius;

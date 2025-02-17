@@ -51,5 +51,6 @@
         "temp/": true,
         "Temp/": true
     },
-    "dotnet.defaultSolution": "MapEditor.sln"
+    "dotnet.defaultSolution": "MapEditor.sln",
+    "dotnet.preferCSharpExtension": true
 }

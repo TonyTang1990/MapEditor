@@ -21,17 +21,7 @@ namespace MapEditor
         /// 地图导出数据成员
         /// </summary>
         public MapDataExport MapData = new MapDataExport();
-
-        /// <summary>
-        /// 所有地图对象导出数据成员
-        /// </summary>
-        public List<MapObjectExport> AllMapObjectExportDatas = new List<MapObjectExport>();
-
-        /// <summary>
-        /// 所有怪物组的怪物组导出数据列表
-        /// </summary>
-        public List<MonsterGroupMapDataExport> AllMonsterGroupMapDatas = new List<MonsterGroupMapDataExport>();
-
+        
         /// <summary>
         /// 所有怪物导出数据列表
         /// </summary>

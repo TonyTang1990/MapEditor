@@ -42,19 +42,13 @@ namespace MapEditor
         /// </summary>
         public Vector3 LocalScale;
 
-        /// <summary>
-        /// 所属九宫格UID列表
-        /// </summary>
-        public List<int> OwnerGridUIDs;
-
-        public MapObjectExport(MapObjectType mapObjectType, int confId, Vector3 position, Vector3 rotation, Vector3 localScale, List<int> ownerGridUIDs = null) 
+        public MapObjectExport(MapObjectType mapObjectType, int confId, Vector3 position, Vector3 rotation, Vector3 localScale) 
         {
             MapObjectType = mapObjectType;
             ConfId = confId;
             Position = position;
             Rotation = rotation;
             LocalScale = localScale;
-            OwnerGridUIDs = ownerGridUIDs;
         }
     }
 }

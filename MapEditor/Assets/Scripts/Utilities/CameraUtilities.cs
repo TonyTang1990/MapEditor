@@ -27,6 +27,11 @@ public static class CameraUtilities
     };
 
     /// <summary>
+    /// 射线数据列表
+    /// </summary>
+    private static List<KeyValuePair<Vector3, Vector3>> RayCastDataList = new List<KeyValuePair<Vector3, Vector3>>();
+
+    /// <summary>
     /// 获取指定摄像机的射线数据列表
     /// </summary>
     /// <param name="camera"></param>
@@ -66,11 +71,11 @@ public static class CameraUtilities
             var cameraPosition = camera.transform.position;
 
             // 获取饰扣四个角的屏幕映射世界坐标
-            var lbNearPlaneWorldPoints = camera.ViewPortToWorldPoint(ViewPortPoints[0]);
-            var ltNearPlaneWorldPoints = camera.ViewPortToWorldPoint(ViewPortPoints[1]);
-            var rtNearPlaneWorldPoints = camera.ViewPortToWorldPoint(ViewPortPoints[2]);
-            var rbNearPlaneWorldPoints = camera.ViewPortToWorldPoint(ViewPortPoints[3]);
-            var ctNearPlaneWorldPoints = camera.ViewPortToWorldPoint(ViewPortPoints[4]);
+            var lbNearPlaneWorldPoints = camera.ViewportToWorldPoint(ViewPortPoints[0]);
+            var ltNearPlaneWorldPoints = camera.ViewportToWorldPoint(ViewPortPoints[1]);
+            var rtNearPlaneWorldPoints = camera.ViewportToWorldPoint(ViewPortPoints[2]);
+            var rbNearPlaneWorldPoints = camera.ViewportToWorldPoint(ViewPortPoints[3]);
+            var ctNearPlaneWorldPoints = camera.ViewportToWorldPoint(ViewPortPoints[4]);
 
             var lbNearPlaneCameraWorldPointDir = lbNearPlaneWorldPoints - cameraPosition;
             var ltNearPlaneCameraWorldPointDir = ltNearPlaneWorldPoints - cameraPosition;
@@ -102,11 +107,11 @@ public static class CameraUtilities
     /// 获取指定摄像机指定区域顶点和法线的的可视区域顶点数据
     /// </summary>
     /// <param name="camera"></param>
-    /// <param name="center"></param>
-    /// <param name="up"></param>
+    /// <param name="areaPoint"></param>
+    /// <param name="areaNormal"></param>
     /// <param name="areaPointsList"></param>
     /// <returns></returns>
-    public static bool GetCameraVisibleArea(Camera camera, Vector3 center, Vector3 up, ref List<Vector3> areaPointsList)
+    public static bool GetCameraVisibleArea(Camera camera, Vector3 areaPoint, Vector3 areaNormal, ref List<Vector3> areaPointsList)
     {
         areaPointsList.Clear();
         if(camera == null)
@@ -123,7 +128,7 @@ public static class CameraUtilities
             var areaData = Vector3Utilities.GetRayAndPlaneIntersect(rayCastData.Key, rayCastDirection, areaPoint, areaNormal);
             if(areaData != null)
             {
-                areaPointsList.Add(areaData.Item1);
+                areaPointsList.Add((Vector3)areaData);
             }
         }
         return true;

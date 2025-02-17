@@ -13,7 +13,7 @@ using UnityEngine;
 /// GameManager.cs
 /// 游戏管理单例类
 /// </summary>
-public class GameManager : SinglentonTemplate<GameManager>
+public class GameManager : SingletonTemplate<GameManager>
 {
     /// <summary>
     /// 当前逻辑帧数
