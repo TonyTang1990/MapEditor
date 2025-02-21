@@ -9,7 +9,8 @@
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProductVersion>10.0.20506</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
-    <RootNamespace></RootNamespace>
+    <RootNamespace>
+    </RootNamespace>
     <ProjectGuid>{8FDB5A40-4C78-576C-FBF9-6CA5ED291819}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
@@ -58,6 +59,21 @@
     <Analyzer Include="G:\Software\VisualStudio\VS2022\Install\Common7\IDE\Extensions\Microsoft\Visual Studio Tools for Unity\Analyzers\Microsoft.Unity.Analyzers.dll" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Assets\Scripts\Game\ECS\Entity\BaseActorEntity.cs" />
+    <Compile Include="Assets\Scripts\Game\ECS\Entity\BaseEntity.cs" />
+    <Compile Include="Assets\Scripts\Game\ECS\Entity\EntityType.cs" />
+    <Compile Include="Assets\Scripts\Game\ECS\MapGame\Entity\MonsterEntity.cs" />
+    <Compile Include="Assets\Scripts\Game\ECS\MapGame\Entity\PlayerEntity.cs" />
+    <Compile Include="Assets\Scripts\Game\ECS\MapGame\Entity\TrapEntity.cs" />
+    <Compile Include="Assets\Scripts\Game\ECS\MapGame\Entity\TreasureBoxEntity.cs" />
+    <Compile Include="Assets\Scripts\Game\ECS\MapGame\System\PlayerSpawnSystem.cs" />
+    <Compile Include="Assets\Scripts\Game\ECS\MapGame\World\MapGameWorld.cs" />
+    <Compile Include="Assets\Scripts\Game\ECS\System\BaseSystem.cs" />
+    <Compile Include="Assets\Scripts\Game\ECS\System\SystemManager.cs" />
+    <Compile Include="Assets\Scripts\Game\ECS\System\SystemName.cs" />
+    <Compile Include="Assets\Scripts\Game\ECS\World\BaseWorld.cs" />
+    <Compile Include="Assets\Scripts\Game\ECS\World\WorldManager.cs" />
+    <Compile Include="Assets\Scripts\Game\ECS\World\WorldName.cs" />
     <Compile Include="Assets\Scripts\Utilities\FolderUtilities.cs" />
     <Compile Include="Assets\Scripts\Map\MapData\MapDataConfig.cs" />
     <Compile Include="Assets\Scripts\Map\MapData\MonsterMapData.cs" />
@@ -1057,8 +1073,7 @@
       <Private>False</Private>
     </Reference>
   </ItemGroup>
-  <ItemGroup>
-  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Target Name="GenerateTargetFrameworkMonikerAttribute" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it.

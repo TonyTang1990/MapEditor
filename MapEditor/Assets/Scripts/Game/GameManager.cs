@@ -71,6 +71,8 @@ public class GameManager : SingletonTemplate<GameManager>
         LogicFramePassedTime = 0;
         mRenderFrameCount = 0;
         mRenderFramePassedTime = 0;
+        InputManager.Singleton.Update();
+        MapGameManager.Singleton.EnterGame();
     }
     
     /// <summary>

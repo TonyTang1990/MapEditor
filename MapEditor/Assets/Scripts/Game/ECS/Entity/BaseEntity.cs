@@ -7,7 +7,7 @@
  */
 
 // Note:
-// 这里的BaseEntity和BaseSystem并非完整的ECS模式
+// 这里的BaseWorld,BaseSystem和BaseEntity并非完整的ECS模式
 // 只是设计上借鉴ECS的概念设计
 
 /// <summary>
