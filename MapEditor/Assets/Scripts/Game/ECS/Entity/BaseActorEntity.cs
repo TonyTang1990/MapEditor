@@ -1,16 +1,16 @@
+
+
+using System.Numerics;
 /**
- * @ Author: TONYTANG
- * @ Create Time: 2025-02-17 16:37:52
- * @ Modified by: TONYTANG
- * @ Modified time: 2025-02-17 16:51:32
- * @ Description:
- */
-
-
-/// <summary>
-/// BaseActorEntity.cs
-/// 带实体对象的Entity基类
-/// </summary>
+* @ Author: TONYTANG
+* @ Create Time: 2025-02-17 16:37:52
+* @ Modified by: TONYTANG
+* @ Modified time: 2025-02-17 16:51:32
+* @ Description:
+*//// <summary>
+  /// BaseActorEntity.cs
+  /// 带实体对象的Entity基类
+  /// </summary>
 public abstract class BaseActorEntity : BaseEntity
 {
     /// <summary>
@@ -23,12 +23,30 @@ public abstract class BaseActorEntity : BaseEntity
     }
 
     /// <summary>
+    /// 是否同步实体逻辑位置
+    /// </summary>
+    public bool SyncPosition
+    {
+        get;
+        set;
+    }
+
+    /// <summary>
     /// 逻辑旋转
     /// </summary>
     public Vector3 Rotation
     {
         get;
         private set;
+    }
+
+    /// <summary>
+    /// 是否同步实体旋转
+    /// </summary>
+    public bool SyncRotation
+    {
+        get;
+        set;
     }
 
     /// <summary>
@@ -44,6 +62,24 @@ public abstract class BaseActorEntity : BaseEntity
     /// 实体对象
     /// </summary>
     public GameObject Go
+    {
+        get;
+        set;
+    }
+
+    /// <summary>
+    /// 播放动画名
+    /// </summary>
+    public string PlayAnimName
+    {
+        get;
+        private set;
+    }
+
+    /// <summary>
+    /// 动画组件
+    /// </summary>
+    public Animator Animator
     {
         get;
         set;
@@ -83,6 +119,49 @@ public abstract class BaseActorEntity : BaseEntity
     {
         base.Init(parameters);
         PrefabPath = (string)parameters[1];
+    }
+
+    /// <summary>
+    /// 设置位置
+    /// </summary>
+    /// <param name="posX"></param>
+    /// <param name="posY"></param>
+    /// <param name="posZ"></param>
+    public void SetPosition(float posX, float posY, float posZ)
+    {
+        var newPos = new Vector3(posX, posY, posZ);
+        NavMeshHit navMeshHit;
+        NavMesh.SamplePosition(newPos, out navMeshHit, MapGameConst.ActorNavMeshHitDistance, NavMesh.AllAreas);
+        if(navMeshHit.hit)
+        {
+            Position = navMeshHit.position;
+            SyncPosition = true;
+        }
+    }
+
+    /// <summary>
+    /// 设置旋转
+    /// </summary>
+    /// <param name="rotationX"></param>
+    /// <param name="rotationY"></param>
+    /// <param name="rotationZ"></param>
+    public void SetRotation(float rotationX, float rotationY, float rotationZ)
+    {
+        Rotation = new Vector3(rotationX, rotationY, rotationZ);
+        SyncRotation = true;
+    }
+
+    /// <summary>
+    /// 播放指定动画
+    /// </summary>
+    /// <param name="animName"></param>
+    public void PlayAnim(string animName)
+    {
+        PlayAnimName = animName;
+        if(Animator != null && !string.IsNullOrEmpty(PlayAnimName))
+        {
+            Animator.Play(PlayAnimName);
+        }
     }
 
     /// <summary>

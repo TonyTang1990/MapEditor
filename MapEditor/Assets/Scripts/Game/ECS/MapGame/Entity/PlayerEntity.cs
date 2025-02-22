@@ -6,3 +6,17 @@
  * @ Description:
  */
 
+/// <summary>
+/// PlayerEntity.cs
+/// 玩家Entity
+/// </summary>
+public class PlayerEntity : BaseActorEntity
+{
+    /// <summary>
+    /// 初始化Entity类型
+    /// </summary>
+    protected override void InitEntityType()
+    {
+        EntityType = EntityType.Player;
+    }
+}

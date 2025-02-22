@@ -10,13 +10,13 @@ using System;
 using System.Collections.Generic;
 
 /// <summary>
-/// SystemName.cs
-/// 系统名定义
+/// WorldNames.cs
+/// 世界名定义
 /// </summary>
-public static class SystemName
+public static class WorldNames
 {
     /// <summary>
-    /// 玩家生成系统名
+    /// 地图游戏世界名
     /// </summary>
-    public const string PlayerSpawnSystemName = "PlayerSpawnSystem";
+    public const string MapGameWorldName = "MapGameWorld";
 }

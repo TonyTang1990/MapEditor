@@ -6,3 +6,17 @@
  * @ Description:
  */
 
+/// <summary>
+/// MonsterEntity.cs
+/// 怪物Entity
+/// </summary>
+public class MonsterEntity : BaseActorEntity
+{
+    /// <summary>
+    /// 初始化Entity类型
+    /// </summary>
+    protected override void InitEntityType()
+    {
+        EntityType = EntityType.Monster;
+    }
+}

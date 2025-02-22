@@ -41,7 +41,7 @@ public abstract class BaseWorld
     /// <summary>
     /// 所有系统Map<系统名，系统>
     /// </summary>
-    protected Dictionary<string, BaseSystem> mAllSystemMap; 
+    protected Dictionary<string, BaseSystem> mAllSystemMap;
 
     /// <summary>
     /// 所有系统列表
@@ -78,6 +78,13 @@ public abstract class BaseWorld
     protected Dictionary<int, BaseEntity> mEntityMap;
 
     /// <summary>
+    /// 所有的Entity
+    /// Note:
+    /// 用于确保有序访问
+    /// </summary>
+    protected List<BaseEntity> mAllEntity;
+
+    /// <summary>
     /// Entity Type Map<EntityType, Entity列表></EntityType>
     /// </summary>
     protected Dictionary<EntityType, List<BaseEntity>> mEntityTypeMap;
@@ -96,6 +103,7 @@ public abstract class BaseWorld
         mAllUpdateSystemNames = new List<string>();
         mNextEntityUuid = 1;
         mEntityMap = new Dictionary<int, BaseEntity>();
+        mAllEntity = new List<BaseEntity>();
         mEntityTypeMap = new Dictionary<EntityType, List<BaseEntity>>();
     }
 
@@ -135,7 +143,7 @@ public abstract class BaseWorld
     public virtual void Update()
     {
         UpdateAllUpdateSystemNames();
-        foreach(var updateSystemName in mAllUpdateSystemNames)
+        foreach (var updateSystemName in mAllUpdateSystemNames)
         {
             var system = GetSystem<BaseSystem>(updateSystemName);
             system?.Update();
@@ -190,7 +198,7 @@ public abstract class BaseWorld
     protected void UpdateAllUpdateSystemNames()
     {
         mAllUpdateSystemNames.Clear();
-        foreach(var system in mAllSystems)
+        foreach (var system in mAllSystems)
         {
             mAllUpdateSystemNames.Add(system.SystemName);
         }
@@ -211,7 +219,7 @@ public abstract class BaseWorld
     /// </summary>
     protected virtual void RemoveAllSystem()
     {
-        for(var index = mAllSystems.Count - 1; index >= 0; index--)
+        for (var index = mAllSystems.Count - 1; index >= 0; index--)
         {
             var system = mAllSystems[index];
             RemoveSystem(system.SystemName);
@@ -223,7 +231,7 @@ public abstract class BaseWorld
     /// </summary>
     protected void DestroyEntityRoot()
     {
-        if(mEntityRootGo != null)
+        if (mEntityRootGo != null)
         {
             GameObject.Destroy(mEntityRootGo);
             mEntityRootGo = null;
@@ -249,10 +257,10 @@ public abstract class BaseWorld
     /// <param name="systemName"></param>
     /// <param name="parameters"></param>
     /// <returns></returns>
-    public T CreateSystem<T>(string systemName, params object[] parameters) where T :BaseSystem, new()
+    public T CreateSystem<T>(string systemName, params object[] parameters) where T : BaseSystem, new()
     {
         var system = GetSystem<T>(systemName);
-        if(system != null)
+        if (system != null)
         {
             var sType = typeof(T);
             Debug.LogError($"World:{WorldName}已包含系统名:{systemName},添加指定系统类型:{sType.Name}和系统名:{systemName}失败！");
@@ -261,9 +269,12 @@ public abstract class BaseWorld
         system = new T();
         system.Init(this, systemName, parameters);
         var result = AddSystem(system);
-        if(result)
+        if (result)
         {
+            system.Enable = true;
+            system.OnEnable();
             system.OnAddToWorld();
+            OnAddSystem(system);
         }
         return system;
     }
@@ -276,14 +287,17 @@ public abstract class BaseWorld
     public bool RemoveSystem(string systemName)
     {
         BaseSystem system = GetSystem<BaseSystem>(systemName);
-        if(system == null)
+        if (system == null)
         {
             Debug.LogError($"World:{WorldName}找不到系统名:{systemName}的系统，移除指定系统失败！");
             return false;
         }
         mAllSystemMap.Remove(systemName);
         mAllSystems.Remove(system);
+        system.Enable = false;
+        system.OnDisable();
         system.OnRemoveFromWorld();
+        OnRemoveSystem(system);
         return true;
     }
 
@@ -296,11 +310,29 @@ public abstract class BaseWorld
     public T GetSystem<T>(string systemName) where T : BaseSystem
     {
         BaseSystem targetSystem;
-        if(!mAllSystemMap.TryGetValue(systemName, out targetSystem))
+        if (!mAllSystemMap.TryGetValue(systemName, out targetSystem))
         {
             return null;
         }
         return targetSystem as T;
+    }
+
+    /// <summary>
+    /// 响应世界增加系统
+    /// </summary>
+    /// <param name="system"></param>
+    protected virtual void OnAddSystem(BaseSystem system)
+    {
+
+    }
+
+    /// <summary>
+    /// 响应世界移除系统
+    /// </summary>
+    /// <param name="system"></param>
+    protected virtual void OnRemoveSystem(BaseSystem system)
+    {
+
     }
 
     /// <summary>
@@ -310,7 +342,7 @@ public abstract class BaseWorld
     /// <returns></returns>
     protected bool AddSystem(BaseSystem system)
     {
-        if(system == null)
+        if (system == null)
         {
             Debug.LogError($"不允许添加空系统！");
             return false;
@@ -407,6 +439,13 @@ public abstract class BaseWorld
             return false;
         }
         var entityUuid = entity.Uuid;
+        if (mEntityMap.ContainsKey(entityUuid))
+        {
+            Debug.LogError($"已注册Uuid:{entityUuid}的Entity，添加Entity失败！");
+            return false;
+        }
+        mEntityMap.Add(entityUuid, entity);
+        mAllEntity.Add(entity);
         var entityType = entity.EntityType;
         List<BaseEntity> entityList;
         if (!mEntityTypeMap.TryGetValue(entityType, out entityList))
@@ -419,11 +458,20 @@ public abstract class BaseWorld
     }
 
     /// <summary>
+    /// 获取所有Entity列表
+    /// </summary>
+    /// <returns></returns>
+    public List<BaseEntity> GetAllEntity()
+    {
+        return mAllEntity;
+    }
+
+    /// <summary>
     /// 获取指定EntityType的Entity列表
     /// </summary>
     /// <param name="entityType"></param>
     /// <returns></returns>
-    protected List<BaseEntity> GetEntityList(EntityType entityType)
+    public List<BaseEntity> GetEntityListByType(EntityType entityType)
     {
         List<BaseEntity> entityList;
         if (!mEntityTypeMap.TryGetValue(entityType, out entityList))
@@ -471,8 +519,9 @@ public abstract class BaseWorld
             return false;
         }
         mEntityMap.Remove(uuid);
+        mAllEntity.Remove(entity);
         var entityType = entity.EntityType;
-        var entityList = GetEntityList(entityType);
+        var entityList = GetEntityListByType(entityType);
         entityList.Remove(entity);
         entity.OnDestroy();
         return true;
@@ -511,8 +560,10 @@ public abstract class BaseWorld
     public void DestroyAllEntity()
     {
         var allEntityUuids = mEntityMap.Keys;
-        foreach(var entityUuid in allEntityUuids)
+        for(int index = mAllEntity.Count - 1; index >=0; index--)
         {
+            var entity = mAllEntity[index];
+            var entityUuid = entity.Uuid;
             DestroyEntityByUuid(entityUuid);
         }
     }
@@ -539,14 +590,24 @@ public abstract class BaseWorld
     /// <param name="prefabPath"></param>
     /// <param name="parent"></param>
     /// <param name="loadCompleteCb"></param>
-    protected void LoadEntityPrefabByPath(BaseEntity actorEntity, string prefabPath, Transform parent, Action<BaseActorEntity> loadCompleteCb = null)
+    protected void LoadEntityPrefabByPath(BaseActorEntity actorEntity, string prefabPath, Transform parent, Action<BaseActorEntity> loadCompleteCb = null)
     {
         PoolManager.Singleton.pop(prefabPath, (instance) =>
         {
             actorEntity.Go = instance;
+            var instanceTransform = instance.transform;
             if (parent != null)
             {
-                instance.transform.SetParent(parent);
+                instanceTransform.SetParent(parent);
+            }
+            instanceTransform.position = actorEntity.Position;
+            instanceTransform.eulerAngles = actorEntity.Rotation;
+            var animator = instanceTransform.GetComponent<Animator>();
+            actorEntity.Animator = animator;
+            var playAnimName = actorEntity.PlayAnimName;
+            if(!string.IsNullOrEmpty(playAnimName))
+            {
+                actorEntity.PlayAnim(playAnimName);
             }
             loadCompleteCb?.Invoke(actorEntity);
         });

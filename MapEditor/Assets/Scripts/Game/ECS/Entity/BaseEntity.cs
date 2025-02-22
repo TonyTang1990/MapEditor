@@ -86,8 +86,5 @@ public abstract class BaseEntity : IRecycle
     /// <summary>
     /// 初始化Entity类型
     /// </summary>
-    protected virtual void InitEntityType()
-    {
-        
-    }
+    protected abstract void InitEntityType();
 }

@@ -59,6 +59,6 @@ public class MapGameManager : SingletonTemplate<MapGameManager>
     /// </summary>
     public void EnterGame()
     {
-        WorldManager.Singleton.CreateWrold<MapGameWorld>(WorldName.MapGameWorldName);
+        WorldManager.Singleton.CreateWrold<MapGameWorld>(WorldNames.MapGameWorldName);
     }
 }

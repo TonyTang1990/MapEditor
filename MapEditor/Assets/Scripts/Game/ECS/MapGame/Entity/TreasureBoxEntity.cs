@@ -6,3 +6,17 @@
  * @ Description:
  */
 
+/// <summary>
+/// TreasureBoxEntity.cs
+/// 宝箱Entity
+/// </summary>
+public class TreasureBoxEntity : BaseActorEntity
+{
+    /// <summary>
+    /// 初始化Entity类型
+    /// </summary>
+    protected override void InitEntityType()
+    {
+        EntityType = EntityType.TreasureBox;
+    }
+}

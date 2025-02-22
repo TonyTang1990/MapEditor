@@ -34,6 +34,15 @@ public abstract class BaseSystem
         private set;
     }
 
+    /// <summary>
+    /// 系统系统激活
+    /// </summary>
+    public bool Enable
+    {
+        get;
+        set;
+    }
+
     public BaseSystem()
     {
 
@@ -52,9 +61,25 @@ public abstract class BaseSystem
     }
 
     /// <summary>
+    /// 响应激活
+    /// </summary>
+    public virtual void OnEnable()
+    {
+
+    }
+
+    /// <summary>
     /// 响应系统添加到世界
     /// </summary>
     public virtual void OnAddToWorld()
+    {
+
+    }
+
+    /// <summary>
+    /// 响应取消激活
+    /// </summary>
+    public virtual void OnDisable()
     {
 
     }

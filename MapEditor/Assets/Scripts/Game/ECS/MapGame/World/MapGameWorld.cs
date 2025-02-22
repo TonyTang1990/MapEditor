@@ -18,9 +18,54 @@ using System.Resources;
 public class MapGameWorld : BaseWorld
 {
     /// <summary>
+    /// 主摄像机
+    /// </summary>
+    public Camera MainCamera
+    {
+        get;
+        private set;
+    }
+
+    /// <summary>
+    /// UI根节点
+    /// </summary>
+    public GameObject UIRoot
+    {
+        get;
+        private set;
+    }
+
+    /// <summary>
+    /// UI摄像机
+    /// </summary>
+    public Camera UICamera
+    {
+        get;
+        private set;
+    }
+
+    /// <summary>
+    /// UI Canvas节点
+    /// </summary>
+    public Transform UICanvas
+    {
+        get;
+        private set;
+    }
+
+    /// <summary>
+    /// 主界面脚本
+    /// </summary>
+    public MainUI MainUI
+    {
+        get;
+        private set;
+    }
+
+    /// <summary>
     /// 地图实例GameObject
     /// </summary>
-    public GameObjectExtension MapInstanceGo
+    public GameObject MapInstanceGo
     {
         get;
         private set;
@@ -29,7 +74,16 @@ public class MapGameWorld : BaseWorld
     /// <summary>
     /// 地图配置
     /// </summary>
-    private MapExport mLevelConfig;
+    public MapExport LevelConfig
+    {
+        get;
+        private set;
+    }
+
+    public MapGameWorld() : base()
+    {
+
+    }
 
     /// <summary>
     /// 响应地图游戏世界创建
@@ -37,7 +91,8 @@ public class MapGameWorld : BaseWorld
     public override void OnCreate()
     {
         base.OnCreate();
-        LoadMap();
+        MainCamera = GameObject.Find("MainCamera").GetComponent<Camera>();
+        LoadUIRoot();
     }
 
     /// <summary>
@@ -46,6 +101,49 @@ public class MapGameWorld : BaseWorld
     public override void OnDestroy()
     {
         base.OnDestroy();
+    }
+
+    /// <summary>
+    /// 加载UI根节点
+    /// </summary>
+    private void LoadUIRoot()
+    {
+        UIRoot = Resoures.Load<GameObject>(MapGameConst.UIRootPrefabPath);
+        var uiRootTransform = UIRoot.transform;
+        uiRootTransform.position = new Vector3(0, 500, 0);
+        UICamera = uiRootTransform.Find("UICamera").GetComponent<Camera>();
+        UICanvas = uiRootTransform.Find("Canvas");
+        OnLoadUIRootComplete();
+    }
+
+    /// <summary>
+    /// 响应UI根节点加载完成
+    /// </summary>
+    private void OnLoadUIRootComplete()
+    {
+        OpenMainUI();
+        LoadMap();
+    }
+
+    /// <summary>
+    /// 打开MainUI
+    /// </summary>
+    private void OpenMainUI()
+    {
+        MainUI = new MainUI("MainUI");
+        MainUI.OnOpen(UICanvas);
+    }
+
+    /// <summary>
+    /// 关闭MainUI
+    /// </summary>
+    private void CloseMainUI()
+    {
+        if(MainUI != null)
+        {
+            MainUI.OnClose();
+            MainUI = null;
+        }
     }
 
     /// <summary>
@@ -69,7 +167,7 @@ public class MapGameWorld : BaseWorld
         }
         else
         {
-            mLevelConfig = JsonUtility.FromJson<MapExport>(levelTxtAsset.text);
+            LevelConfig = JsonUtility.FromJson<MapExport>(levelTxtAsset.text);
         }
         OnLevelConfigLoadComplete();
     }
@@ -87,6 +185,6 @@ public class MapGameWorld : BaseWorld
     /// </summary>
     private void CreateAllSystem()
     {
-
+        CreateSystem<PlayerSpawnSystem>(SystemNames.PlayerSpawnSystemName);
     }
 }

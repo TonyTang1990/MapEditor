@@ -16,4 +16,5 @@ public enum EntityType
     Monster,        // 怪物Entity
     TreasureBox,    // 宝箱Entity
     Trap,           // 陷阱Entity
+    Camera,         // 摄像机Entity
 }
