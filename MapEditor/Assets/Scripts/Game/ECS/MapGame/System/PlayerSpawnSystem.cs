@@ -15,6 +15,10 @@ using System.Collections.Generic;
 /// </summary>
 public class PlayerSpawnSystem : BaseSystem
 {
+    /// <summary>
+    /// 关联的玩家Entity Uuid
+    /// </summary>
+    private int mPlayerEntityUuid;
 
     /// <summary>
     /// 响应系统添加到世界
@@ -35,6 +39,7 @@ public class PlayerSpawnSystem : BaseSystem
         var playerEntity = OwnerWorld.CreateEtity<PlayerEntity>(MapGameConst.LevelConfigPath);
         var birthPos = levelConfig.MapData.BirthPos[0];
         playerEntity.SetPosition(birthPos.x, birthPos.y, birthPos.z);
+        mPlayerEntityUuid = playerEntity.Uuid;
     }
 
     /// <summary>
@@ -43,11 +48,6 @@ public class PlayerSpawnSystem : BaseSystem
     public override void OnRemoveFromWorld()
     {
         base.OnRemoveFromWorld();
-        var allPlayerEntity = OwnerWorld.GetEntityListByType(EntityType.Player);
-        for(int index = allPlayerEntity.Count - 1; index >= 0; index--)
-        {
-            var playerEntity = allPlayerEntity[index];
-            OwnerWorld.DestroyEntity(playerEntity);
-        }
+        OwnerWorld.DestroyEntityByUuid(mPlayerEntityUuid);
     }
 }

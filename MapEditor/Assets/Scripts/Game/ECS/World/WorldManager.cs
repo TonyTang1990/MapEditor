@@ -41,13 +41,14 @@ public class WorldManager : SingletonTemplate<WorldManager>
     /// <summary>
     /// Update
     /// </summary>
-    public void Update()
+    /// <param name="deltaTime"></param>
+    public void Update(float deltaTime)
     {
         UpdateAllUpdateWorldNames();
         foreach(var updateWorldName in mAllUpdateWorldNames)
         {
             var world = GetWorld<BaseWorld>(updateWorldName);
-            world?.Update();
+            world?.Update(deltaTime);
         }
     }
 
@@ -67,13 +68,14 @@ public class WorldManager : SingletonTemplate<WorldManager>
     /// <summary>
     /// FixedUpdate
     /// </summary>
-    public void FixedUpdate()
+    /// <param name="fixedDeltaTime"></param>
+    public void FixedUpdate(float fixedDeltaTime)
     {
         UpdateAllUpdateWorldNames();
         foreach (var updateWorldName in mAllUpdateWorldNames)
         {
             var world = GetWorld<BaseWorld>(updateWorldName);
-            world?.FixedUpdate();
+            world?.FixedUpdate(fixedDeltaTime);
         }
     }
 
@@ -81,13 +83,14 @@ public class WorldManager : SingletonTemplate<WorldManager>
     /// <summary>
     /// LateUpdate
     /// </summary>
-    public void LateUpdate()
+    /// <param name="deltaTime"></param>
+    public void LateUpdate(float deltaTime)
     {
         UpdateAllUpdateWorldNames();
         foreach (var updateWorldName in mAllUpdateWorldNames)
         {
             var world = GetWorld<BaseWorld>(updateWorldName);
-            world?.LateUpdate();
+            world?.LateUpdate(deltaTime);
         }
     }
 

@@ -24,10 +24,10 @@ public class MapGameManager : SingletonTemplate<MapGameManager>
     /// <summary>
     /// 更新
     /// </summary>
-    public void Update()
+    /// <param name="deltaTime"></param>
+    public void Update(float deltaTime)
     {
-        InputManager.Singleton.Update();
-        WorldManager.Singleton.Update();
+        WorldManager.Singleton.Update(deltaTime);
     }
 
     /// <summary>
@@ -41,17 +41,19 @@ public class MapGameManager : SingletonTemplate<MapGameManager>
     /// <summary>
     /// 固定更新
     /// </summary>
-    public void FixedUpdate()
+    /// <param name="fixedDeltaTime"></param>
+    public void FixedUpdate(float fixedDeltaTime)
     {
-        WorldManager.Singleton.FixedUpdate();
+        WorldManager.Singleton.FixedUpdate(fixedDeltaTime);
     }
 
     /// <summary>
     /// 延迟更新
     /// </summary>
-    public void LateUpdate()
+    /// <param name="deltaTime"></param>
+    public void LateUpdate(float deltaTime)
     {
-        WorldManager.Singleton.LateUpdate();
+        WorldManager.Singleton.LateUpdate(deltaTime);
     }
 
     /// <summary>

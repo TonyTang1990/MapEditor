@@ -6,6 +6,7 @@
 * @ Description:
 */
 
+using MapEditor;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -72,12 +73,39 @@ public class MapGameWorld : BaseWorld
     }
 
     /// <summary>
+    /// 游戏虚拟摄像机组件
+    /// </summary>
+    public CinemachineVirtualCamera GameVirtualCamera
+    {
+        get;
+        private set;
+    }
+
+    /// <summary>
     /// 地图配置
     /// </summary>
     public MapExport LevelConfig
     {
         get;
         private set;
+    }
+
+    /// <summary>
+    /// 玩家和摄像机位置偏移
+    /// </summary>
+    public Vector3 PlayerCameraPosOffset
+    {
+        get;
+        private set;
+    }
+
+    /// <summary>
+    /// 玩家移动速度
+    /// </summary>
+    public float PlayerMoveSpeed
+    {
+        get;
+        set;
     }
 
     public MapGameWorld() : base()
@@ -160,6 +188,39 @@ public class MapGameWorld : BaseWorld
     /// </summary>
     private void OnMapLoadComplete()
     {
+        InitMapDatas();
+        LoadLevelDatas();
+    }
+
+    /// <summary>
+    /// 初始化地图数据
+    /// </summary>
+    private void InitMapDatas()
+    {
+        if(MapInstanceGo == null)
+        {
+            Debug.LogError($"找不到地图实例对象，初始化地图数据失败！");
+            return;
+        }
+        var gameVirtualCameraNodeRelativePath = MapUtilities.GetGameVirtualCameraNodeRelativePath();
+        var gameVirtualCameraNode = MapInstanceGo.transform.Find(gameVirtualCameraNodeRelativePath);
+        GameVirtualCamera = gameVirtualCameraNode != null ? gameVirtualCameraNode.GetComponent<CinemachineVirtualCamera>() : null;
+    }
+
+    /// <summary>
+    /// 加载关卡数据
+    /// </summary>
+    private void LoadLevelDatas()
+    {
+        PlayerMoveSpeed = MapConst.PlayerDefaultMoveSpeed;
+        LoadLevelConfig();
+    }
+
+    /// <summary>
+    /// 加载关卡配置
+    /// </summary>
+    private void LoadLevelConfig()
+    {
         var levelTxtAsset = Resources.Load<TextAsset>(MapGameConst.LevelConfigPath);
         if (levelTxtAsset == null)
         {
@@ -177,7 +238,24 @@ public class MapGameWorld : BaseWorld
     /// </summary>
     private void OnLevelConfigLoadComplete()
     {
+        InitLevelDatas();
         CreateAllSystem();
+    }
+
+    /// <summary>
+    /// 初始化关卡数据
+    /// </summary>
+    private void InitLevelDatas()
+    {
+        if(LevelConfig != null)
+        {
+            var playerBirthPos = LevelConfig.MapData.BirthPos.Count > 0 ? LevelConfig.MapData.BirthPos[0] : Vector3.zero;
+            PlayerCameraPosOffset = LevelConfig.MapData.GameVirtualCameraInitPos - playerBirthPos;
+        }
+        else
+        {
+            PlayerCameraPosOffset = Vector3.zero;
+        }
     }
 
     /// <summary>

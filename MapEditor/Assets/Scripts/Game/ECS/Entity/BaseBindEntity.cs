@@ -1,8 +1,8 @@
-/**
+﻿/**
 * @ Author: TONYTANG
 * @ Create Time: 2025-02-17 16:37:52
 * @ Modified by: TONYTANG
-* @ Modified time: 2025-02-17 16:51:32
+* @ Modified time: 2025-02-24 15:29:00
 * @ Description:
 *
 */
@@ -10,10 +10,10 @@
 using System.Numerics;
 
 /// <summary>
-/// BaseActorEntity.cs
-/// 带实体对象的Entity基类
+/// BaseBindEntity.cs
+/// 带实体对象的Entity基类(无视寻路的物体)
 /// </summary>
-public abstract class BaseActorEntity : BaseEntity
+public abstract class BaseBindEntity : BaseEntity
 {
     /// <summary>
     /// 逻辑位置
@@ -52,18 +52,9 @@ public abstract class BaseActorEntity : BaseEntity
     }
 
     /// <summary>
-    /// 预制体路径
+    /// 绑定实体对象
     /// </summary>
-    public string PrefabPath
-    {
-        get;
-        private set;
-    }
-
-    /// <summary>
-    /// 实体对象
-    /// </summary>
-    public GameObject Go
+    public GameObject BindGo
     {
         get;
         set;
@@ -87,7 +78,16 @@ public abstract class BaseActorEntity : BaseEntity
         set;
     }
 
-    public BaseActorEntity() : base()
+    /// <summary>
+    /// 是否自动销毁绑定对象
+    /// </summary>
+    public bool IsAutoDestroyBindGo
+    {
+        get;
+        private set;
+    }
+
+    public BaseBindEntity() : base()
     {
 
     }
@@ -109,8 +109,8 @@ public abstract class BaseActorEntity : BaseEntity
         base.ResetDatas();
         Position = Vector3.zero;
         Rotation = Vector3.zero;
-        PrefabPath = null;
-        Go = null;
+        BindGo = null;
+        IsAutoDestroyBindGo = false;
     }
 
     /// <summary>
@@ -120,7 +120,8 @@ public abstract class BaseActorEntity : BaseEntity
     public override void Init(params object[] parameters)
     {
         base.Init(parameters);
-        PrefabPath = (string)parameters[1];
+        BindGo = (GameObject)parameters[1];
+        IsAutoDestroyBindGo = (bool)parameters[2];
     }
 
     /// <summary>
@@ -131,14 +132,8 @@ public abstract class BaseActorEntity : BaseEntity
     /// <param name="posZ"></param>
     public void SetPosition(float posX, float posY, float posZ)
     {
-        var newPos = new Vector3(posX, posY, posZ);
-        NavMeshHit navMeshHit;
-        NavMesh.SamplePosition(newPos, out navMeshHit, MapGameConst.ActorNavMeshHitDistance, NavMesh.AllAreas);
-        if(navMeshHit.hit)
-        {
-            Position = navMeshHit.position;
-            SyncPosition = true;
-        }
+        Position = new Vector3(posX, posY, posZ);
+        SyncPosition = true;
     }
 
     /// <summary>
@@ -160,7 +155,7 @@ public abstract class BaseActorEntity : BaseEntity
     public void PlayAnim(string animName)
     {
         PlayAnimName = animName;
-        if(Animator != null && !string.IsNullOrEmpty(PlayAnimName))
+        if (Animator != null && !string.IsNullOrEmpty(PlayAnimName))
         {
             Animator.Play(PlayAnimName);
         }
@@ -171,10 +166,10 @@ public abstract class BaseActorEntity : BaseEntity
     /// </summary>
     protected virtual void DestroyInstance()
     {
-        if(Go != null)
+        if (IsAutoDestroyBindGo && BindGo != null)
         {
-            PoolManager.Singleton.push(PrefabPath, Go);
-            Go = null;
+            GameObject.Destroy(BindGo);
+            BindGo = null;
         }
     }
 }

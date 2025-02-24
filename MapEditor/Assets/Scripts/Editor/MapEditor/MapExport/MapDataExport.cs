@@ -38,6 +38,11 @@ namespace MapEditor
         public List<Vector3> BirthPos = new List<Vector3>();
 
         /// <summary>
+        /// 游戏虚拟摄像机初始位置
+        /// </summary>
+        public Vector3 GameVirtualCameraInitPos;
+
+        /// <summary>
         /// 地图九宫格大小
         /// </summary>
         public float GridSize;

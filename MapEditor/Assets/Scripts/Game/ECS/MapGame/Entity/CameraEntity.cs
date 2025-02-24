@@ -14,17 +14,8 @@ using System.Web.Configuration;
 /// CameraEntity.cs
 /// 摄像机Entity
 /// </summary>
-public class CameraEntity : BaseEntity
+public class CameraEntity : BaseBindEntity
 {
-    /// <summary>
-    /// 绑定摄像机Transform
-    /// </summary>
-    public Transform BindCamera
-    {
-        get;
-        private set;
-    }
-
     /// <summary>
     /// 初始化
     /// </summary>
@@ -32,7 +23,6 @@ public class CameraEntity : BaseEntity
     public override void Init(params object[] parameters)
     {
         base.Init(parameters);
-        BindCamera = parameters[1] as Transform;
     }
 
     /// <summary>

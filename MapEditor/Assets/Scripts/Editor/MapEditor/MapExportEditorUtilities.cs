@@ -6,6 +6,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -337,6 +338,17 @@ namespace MapEditor
                 {
                     mapExport.MapData.BirthPos.Add(playerSpawnData.Position);
                 }
+            }
+
+            var gameVirtualCameraNode = MapEditorUtilities.GetGameVirtualCameraNode(map.gameObject);
+            if(gameVirtualCameraNode != null)
+            {
+                mapExport.MapData.GameVirtualCameraInitPos = gameVirtualCameraNode.position;
+            }
+            else
+            {
+                Debug.LogError($"找不到游戏虚拟摄像机节点Transform，导出游戏虚拟摄像机初始位置失败！");
+                mapExport.MapData.GameVirtualCameraInitPos = Vector3.zero;
             }
 
             List<MapData> monsterDatas;

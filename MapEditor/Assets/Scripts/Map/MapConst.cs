@@ -5,6 +5,8 @@
  */
 
 using System;
+using System.Numerics;
+using UnityEngine;
 
 namespace MapEditor
 {
@@ -60,6 +62,11 @@ namespace MapEditor
         public static readonly Type LevelMapDataType = typeof(LevelMapData);
 
         /// <summary>
+        /// BaseActorEntity类型信息
+        /// </summary>
+        public static readonly Type BaseActorEntityType = typeof(BaseActorEntity);
+
+        /// <summary>
         /// 地图对象父节点挂点名
         /// </summary>
         public const string MapObjectParentNodeName = "MapObjectParent";
@@ -70,9 +77,34 @@ namespace MapEditor
         public const string MapTerrianNodeName = "MapTerrian";
 
         /// <summary>
+        /// 游戏虚拟摄像机父节点名
+        /// </summary>
+        public const string GameVirtualCameraParentNodeName = "GameVirtualCamera";
+
+        /// <summary>
+        /// 游戏虚拟摄像机节点名
+        /// </summary>
+        public const string GameVirtualCameraNodeName = "VirtualCamera";
+
+        /// <summary>
         /// 默认地图地形预制件路径
         /// </summary>
         public const string DetaulMapTerrianPrefabPath = "Assets/Resources/Terrian/Terrian.prefab";
+
+        /// <summary>
+        /// 游戏虚拟摄像机优先级
+        /// </summary>
+        public const int GameVirtualCameraPriority = 100;
+
+        /// <summary>
+        /// 游戏虚拟摄像机默认位置
+        /// </summary>
+        public static readonly Vector3 GameVirtualCameraDefaultPos = new Vector3(3, 15, -2);
+
+        /// <summary>
+        /// 游戏虚拟摄像机默认旋转
+        /// </summary>
+        public static readonly Vector3 GameVirtualCameraDefaultRot = new Vector3(45, 0, 0);
 
         /// <summary>
         /// 默认怪物创建半径
@@ -83,5 +115,10 @@ namespace MapEditor
         /// 默认怪物警戒半径
         /// </summary>
         public const float DefaultMonsterActiveRadius = 5f;
+
+        /// <summary>
+        /// 玩家默认移动速度
+        /// </summary>
+        public const float PlayerDefaultMoveSpeed = 5f;
     }
 }

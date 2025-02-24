@@ -95,7 +95,8 @@ public abstract class BaseSystem
     /// <summary>
     /// Update
     /// </summary>
-    public virtual void Update()
+    /// <param name="deltaTime"></param>
+    public virtual void Update(float deltaTime)
     {
 
     }
@@ -111,7 +112,8 @@ public abstract class BaseSystem
     /// <summary>
     /// FixedUpdate
     /// </summary>
-    public virtual void FixedUpdate()
+    /// <param name="fixedDeltaTime"></param>
+    public virtual void FixedUpdate(float fixedDeltaTime)
     {
 
     }
@@ -119,7 +121,8 @@ public abstract class BaseSystem
     /// <summary>
     /// LateUpdate
     /// </summary>
-    public virtual void LateUpdate()
+    /// <param name="deltaTime"></param>
+    public virtual void LateUpdate(float deltaTime)
     {
 
     }

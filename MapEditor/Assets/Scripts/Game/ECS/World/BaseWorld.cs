@@ -6,6 +6,7 @@
 * @ Description:
 */
 
+using MapEditor;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -140,13 +141,14 @@ public abstract class BaseWorld
     /// <summary>
     /// Update
     /// </summary>
-    public virtual void Update()
+    /// <param name="deltaTime"></param>
+    public virtual void Update(float deltaTime)
     {
         UpdateAllUpdateSystemNames();
         foreach (var updateSystemName in mAllUpdateSystemNames)
         {
             var system = GetSystem<BaseSystem>(updateSystemName);
-            system?.Update();
+            system?.Update(deltaTime);
         }
     }
 
@@ -166,26 +168,28 @@ public abstract class BaseWorld
     /// <summary>
     /// FixedUpdate
     /// </summary>
-    public virtual void FixedUpdate()
+    /// <param name="fixedDeltaTime"></param>
+    public virtual void FixedUpdate(float fixedDeltaTime)
     {
         UpdateAllUpdateSystemNames();
         foreach (var updateSystemName in mAllUpdateSystemNames)
         {
             var system = GetSystem<BaseSystem>(updateSystemName);
-            system?.FixedUpdate();
+            system?.FixedUpdate(fixedDeltaTime);
         }
     }
 
     /// <summary>
     /// LateUpdate
     /// </summary>
-    public virtual void LateUpdate()
+    /// <param name="deltaTime"></param>
+    public virtual void LateUpdate(float deltaTime)
     {
         UpdateAllUpdateSystemNames();
         foreach (var updateSystemName in mAllUpdateSystemNames)
         {
             var system = GetSystem<BaseSystem>(updateSystemName);
-            system?.LateUpdate();
+            system?.LateUpdate(deltaTime);
         }
     }
 
@@ -482,6 +486,26 @@ public abstract class BaseWorld
     }
 
     /// <summary>
+    /// 获取指定Entity类型的首个Entity
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
+    /// <param name="entityType"></param>
+    /// <returns></returns>
+    public T GetFirstEntityByType<T>(EntityType entityType) where T : BaseEntity
+    {
+        List<BaseEntity> entityList;
+        if(!mEntityTypeMap.TryGetValue(entityType, out entityList))
+        {
+            return null;
+        }
+        if(entityList == null || entityList.Count == 0)
+        {
+            return null;
+        }
+        return entityList[0] as T;
+    }
+
+    /// <summary>
     /// 创建指定Entity
     /// </summary>
     /// <typeparam name="T"></typeparam>
@@ -490,16 +514,14 @@ public abstract class BaseWorld
     public T CreateEtity<T>(params object[] parameters) where T : BaseEntity, new()
     {
         var entityType = typeof(T);
-        T entity;
-        if (entityType == PlayerEntityType)
+        T entity = ObjectPool.Singleton.pop<T>();
+        var entityUuid = GetNextEntityUuid();
+        entity.Init(entityUuid, parameters);
+        if (MapConst.BaseActorEntityType.IsAssignableFrom(entityType))
         {
-            entity = CreatePlayerEntity(parameters) as T;
-        }
-        else
-        {
-            entity = ObjectPool.Singleton.pop<T>();
-            var entityUuid = GetNextEntityUuid();
-            entity.Init(entityUuid, parameters);
+            var parent = GetEntityTypeParent(entity.EntityType);
+            var actorEntity = entity as BaseActorEntity;
+            LoadEntityPrefabByPath(actorEntity, actorEntity.PrefabPath, parent);
         }
         AddEntity(entity);
         return entity;

@@ -192,5 +192,13 @@ namespace MapEditor
             }
         }
 
+        /// <summary>
+        /// 获取游戏虚拟摄像机节点相对路径
+        /// </summary>
+        /// <returns></returns>
+        public static string GetGameVirtualCameraNodeRelativePath()
+        {
+            return $"{MapConst.GameVirtualCameraParentNodeName}/{MapConst.GameVirtualCameraNodeName}";
+        }
     }
 }

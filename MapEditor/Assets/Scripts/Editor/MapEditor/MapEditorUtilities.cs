@@ -6,6 +6,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Text;
 using System.Threading.Tasks;
@@ -1076,6 +1077,58 @@ namespace MapEditor
             navMeshSurface.useGeometry = NavMeshCollectGeometry.RenderMeshes;
             navMeshSurface.layerMask = LayerMask.GetMask("NavigationBake");
             return navMeshSurface;
+        }
+
+        /// <summary>
+        /// 获取指定地图GameObject的游戏虚拟摄像机节点
+        /// </summary>
+        /// <param name="mapGo"></param>
+        /// <returns></returns>
+        public static Transform GetGameVirtualCameraNode(GameObject mapGo)
+        {
+            if(mapGo == null)
+            {
+                Debug.LogError($"不允许传空地图GameObject,获取指定地图游戏虚拟摄像机节点失败！");
+                return null;
+            }
+            var gameVirtualCameraNodeRelativePath = MapUtilities.GetGameVirtualCameraNodeRelativePath();
+            return mapGo.transform.Find(gameVirtualCameraNodeRelativePath);
+        }
+
+        /// <summary>
+        /// 获取或创建指定地图GameObject游戏虚拟摄像机节点
+        /// </summary>
+        /// <param name="mapGo"></param>
+        /// <returns></returns>
+        public static Transform GetOrCreateGameVirtualCameraNode(GameObjectExtension mapGo)
+        {
+            if(mapGo == null)
+            {
+                Debug.LogError($"不允许传空地图GameObject,获取或创建指定地图游戏虚拟摄像机节点失败！");
+                return null;
+            }
+            var gameVirtualCameraParentNodeName = MapConst.GameVirtualCameraParentNodeName;
+            var gameVirtualCameraParentTransform = mapGo.transform.Find(gameVirtualCameraParentNodeName);
+            Transform virtualCameraNodeTransform;
+            if (gameVirtualCameraParentTransform == null)
+            {
+                var virtualCameraParentNodeGo = new GameObject(MapConst.GameVirtualCameraParentNodeName);
+                var virtualCameraParentTransform = virtualCameraParentNodeGo.transform;
+                virtualCameraParentTransform.SetParent(mapGo.transform);
+                var virtualCameraNodeGo = new GameObject(MapConst.GameVirtualCameraNodeName);
+                virtualCameraNodeTransform = virtualCameraNodeGo.transform;
+                virtualCameraNodeTransform.SetParent(virtualCameraParentTransform);
+                var virtualCamera = virtualCameraNodeGo.AddComponent<CinemachineVirtualCamera>();
+                virtualCamera.Priority = MapConst.GameVirtualCameraPriority;
+                virtualCamera.m_Lens.FarClipPlane = 500f;
+                virtualCameraNodeTransform.position = MapConst.GameVirtualCameraDefaultPos;
+                virtualCameraNodeTransform.eulerAngles = MapConst.GameVirtualCameraDefaultRot;
+            }
+            else
+            {
+                virtualCameraNodeTransform = GetGameVirtualCameraNode(mapGo);
+            }
+            return virtualCameraNodeTransform;
         }
 
         /// <summary>

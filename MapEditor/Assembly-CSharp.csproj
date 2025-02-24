@@ -60,6 +60,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Assets\Scripts\Game\ECS\Entity\BaseActorEntity.cs" />
+    <Compile Include="Assets\Scripts\Game\ECS\Entity\BaseBindEntity.cs" />
     <Compile Include="Assets\Scripts\Game\ECS\Entity\BaseEntity.cs" />
     <Compile Include="Assets\Scripts\Game\ECS\Entity\EntityType.cs" />
     <Compile Include="Assets\Scripts\Game\ECS\MapGame\Entity\CameraEntity.cs" />
@@ -69,6 +70,7 @@
     <Compile Include="Assets\Scripts\Game\ECS\MapGame\Entity\TreasureBoxEntity.cs" />
     <Compile Include="Assets\Scripts\Game\ECS\MapGame\System\ActorSyncSystem.cs" />
     <Compile Include="Assets\Scripts\Game\ECS\MapGame\System\CameraFollowSystem.cs" />
+    <Compile Include="Assets\Scripts\Game\ECS\MapGame\System\InputControlSystem.cs" />
     <Compile Include="Assets\Scripts\Game\ECS\MapGame\System\PlayerSpawnSystem.cs" />
     <Compile Include="Assets\Scripts\Game\ECS\MapGame\World\MapGameWorld.cs" />
     <Compile Include="Assets\Scripts\Game\ECS\System\BaseSystem.cs" />
@@ -93,7 +95,6 @@
     <Compile Include="Assets\Scripts\Map\Level\LevelMapData.cs" />
     <Compile Include="Assets\Scripts\Core\Collision\Collision2D\VisibleDraw\Polygon2DVisible.cs" />
     <Compile Include="Assets\Scripts\Core\Collision\Collision3D\VisibleDraw\Sphere3DVisible.cs" />
-    <Compile Include="Assets\Scripts\Game\Input\InputManager.cs" />
     <Compile Include="Assets\Scripts\Map\MapData\PlayerSpawnMapData.cs" />
     <Compile Include="Assets\Scripts\Core\Extension\StringExt.cs" />
     <Compile Include="Assets\Scripts\Utilities\Vector3Utilities.cs" />

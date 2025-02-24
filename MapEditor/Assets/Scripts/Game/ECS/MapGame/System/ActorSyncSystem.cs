@@ -18,26 +18,42 @@ public class ActorSyncSystem : BaseSystem
     /// <summary>
     /// Update
     /// </summary>
-    public override void Update()
+    /// <param name="deltaTime"></param>
+    public override void Update(float deltaTime)
     {
-        base.Update();
+        base.Update(deltaTime);
         var allEntity = OwnerWorld.GetAllEntity();
         foreach ( var entity in allEntity )
         {
             var actorEntity = entity as BaseActorEntity;
-            if (actorEntity == null)
+            if (actorEntity != null)
             {
+                if (actorEntity.SyncPosition && actorEntity.Go != null)
+                {
+                    actorEntity.Go.transform.position = actorEntity.Position;
+                    actorEntity.SyncPosition = false;
+                }
+                if (actorEntity.SyncRotation && actorEntity.Go != null)
+                {
+                    actorEntity.Go.transform.eulerAngles = actorEntity.Rotation;
+                    actorEntity.SyncRotation = false;
+                }
                 continue;
             }
-            if (actorEntity.SyncPosition && actorEntity.Go != null)
+            var bindEntity = entity as BaseBindEntity;
+            if (bindEntity != null)
             {
-                actorEntity.Go.transform.position = actorEntity.Position;
-                actorEntity.SyncPosition = false;
-            }
-            if (actorEntity.SyncRotation && actorEntity.Go != null)
-            {
-                actorEntity.Go.transform.eulerAngles = actorEntity.Rotation;
-                actorEntity.SyncRotation = false;
+                if (bindEntity.SyncPosition && bindEntity.BindGo != null)
+                {
+                    bindEntity.BindGo.transform.position = bindEntity.Position;
+                    bindEntity.SyncPosition = false;
+                }
+                if (bindEntity.SyncRotation && bindEntity.BindGo != null)
+                {
+                    bindEntity.BindGo.transform.eulerAngles = bindEntity.Rotation;
+                    bindEntity.SyncRotation = false;
+                }
+                continue;
             }
         }
     }

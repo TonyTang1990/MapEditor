@@ -407,6 +407,7 @@ namespace MapEditor
             CreateAllMapObjectParentNodes();
             CreateMapTerrianNode();
             CreateNavMeshSurface();
+            CreateVirtualCameraNode();
         }
 
         /// <summary>
@@ -459,6 +460,18 @@ namespace MapEditor
                 return;
             }
             MapEditorUtilities.GetOrCreateNavMeshSurface(mTarget?.gameObject);
+        }
+
+        /// <summary>
+        /// 创建虚拟摄像机节点
+        /// </summary>
+        private void CreateVirtualCameraNode()
+        {
+            if (!MapEditorUtilities.IsOperationAvalible(mTarget?.gameObject))
+            {
+                return;
+            }
+            MapEditorUtilities.GetOrCreateGameVirtualCameraNode(mTarget?.gameObject);
         }
 
         /// <summary>

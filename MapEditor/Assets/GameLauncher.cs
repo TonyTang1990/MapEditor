@@ -24,24 +24,27 @@ public class GameLauncher : MonoBehaviour
     /// <summary>
     /// 更新
     /// </summary>
-    public void Update()
+    /// <param name="deltaTime"></param>
+    public void Update(float deltaTime)
     {
-        GameManager.Singleton.Update();
+        GameManager.Singleton.Update(deltaTime);
     }
 
     /// <summary>
     /// 固定更新
     /// </summary>
-    public void FixedUpdate()
+    /// <param name="fixedDeltaTime"></param>
+    public void FixedUpdate(float fixedDeltaTime)
     {
-        GameManager.Singleton.FixedUpdate();
+        GameManager.Singleton.FixedUpdate(fixedDeltaTime);
     }
 
     /// <summary>
     /// 延迟更新
     /// </summary>
-    public void LateUpdate()
+    /// <param name="deltaTime"></param>
+    public void LateUpdate(float deltaTime)
     {
-        GameManager.Singleton.LateUpdate();
+        GameManager.Singleton.LateUpdate(deltaTime);
     }
 }

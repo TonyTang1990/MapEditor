@@ -71,14 +71,14 @@ public class GameManager : SingletonTemplate<GameManager>
         LogicFramePassedTime = 0;
         mRenderFrameCount = 0;
         mRenderFramePassedTime = 0;
-        InputManager.Singleton.Update();
         MapGameManager.Singleton.EnterGame();
     }
     
     /// <summary>
     /// 更新
     /// </summary>
-    public void Update()
+    /// <param name="deltaTime"></param>
+    public void Update(float deltaTime)
     {
         LogicFramePassedTime += Time.deltaTime;
         while (LogicFramePassedTime >= LogicFrameTime)
@@ -96,7 +96,7 @@ public class GameManager : SingletonTemplate<GameManager>
             mRenderFrameCount = 0;
         }
         
-        MapGameManager.Singleton.Update();
+        MapGameManager.Singleton.Update(deltaTime);
     }
 
     /// <summary>
@@ -111,16 +111,18 @@ public class GameManager : SingletonTemplate<GameManager>
     /// <summary>
     /// 固定更新
     /// </summary>
-    public void FixedUpdate()
+    /// <param name="fixedDeltaTime"></param>
+    public void FixedUpdate(float fixedDeltaTime)
     {
-        MapGameManager.Singleton.FixedUpdate();
+        MapGameManager.Singleton.FixedUpdate(fixedDeltaTime);
     }
 
     /// <summary>
     /// 延迟更新
     /// </summary>
-    public void LateUpdate()
+    /// <param name="deltaTime"></param>
+    public void LateUpdate(float deltaTime)
     {
-        MapGameManager.Singleton.LateUpdate();
+        MapGameManager.Singleton.LateUpdate(deltaTime);
     }
 }
