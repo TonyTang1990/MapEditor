@@ -1,5 +1,5 @@
 ﻿/*
- * Description:             MapDataUIType.cs
+ * Description:             MapUIType.cs
  * Author:                  TONYTANG
  * Create Date:             2024/06/20
  */
@@ -7,10 +7,10 @@
 namespace MapEditor
 {
     /// <summary>
-    /// MapDataUIType.cs
+    /// MapUIType.cs
     /// 地图数据UI类型
     /// </summary>
-    public enum MapDataUIType
+    public enum MapUIType
     {
         Batch = 0,                              // 批量UI
         Index = 1,                              // 索引UI

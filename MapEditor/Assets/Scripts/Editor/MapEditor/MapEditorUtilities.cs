@@ -7,6 +7,7 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Drawing;
 using System.IO;
 using System.Text;
 using System.Threading.Tasks;
@@ -509,17 +510,6 @@ namespace MapEditor
         }
 
         /// <summary>
-        /// 地图埋点数据类型和默认显示颜色Map
-        /// </summary>
-        private static Dictionary<MapDataType, Color> MapDataTypeColorMap = new Dictionary<MapDataType, Color>()
-        {
-            { MapDataType.PlayerSpawn, Color.yellow },
-            { MapDataType.Monster, Color.magenta },
-            { MapDataType.TreasureBox, Color.green },
-            { MapDataType.Trap, Color.red },
-        };
-
-        /// <summary>
         /// 获取指定地图埋点类型的默认颜色信息
         /// </summary>
         /// <param name="dataType"></param>
@@ -644,15 +634,15 @@ namespace MapEditor
         public static void DrawMapDataTitleAreaByType(MapDataType mapDataType)
         {
             EditorGUILayout.BeginHorizontal("box");
-            if (MapEditorUtilities.IsShowMapUI(mapDataType, MapDataUIType.Batch))
+            if (MapEditorUtilities.IsShowMapUI(mapDataType, MapUIType.Batch))
             {
                 EditorGUILayout.LabelField("批量", MapStyles.TabMiddleStyle, GUILayout.Width(MapEditorConst.InspectorDataBatchUIWidth));
             }
-            if (MapEditorUtilities.IsShowMapUI(mapDataType, MapDataUIType.Index))
+            if (MapEditorUtilities.IsShowMapUI(mapDataType, MapUIType.Index))
             {
                 EditorGUILayout.LabelField("索引", MapStyles.TabMiddleStyle, GUILayout.Width(MapEditorConst.InspectorDataIndexUIWidth));
             }
-            if (MapEditorUtilities.IsShowMapUI(mapDataType, MapDataUIType.UID))
+            if (MapEditorUtilities.IsShowMapUI(mapDataType, MapUIType.UID))
             {
                 EditorGUILayout.LabelField("UID", MapStyles.TabMiddleStyle, GUILayout.Width(MapEditorConst.InspectorDataUIDUIWidth));
             }
@@ -660,7 +650,7 @@ namespace MapEditor
             //{
             //    EditorGUILayout.LabelField("埋点类型", MapStyles.TabMiddleStyle, GUILayout.Width(MapEditorConst.InspectorDataTypeUIWidth));
             //}
-            if (MapEditorUtilities.IsShowMapUI(mapDataType, MapDataUIType.ConfId))
+            if (MapEditorUtilities.IsShowMapUI(mapDataType, MapUIType.ConfId))
             {
                 EditorGUILayout.LabelField("配置Id", MapStyles.TabMiddleStyle, GUILayout.Width(MapEditorConst.InspectorDataConfIdUIWidth));
             }
@@ -668,39 +658,39 @@ namespace MapEditor
             //{
             //    EditorGUILayout.LabelField("描述", MapStyles.TabMiddleStyle, GUILayout.Width(MapEditorConst.InspectorDataDesUIWidth));
             //}
-            if (MapEditorUtilities.IsShowMapUI(mapDataType, MapDataUIType.GUISwitchOff))
+            if (MapEditorUtilities.IsShowMapUI(mapDataType, MapUIType.GUISwitchOff))
             {
                 EditorGUILayout.LabelField("GUI关闭", MapStyles.TabMiddleStyle, GUILayout.Width(MapEditorConst.InspectorDataGUISwitchOffUIWidth));
             }
-            if (MapEditorUtilities.IsShowMapUI(mapDataType, MapDataUIType.Position))
+            if (MapEditorUtilities.IsShowMapUI(mapDataType, MapUIType.Position))
             {
                 EditorGUILayout.LabelField("位置", MapStyles.TabMiddleStyle, GUILayout.Width(MapEditorConst.InspectorDataPositionUIWidth));
             }
-            if (MapEditorUtilities.IsShowMapUI(mapDataType, MapDataUIType.Rotation))
+            if (MapEditorUtilities.IsShowMapUI(mapDataType, MapUIType.Rotation))
             {
                 EditorGUILayout.LabelField("旋转", MapStyles.TabMiddleStyle, GUILayout.Width(MapEditorConst.InspectorDataRotationUIWidth));
             }
-            if (MapEditorUtilities.IsShowMapUI(mapDataType, MapDataUIType.MonsterCreateRadius))
+            if (MapEditorUtilities.IsShowMapUI(mapDataType, MapUIType.MonsterCreateRadius))
             {
                 EditorGUILayout.LabelField("创建半径", MapStyles.TabMiddleStyle, GUILayout.Width(MapEditorConst.InspectorDataMonsterCreateRadiusUIWidth));
             }
-            if (MapEditorUtilities.IsShowMapUI(mapDataType, MapDataUIType.MonsterActiveRadius))
+            if (MapEditorUtilities.IsShowMapUI(mapDataType, MapUIType.MonsterActiveRadius))
             {
                 EditorGUILayout.LabelField("警戒半径", MapStyles.TabMiddleStyle, GUILayout.Width(MapEditorConst.InspectorDataMonsterActiveRediusUIWidth));
             }
-            if (MapEditorUtilities.IsShowMapUI(mapDataType, MapDataUIType.MoveUp))
+            if (MapEditorUtilities.IsShowMapUI(mapDataType, MapUIType.MoveUp))
             {
                 EditorGUILayout.LabelField("上移", MapStyles.TabMiddleStyle, GUILayout.Width(MapEditorConst.InspectorDataMoveUpUIWidth));
             }
-            if (MapEditorUtilities.IsShowMapUI(mapDataType, MapDataUIType.MoveDown))
+            if (MapEditorUtilities.IsShowMapUI(mapDataType, MapUIType.MoveDown))
             {
                 EditorGUILayout.LabelField("下移", MapStyles.TabMiddleStyle, GUILayout.Width(MapEditorConst.InspectorDataMoveDownUIWidth));
             }
-            if (MapEditorUtilities.IsShowMapUI(mapDataType, MapDataUIType.Add))
+            if (MapEditorUtilities.IsShowMapUI(mapDataType, MapUIType.Add))
             {
                 EditorGUILayout.LabelField("添加", MapStyles.TabMiddleStyle, GUILayout.Width(MapEditorConst.InspectorDataRemoveUIWidth));
             }
-            if (MapEditorUtilities.IsShowMapUI(mapDataType, MapDataUIType.Remove))
+            if (MapEditorUtilities.IsShowMapUI(mapDataType, MapUIType.Remove))
             {
                 EditorGUILayout.LabelField("删除", MapStyles.TabMiddleStyle, GUILayout.Width(MapEditorConst.InspectorDataAddUIWidth));
             }
@@ -1252,123 +1242,204 @@ namespace MapEditor
             return map.gameObject.name;
         }
 
+        /// <summary>
+        /// 静态构造函数
+        /// </summary>
+        static MapEditorUtilities()
+        {
+            InitStaticDatas();
+        }
+
+        /// <summary>
+        /// 初始化静态数据
+        /// </summary>
+        private static void InitStaticDatas()
+        {
+            InitMapDataTypeFoldTypeMap();
+            InitMapDataTypeColorMap();
+            InitMapOneKeyFoldTitleMap();
+            InitMapOneKeyUnfoldTitleMap();
+            InitMapDataFoldAndUITypeMap();
+        }
+
+        #region 地图UI显示相关基础数据定义
+        /// <summary>
+        /// 地图UI类型显示数据列表
+        /// Note:
+        /// 标题和属性默认按照这里定义的顺序显示
+        /// </summary>
+        public static readonly List<MapUITypeDisplayData> MapUITypeDisplayData = new List<MapUITypeDisplayData>()
+        {
+            new MapUITypeDisplayData(MapUIType.Batch, "BatchOperationSwitch", "批量", MapEditorConst.InspectorDataBatchUIWidth, MapStyles.TabMiddleStyle),
+            new MapUITypeDisplayData(MapUIType.Index, "", "索引", MapEditorConst.InspectorDataIndexUIWidth, MapStyles.TabMiddleStyle),
+            new MapUITypeDisplayData(MapUIType.UID, "UID", "UID", MapEditorConst.InspectorDataUIDUIWidth, MapStyles.TabMiddleStyle),
+            //new MapUITypeDisplayData(MapUIType.MapDataType, "", "埋点类型", MapEditorConst.InspectorDataTypeUIWidth, MapStyles.TabMiddleStyle),
+            new MapUITypeDisplayData(MapUIType.ConfId, "", "配置Id", MapEditorConst.InspectorDataConfIdUIWidth, MapStyles.TabMiddleStyle),
+            new MapUITypeDisplayData(MapUIType.GUISwitchOff, "GUISwitchOff", "GUI关闭", MapEditorConst.InspectorDataGUISwitchOffUIWidth, MapStyles.TabMiddleStyle),
+            new MapUITypeDisplayData(MapUIType.Position, "Position", "位置", MapEditorConst.InspectorDataPositionUIWidth, MapStyles.TabMiddleStyle),
+            new MapUITypeDisplayData(MapUIType.Rotation, "Rotation", "旋转", MapEditorConst.InspectorDataRotationUIWidth, MapStyles.TabMiddleStyle),
+            new MapUITypeDisplayData(MapUIType.MonsterCreateRadius, "MonsterCreateRadius", "创建半径", MapEditorConst.InspectorDataMonsterCreateRadiusUIWidth, MapStyles.TabMiddleStyle),
+            new MapUITypeDisplayData(MapUIType.MonsterActiveRadius, "MonsterActiveRadius", "警戒半径", MapEditorConst.InspectorDataMonsterActiveRediusUIWidth, MapStyles.TabMiddleStyle),
+            new MapUITypeDisplayData(MapUIType.Des, "", "描述", MapEditorConst.InspectorDataDesUIWidth, MapStyles.TabMiddleStyle),
+            new MapUITypeDisplayData(MapUIType.MoveUp, "", "上移", MapEditorConst.InspectorDataMoveUpUIWidth, MapStyles.TabMiddleStyle),
+            new MapUITypeDisplayData(MapUIType.MoveDown, "", "下移", MapEditorConst.InspectorDataMoveDownUIWidth, MapStyles.TabMiddleStyle),
+            new MapUITypeDisplayData(MapUIType.Add, "", "添加", MapEditorConst.InspectorDataAddUIWidth, MapStyles.TabMiddleStyle),
+            new MapUITypeDisplayData(MapUIType.Remove, "", "删除", MapEditorConst.InspectorDataRemoveUIWidth, MapStyles.TabMiddleStyle),
+        };
+
+        /// <summary>
+        /// 地图埋点类型UI类型显示数据列表
+        /// </summary>
+        private static readonly List<MapDataTypeDisplayData> MapDataTypeDisplayDatas = new List<MapDataTypeDisplayData>()
+        {
+            new MapDataTypeDisplayData(MapDataType.PlayerSpawn, MapFoldType.PlayerSpawnMapDataFold, "玩家出生点", Color.yellow),
+            new MapDataTypeDisplayData(MapDataType.Monster, MapFoldType.MonsterMapDataFold, "怪物", Color.magenta),
+            new MapDataTypeDisplayData(MapDataType.TreasureBox, MapFoldType.TreasureBoxMapDataFold, "宝箱", Color.green),
+            new MapDataTypeDisplayData(MapDataType.Trap, MapFoldType.TrapMapDataFold, "陷阱", Color.red),
+        };
+        #endregion
+
         #region 折叠部分
+        /// <summary>
+        /// 地图折叠类型UI类型显示数据列表
+        /// </summary>
+        private static readonly List<MapFoldTypeDisplayData> MapFoldTypeDisplayDatas = new List<MapFoldTypeDisplayData>()
+        {
+            new MapFoldTypeDisplayData(MapFoldType.MapObjectDataFold, "通用对象"),
+            new MapFoldTypeDisplayData(MapFoldType.PlayerSpawnMapDataFold, "玩家出生点埋点"),
+            new MapFoldTypeDisplayData(MapFoldType.MonsterMapDataFold, "怪物埋点"),
+            new MapFoldTypeDisplayData(MapFoldType.TreasureBoxMapDataFold, "宝箱埋点"),
+            new MapFoldTypeDisplayData(MapFoldType.TrapMapDataFold, "陷阱埋点"),
+        };
 
         /// <summary>
         /// 地图埋点类型和折叠类型映射
         /// </summary>
-        private static Dictionary<MapDataType, MapFoldType> MapDataTypeFoldTypeMap = new Dictionary<MapDataType, MapFoldType>()
-        {
-            {MapDataType.PlayerSpawn, MapFoldType.PlayerSpawnMapDataFold},
-            {MapDataType.Monster, MapFoldType.MonsterMapDataFold},
-            {MapDataType.TreasureBox, MapFoldType.TreasureBoxMapDataFold},
-            {MapDataType.Trap, MapFoldType.TrapMapDataFold},
-        };
+        private static Dictionary<MapDataType, MapFoldType> MapDataTypeFoldTypeMap = new Dictionary<MapDataType, MapFoldType>(){};
+
+        /// <summary>
+        /// 地图埋点数据类型和默认显示颜色Map
+        /// </summary>
+        private static Dictionary<MapDataType, Color> MapDataTypeColorMap = new Dictionary<MapDataType, Color>() { };
 
         /// <summary>
         /// 地图折叠类型和一键折叠标题Map<地图折叠类型，一键折叠标题>
         /// </summary>
-        private static Dictionary<MapFoldType, string> MapOneKeyFoldTitleMap = new Dictionary<MapFoldType, string>()
-        {
-            {MapFoldType.MapObjectDataFold, "一键折叠所有(通用对象数据)"},
-            {MapFoldType.PlayerSpawnMapDataFold, "一键折叠所有(玩家出生点埋点数据)"},
-            {MapFoldType.MonsterMapDataFold, "一键折叠所有(怪物埋点数据)"},
-            {MapFoldType.TreasureBoxMapDataFold, "一键折叠所有(宝箱埋点数据)"},
-            {MapFoldType.TrapMapDataFold, "一键折叠所有(陷阱埋点数据)"},
-        };
+        private static Dictionary<MapFoldType, string> MapOneKeyFoldTitleMap = new Dictionary<MapFoldType, string>(){};
 
         /// <summary>
         /// 地图折叠类型和一键展开标题Map<地图折叠类型，一键展开标题>
         /// </summary>
-        private static Dictionary<MapFoldType, string> MapOneKeyUnfoldTitleMap = new Dictionary<MapFoldType, string>()
+        private static Dictionary<MapFoldType, string> MapOneKeyUnfoldTitleMap = new Dictionary<MapFoldType, string>(){};
+
+        /// <summary>
+        /// 所有埋点类型都通用的游戏地图UI类型Map<游戏地图UI类型，是否显示>
+        /// </summary>
+        private static Dictionary<MapUIType, bool> CommonMapUITypeMap = new Dictionary<MapUIType, bool>()
         {
-            {MapFoldType.MapObjectDataFold, "一键展开所有(通用对象数据)"},
-            {MapFoldType.PlayerSpawnMapDataFold, "一键展开所有(玩家出生点埋点数据)"},
-            {MapFoldType.MonsterMapDataFold, "一键展开所有(怪物埋点数据)"},
-            {MapFoldType.TreasureBoxMapDataFold, "一键展开所有(宝箱埋点数据)"},
-            {MapFoldType.TrapMapDataFold, "一键展开所有(陷阱埋点数据)"},
+            { MapUIType.Batch, true },
+            { MapUIType.Index, true },
+            { MapUIType.UID, true },
+            { MapUIType.MapDataType, true },
+            { MapUIType.ConfId, true },
+            { MapUIType.Position, true },
+            { MapUIType.Rotation, true },
+            { MapUIType.GUISwitchOff, true },
+            { MapUIType.Des, true },
+            { MapUIType.MoveUp, true },
+            { MapUIType.MoveDown, true },
+            { MapUIType.Add, true },
+            { MapUIType.Remove, true },
         };
 
         /// <summary>
         /// 地图埋点类型和UI显示类型Map<地图埋点类型，<地图UI显示类型，是否显示>>
+        /// Note:
+        /// 所有需要显示的折叠数据都在这里定义相关UI是否显示
+        /// 通用必显示的不同定义在这里，详情参见CommonGameMapUITypeMap
+        /// 所有MapDataType类型必定会自动初始化到MapFoldAndUITypeMap，没有DIY UI显示的可以不定义在这
         /// </summary>
-        private static Dictionary<MapDataType, Dictionary<MapDataUIType, bool>> MapDataFoldAndUITypeMap = new Dictionary<MapDataType, Dictionary<MapDataUIType, bool>>()
+        private static Dictionary<MapDataType, Dictionary<MapUIType, bool>> MapFoldAndUITypeMap = new Dictionary<MapDataType, Dictionary<MapUIType, bool>>()
         {
             {
-                MapDataType.PlayerSpawn, new Dictionary<MapDataUIType, bool>()
+                MapDataType.Monster, new Dictionary<MapUIType, bool>()
                 {
-                    {MapDataUIType.Batch, true},
-                    {MapDataUIType.Index, true},
-                    {MapDataUIType.UID, true},
-                    {MapDataUIType.MapDataType, true},
-                    {MapDataUIType.ConfId, true},
-                    {MapDataUIType.Des, true},
-                    {MapDataUIType.GUISwitchOff, true},
-                    {MapDataUIType.Position, true},
-                    {MapDataUIType.Rotation, true},
-                    {MapDataUIType.MoveUp, true},
-                    {MapDataUIType.MoveDown, true},
-                    {MapDataUIType.Add, true},
-                    {MapDataUIType.Remove, true},
-                }
-            },
-            {
-                MapDataType.Monster, new Dictionary<MapDataUIType, bool>()
-                {
-                    {MapDataUIType.Batch, true},
-                    {MapDataUIType.Index, true},
-                    {MapDataUIType.UID, true},
-                    {MapDataUIType.MapDataType, true},
-                    {MapDataUIType.ConfId, true},
-                    {MapDataUIType.Des, true},
-                    {MapDataUIType.GUISwitchOff, true},
-                    {MapDataUIType.Position, true},
-                    {MapDataUIType.Rotation, true},
-                    {MapDataUIType.MonsterCreateRadius, true},
-                    {MapDataUIType.MonsterActiveRadius, true},
-                    {MapDataUIType.MoveUp, true},
-                    {MapDataUIType.MoveDown, true},
-                    {MapDataUIType.Add, true},
-                    {MapDataUIType.Remove, true},
-                }
-            },
-            {
-                MapDataType.TreasureBox, new Dictionary<MapDataUIType, bool>()
-                {
-                    {MapDataUIType.Batch, true},
-                    {MapDataUIType.Index, true},
-                    {MapDataUIType.UID, true},
-                    {MapDataUIType.MapDataType, true},
-                    {MapDataUIType.ConfId, true},
-                    {MapDataUIType.Des, true},
-                    {MapDataUIType.GUISwitchOff, true},
-                    {MapDataUIType.Position, true},
-                    {MapDataUIType.Rotation, true},
-                    {MapDataUIType.MoveUp, true},
-                    {MapDataUIType.MoveDown, true},
-                    {MapDataUIType.Add, true},
-                    {MapDataUIType.Remove, true},
-                }
-            },
-            {
-                MapDataType.Trap, new Dictionary<MapDataUIType, bool>()
-                {
-                    {MapDataUIType.Batch, true},
-                    {MapDataUIType.Index, true},
-                    {MapDataUIType.UID, true},
-                    {MapDataUIType.MapDataType, true},
-                    {MapDataUIType.ConfId, true},
-                    {MapDataUIType.Des, true},
-                    {MapDataUIType.GUISwitchOff, true},
-                    {MapDataUIType.Position, true},
-                    {MapDataUIType.Rotation, true},
-                    {MapDataUIType.MoveUp, true},
-                    {MapDataUIType.MoveDown, true},
-                    {MapDataUIType.Add, true},
-                    {MapDataUIType.Remove, true},
+                    {MapUIType.MonsterCreateRadius, true},
+                    {MapUIType.MonsterActiveRadius, true},
                 }
             },
         };
+
+        /// <summary>
+        /// 初始化MapDataTypeFoldTypeMap
+        /// </summary>
+        private static void InitMapDataTypeFoldTypeMap()
+        {
+            foreach(var mapDataTypeUIDisplayData in MapDataTypeDisplayDatas)
+            {
+                MapDataTypeFoldTypeMap.Add(mapDataTypeUIDisplayData.MapDataType, mapDataTypeUIDisplayData.MapFoldType);
+            }
+        }
+
+        /// <summary>
+        /// 初始化MapDataTypeColorMap
+        /// </summary>
+        private static void InitMapDataTypeColorMap()
+        {
+            foreach (var mapDataTypeUIDisplayData in MapDataTypeDisplayDatas)
+            {
+                MapDataTypeColorMap.Add(mapDataTypeUIDisplayData.MapDataType, mapDataTypeUIDisplayData.DisplayColor);
+            }
+        }
+
+        /// <summary>
+        /// 初始化MapOneKeyFoldTitleMap
+        /// </summary>
+        private static void InitMapOneKeyFoldTitleMap()
+        {
+            foreach (var mapFoldTypeDisplayData in MapFoldTypeDisplayDatas)
+            {
+                var mapFoldType = mapFoldTypeDisplayData.MapFoldType;
+                var mapFoldDes = mapFoldTypeDisplayData.FoldDes;
+                MapOneKeyFoldTitleMap.Add(mapFoldType, $"一键折叠所有({mapFoldDes})");
+            }
+        }
+
+        /// <summary>
+        /// 初始化MapOneKeyUnfoldTitleMap
+        /// </summary>
+        private static void InitMapOneKeyUnfoldTitleMap()
+        {
+            foreach (var mapFoldTypeDisplayData in MapFoldTypeDisplayDatas)
+            {
+                var mapFoldType = mapFoldTypeDisplayData.MapFoldType;
+                var mapFoldDes = mapFoldTypeDisplayData.FoldDes;
+                MapOneKeyUnfoldTitleMap.Add(mapFoldType, $"一键展开所有({mapFoldDes})");
+            }
+        }
+
+        /// <summary>
+        /// 初始化MapDataFoldAndUITypeMap
+        /// </summary>
+        private static void InitMapDataFoldAndUITypeMap()
+        {
+            foreach(var mapDataType in MapEditorConst.AllMapDataTypes)
+            {
+                Dictionary<MapUIType, bool> mapUITypeMap;
+                if(!MapFoldAndUITypeMap.TryGetValue(mapDataType, out mapUITypeMap))
+                {
+                    mapUITypeMap = new Dictionary<MapUIType, bool>();
+                    MapFoldAndUITypeMap.Add(mapDataType, mapUITypeMap);
+                }
+                foreach(var commonMapUIType in CommonMapUITypeMap)
+                {
+                    if(!mapUITypeMap.ContainsKey(commonMapUIType.Key))
+                    {
+                        mapUITypeMap.Add(commonMapUIType.Key, commonMapUIType.Value);
+                    }
+                }
+            }
+        }
 
         /// <summary>
         /// 获取制定地图埋点类型的折叠类型
@@ -1422,7 +1493,7 @@ namespace MapEditor
         /// <returns></returns>
         public static bool IsShowMapDataFoldType(MapDataType mapDataType)
         {
-            return MapDataFoldAndUITypeMap.ContainsKey(mapDataType);
+            return MapFoldAndUITypeMap.ContainsKey(mapDataType);
         }
 
         /// <summary>
@@ -1431,10 +1502,10 @@ namespace MapEditor
         /// <param name="mapDataType"></param>
         /// <param name="mapDataUIType"></param>
         /// <returns></returns>
-        public static bool IsShowMapUI(MapDataType mapDataType, MapDataUIType mapDataUIType)
+        public static bool IsShowMapUI(MapDataType mapDataType, MapUIType mapDataUIType)
         {
-            Dictionary<MapDataUIType, bool> mapFoldTypeUIMap;
-            if (!MapDataFoldAndUITypeMap.TryGetValue(mapDataType, out mapFoldTypeUIMap))
+            Dictionary<MapUIType, bool> mapFoldTypeUIMap;
+            if (!MapFoldAndUITypeMap.TryGetValue(mapDataType, out mapFoldTypeUIMap))
             {
                 return false;
             }

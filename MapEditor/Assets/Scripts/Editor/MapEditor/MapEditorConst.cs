@@ -4,6 +4,8 @@
  * Create Date:             2024/04/08
  */
 
+using System;
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace MapEditor
@@ -28,6 +30,16 @@ namespace MapEditor
         /// 关卡地图数据保存路径
         /// </summary>
         public const string LevelMapDataSaveFolder = "Assets/Editor/Map/Level/LevelMapData/";
+
+        /// <summary>
+        /// MapDataType类型信息
+        /// </summary>
+        public static readonly Type MapDataTypeType = typeof(MapDataType);
+
+        /// <summary>
+        /// MapObjectType类型信息
+        /// </summary>
+        public static readonly Type MapObjectTypeType = typeof(MapObjectType);
 
         /// <summary>
         /// 地图对象类型配置UI显示宽度
@@ -268,5 +280,36 @@ namespace MapEditor
         /// 面板地图埋点添加的UI宽度
         /// </summary>
         public const float InspectorDataAddUIWidth = 40f;
+
+        /// <summary>
+        /// 所有地图对象类型枚举
+        /// </summary>
+        public static readonly List<MapDataType> AllMapDataTypes = new List<MapDataType>();
+
+        static MapEditorConst()
+        {
+            InitStaticDatas();
+        }
+
+        /// <summary>
+        /// 初始化静态数据
+        /// </summary>
+        private static void InitStaticDatas()
+        {
+            InitAllMapDataTypes();
+        }
+
+        /// <summary>
+        /// 初始化所有地图埋点类型
+        /// </summary>
+        private static void InitAllMapDataTypes()
+        {
+            AllMapDataTypes.Clear();
+            var mapDataTypeValues = Enum.GetValues(MapDataTypeType);
+            foreach(var mapDataTypeValue in mapDataTypeValues)
+            {
+                AllMapDataTypes.Add((MapDataType)mapDataTypeValue);
+            }
+        }
     }
 }

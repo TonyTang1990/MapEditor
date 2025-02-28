@@ -82,6 +82,8 @@
     <Compile Include="Assets\Scripts\Game\MapGameConst.cs" />
     <Compile Include="Assets\Scripts\Game\UI\BaseUI.cs" />
     <Compile Include="Assets\Scripts\Game\UI\MainUI.cs" />
+    <Compile Include="Assets\Scripts\Map\MapFoldType.cs" />
+    <Compile Include="Assets\Scripts\Map\MapFoldTypeData.cs" />
     <Compile Include="Assets\Scripts\Utilities\FolderUtilities.cs" />
     <Compile Include="Assets\Scripts\Map\MapData\MapDataConfig.cs" />
     <Compile Include="Assets\Scripts\Map\MapData\MonsterMapData.cs" />

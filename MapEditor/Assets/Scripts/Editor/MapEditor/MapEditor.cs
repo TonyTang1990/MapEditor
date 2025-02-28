@@ -120,39 +120,24 @@ namespace MapEditor
         private SerializedProperty mCustomExportFileNameProperty;
 
         /// <summary>
-        /// MapObjectDataUnfoldData属性
+        /// 所有的折叠数据列表属性
         /// </summary>
-        private SerializedProperty mMapObjectDataUnfoldDataProperty;
+        public SerializedProperty mAllGroupUnfoldDataListProperty;
 
         /// <summary>
-        /// MapObjectDataGroupUnfoldDataList属性
+        /// 折叠类型和MapFoldTypeData类型折叠数据属性Map
         /// </summary>
-        private SerializedProperty mMapObjectDataGroupUnfoldDataListProperty;
+        private Dictionary<MapFoldType, SerializedProperty> mMapFoldTypeDataPropertyMap = new Dictionary<MapFoldType, SerializedProperty>();
+
+        ///// <summary>
+        ///// MapObjectDataUnfoldData属性
+        ///// </summary>
+        private SerializedProperty mMapObjectDataUnfoldDataProperty;
 
         /// <summary>
         /// MapDataUnfoldData属性
         /// </summary>
         private SerializedProperty mMapDataUnfoldDataProperty;
-
-        /// <summary>
-        /// PlayerSpawnMapGroupUnfoldDataList属性
-        /// </summary>
-        private SerializedProperty mPlayerSpawnMapGroupUnfoldDataListProperty;
-
-        /// <summary>
-        /// MonsterMapGroupUnfoldDataList属性
-        /// </summary>
-        private SerializedProperty mMonsterMapGroupUnfoldDataListProperty;
-
-        /// <summary>
-        /// TreasureBoxMapGroupUnfoldDataList属性
-        /// </summary>
-        private SerializedProperty mTreasureBoxMapGroupUnfoldDataListProperty;
-        
-        /// <summary>
-        /// TrapMapGroupUnfoldDataList属性
-        /// </summary>
-        private SerializedProperty mTrapMapGroupUnfoldDataListProperty;
 
         /// <summary>
         /// BatchTickRangeStartIndex属性
@@ -312,13 +297,7 @@ namespace MapEditor
             mAddMapDataIndexProperty ??= serializedObject.FindProperty("AddMapDataIndex");
             mExportTypeProperty ??= serializedObject.FindProperty("ExportType");
             mCustomExportFileNameProperty ??= serializedObject.FindProperty("CustomExportFileName");
-            mMapObjectDataUnfoldDataProperty ??= serializedObject.FindProperty("MapObjectDataUnfoldData");
-            mMapObjectDataGroupUnfoldDataListProperty ??= serializedObject.FindProperty("MapObjectDataGroupUnfoldDataList");
-            mMapDataUnfoldDataProperty ??= serializedObject.FindProperty("MapDataUnfoldData");
-            mPlayerSpawnMapGroupUnfoldDataListProperty ??= serializedObject.FindProperty("PlayerSpawnMapGroupUnfoldDataList");
-            mMonsterMapGroupUnfoldDataListProperty ??= serializedObject.FindProperty("MonsterMapGroupUnfoldDataList");
-            mTreasureBoxMapGroupUnfoldDataListProperty ??= serializedObject.FindProperty("TreasureBoxMapGroupUnfoldDataList");
-            mTrapMapGroupUnfoldDataListProperty ??= serializedObject.FindProperty("TrapMapGroupUnfoldDataList");
+            mAllGroupUnfoldDataListProperty ??= serializedObject.FindProperty("AllGroupUnfoldDataList");
             mBatchTickRangeStartIndexProperty ??= serializedObject.FindProperty("BatchTickRangeStartIndex");
             mBatchTickRangeEndIndexProperty ??= serializedObject.FindProperty("BatchTickRangeEndIndex");
             mLevelMapDataProperty ??= serializedObject.FindProperty("LevelMapData");
@@ -2018,35 +1997,39 @@ namespace MapEditor
         /// <summary>
         /// 获取指定地图折叠类型的展开数据列表属性
         /// </summary>
-        /// <param name="mapFoldType"></param>
+        /// <param name="targetMapFoldType"></param>
         /// <returns></returns>
-        private SerializedProperty GetMapUnfoldDataListProperty(MapFoldType mapFoldType)
+        private SerializedProperty GetMapUnfoldDataListProperty(MapFoldType targetMapFoldType)
         {
-            if (mapFoldType == MapFoldType.MapObjectDataFold)
+            SerializedProperty groupUnfoldListProperty;
+            if(!mMapFoldTypeDataPropertyMap.TryGetValue(targetMapFoldType, out groupUnfoldListProperty))
             {
-                return mMapObjectDataGroupUnfoldDataListProperty;
+                SerializedProperty mapFoldTypeDataProperty = null;
+                var groupUnfoldDataListNum = mAllGroupUnfoldDataListProperty.arraySize;
+                for(int index = 0; index < groupUnfoldDataListNum; index++)
+                {
+                    var singleGroupUnfoldDataListProperty = mAllGroupUnfoldDataListProperty.GetArrayElementAtIndex(index);
+                    var mapFoldTypeProperty = singleGroupUnfoldDataListProperty.FindPropertyRelative("MapFoldType");
+                    var mapFoldType = (MapFoldType)mapFoldTypeProperty.intValue;
+                    if(mapFoldType == targetMapFoldType)
+                    {
+                        mapFoldTypeDataProperty = singleGroupUnfoldDataListProperty;
+                        groupUnfoldListProperty = mapFoldTypeDataProperty.FindPropertyRelative("GroupUnfoldList");
+                        break;
+                    }
+                }
+                if(mapFoldTypeDataProperty == null)
+                {
+                    mAllGroupUnfoldDataListProperty.InsertArrayElementAtIndex(groupUnfoldDataListNum);
+                    mapFoldTypeDataProperty = mAllGroupUnfoldDataListProperty.GetArrayElementAtIndex(groupUnfoldDataListNum);
+                    mapFoldTypeDataProperty.managedReferenceValue = new MapFoldTypeData(targetMapFoldType);
+                    var mapFoldTypeProperty = mapFoldTypeDataProperty.FindPropertyRelative("MapFoldType");
+                    mapFoldTypeProperty.intValue = (int)targetMapFoldType;
+                    groupUnfoldListProperty = mapFoldTypeDataProperty.FindPropertyRelative("GroupUnfoldList");
+                }
+                mMapFoldTypeDataPropertyMap.Add(targetMapFoldType, groupUnfoldListProperty);
             }
-            else if (mapFoldType == MapFoldType.PlayerSpawnMapDataFold)
-            {
-                return mPlayerSpawnMapGroupUnfoldDataListProperty;
-            }
-            else if (mapFoldType == MapFoldType.MonsterMapDataFold)
-            {
-                return mMonsterMapGroupUnfoldDataListProperty;
-            }
-            else if (mapFoldType == MapFoldType.TreasureBoxMapDataFold)
-            {
-                return mTreasureBoxMapGroupUnfoldDataListProperty;
-            }
-            else if (mapFoldType == MapFoldType.TrapMapDataFold)
-            {
-                return mTrapMapGroupUnfoldDataListProperty;
-            }
-            else
-            {
-                Debug.LogError($"不支持的地图折叠类型:{mapFoldType}，获取展开数据列表属性失败！");
-                return null;
-            }
+            return groupUnfoldListProperty;
         }
 
         /// <summary>
@@ -2602,10 +2585,10 @@ namespace MapEditor
             mMapDataUnfoldDataProperty.boolValue = EditorGUILayout.Foldout(mMapDataUnfoldDataProperty.boolValue, "地图埋点数据列表");
             if (mMapDataUnfoldDataProperty.boolValue)
             {
-                DrawMapDataAreaByType(MapDataType.PlayerSpawn);
-                DrawMapDataAreaByType(MapDataType.Monster);
-                DrawMapDataAreaByType(MapDataType.TreasureBox);
-                DrawMapDataAreaByType(MapDataType.Trap);
+                foreach(var mapDataType in MapEditorConst.AllMapDataTypes)
+                {
+                    DrawMapDataAreaByType(mapDataType);
+                }
             }
         }
 
@@ -2716,7 +2699,7 @@ namespace MapEditor
         {
             EditorGUILayout.BeginHorizontal();
             var mapDataProperty = GetMapDataSerializedPropertyByIndex(mapDataIndex);
-            if (MapEditorUtilities.IsShowMapUI(mapDataType, MapDataUIType.Batch))
+            if (MapEditorUtilities.IsShowMapUI(mapDataType, MapUIType.Batch))
             {
                 var batchOperationSwitchProperty = mapDataProperty.FindPropertyRelative("BatchOperationSwitch");
                 var space = 10f;
@@ -2746,7 +2729,7 @@ namespace MapEditor
                     }
                 }
             }
-            if (MapEditorUtilities.IsShowMapUI(mapDataType, MapDataUIType.Index))
+            if (MapEditorUtilities.IsShowMapUI(mapDataType, MapUIType.Index))
             {
                 EditorGUILayout.LabelField($"{mapDataIndex}", MapStyles.TabMiddleStyle, GUILayout.Width(MapEditorConst.InspectorDataIndexUIWidth));
             }
@@ -2755,7 +2738,7 @@ namespace MapEditor
             var uid = uidProperty.intValue;
             var positionProperty = mapDataProperty.FindPropertyRelative("Position");
             mapDataConfig = MapSetting.GetEditorInstance().DataSetting.GetMapDataConfigByUID(uid);
-            if (MapEditorUtilities.IsShowMapUI(mapDataType, MapDataUIType.UID))
+            if (MapEditorUtilities.IsShowMapUI(mapDataType, MapUIType.UID))
             {
                 EditorGUI.BeginChangeCheck();
                 var realMapDataType = mapDataConfig != null ? mapDataConfig.DataType : MapDataType.PlayerSpawn;
@@ -2778,7 +2761,7 @@ namespace MapEditor
             //        EditorGUILayout.LabelField("找不到对象类型数据", MapStyles.TabMiddleStyle, GUILayout.Width(MapEditorConst.InspectorDataTypeUIWidth));
             //    }
             //}
-            if (MapEditorUtilities.IsShowMapUI(mapDataType, MapDataUIType.ConfId))
+            if (MapEditorUtilities.IsShowMapUI(mapDataType, MapUIType.ConfId))
             {
                 if (mapDataConfig != null)
                 {
@@ -2794,7 +2777,7 @@ namespace MapEditor
             //    var des = mapDataConfig != null ? mapDataConfig.Des : "";
             //    EditorGUILayout.LabelField(des, MapStyles.TabMiddleStyle, GUILayout.Width(MapEditorConst.InspectorDataDesUIWidth));
             //}
-            if (MapEditorUtilities.IsShowMapUI(mapDataType, MapDataUIType.GUISwitchOff))
+            if (MapEditorUtilities.IsShowMapUI(mapDataType, MapUIType.GUISwitchOff))
             {
                 var propertyName = "GUISwitchOff";
                 var guiSwitchOffProperty = mapDataProperty.FindPropertyRelative(propertyName);
@@ -2810,7 +2793,7 @@ namespace MapEditor
                     }
                 }
             }
-            if (MapEditorUtilities.IsShowMapUI(mapDataType, MapDataUIType.Position))
+            if (MapEditorUtilities.IsShowMapUI(mapDataType, MapUIType.Position))
             {
                 var newVector3Value = positionProperty.vector3Value;
                 EditorGUI.BeginChangeCheck();
@@ -2827,7 +2810,7 @@ namespace MapEditor
                     OnMapDataPositionMove(mapDataIndex, positionOffset);
                 }
             }
-            if (MapEditorUtilities.IsShowMapUI(mapDataType, MapDataUIType.Rotation))
+            if (MapEditorUtilities.IsShowMapUI(mapDataType, MapUIType.Rotation))
             {
                 var rotationProperty = mapDataProperty.FindPropertyRelative("Rotation");
                 var newRotationVector3Value = rotationProperty.vector3Value;
@@ -2844,7 +2827,7 @@ namespace MapEditor
                     rotationProperty.vector3Value = newRotationVector3Value;
                 }
             }
-            if (MapEditorUtilities.IsShowMapUI(mapDataType, MapDataUIType.MonsterCreateRadius))
+            if (MapEditorUtilities.IsShowMapUI(mapDataType, MapUIType.MonsterCreateRadius))
             {
                 var propertyName = "MonsterCreateRadius";
                 var monsterCreateRadiusProperty = mapDataProperty.FindPropertyRelative(propertyName);
@@ -2858,7 +2841,7 @@ namespace MapEditor
                     }
                 }
             }
-            if (MapEditorUtilities.IsShowMapUI(mapDataType, MapDataUIType.MonsterActiveRadius))
+            if (MapEditorUtilities.IsShowMapUI(mapDataType, MapUIType.MonsterActiveRadius))
             {
                 var propertyName = "MonsterActiveRadius";
                 var monsterActiveRadiusProperty = mapDataProperty.FindPropertyRelative(propertyName);
@@ -2872,21 +2855,21 @@ namespace MapEditor
                     }
                 }
             }
-            if (MapEditorUtilities.IsShowMapUI(mapDataType, MapDataUIType.MoveUp))
+            if (MapEditorUtilities.IsShowMapUI(mapDataType, MapUIType.MoveUp))
             {
                 if (GUILayout.Button("↑", GUILayout.Width(MapEditorConst.InspectorDataMoveUpUIWidth)))
                 {
                     DoMovePropertyDataUpByIndex(mMapDataListProperty, mapDataIndex);
                 }
             }
-            if (MapEditorUtilities.IsShowMapUI(mapDataType, MapDataUIType.MoveDown))
+            if (MapEditorUtilities.IsShowMapUI(mapDataType, MapUIType.MoveDown))
             {
                 if (GUILayout.Button("↓", GUILayout.Width(MapEditorConst.InspectorDataMoveDownUIWidth)))
                 {
                     DoMovePropertyDataDownByIndex(mMapDataListProperty, mapDataIndex);
                 }
             }
-            if (MapEditorUtilities.IsShowMapUI(mapDataType, MapDataUIType.Add))
+            if (MapEditorUtilities.IsShowMapUI(mapDataType, MapUIType.Add))
             {
                 if (GUILayout.Button("+", GUILayout.Width(MapEditorConst.InspectorDataRemoveUIWidth)))
                 {
@@ -2894,7 +2877,7 @@ namespace MapEditor
                     DoAddMapData(addMapDataValue, mapDataIndex);
                 }
             }
-            if (MapEditorUtilities.IsShowMapUI(mapDataType, MapDataUIType.Remove))
+            if (MapEditorUtilities.IsShowMapUI(mapDataType, MapUIType.Remove))
             {
                 if (GUILayout.Button("-", GUILayout.Width(MapEditorConst.InspectorDataAddUIWidth)))
                 {
