@@ -7,7 +7,8 @@
 *
 */
 
-using System.Numerics;
+using UnityEngine;
+using UnityEngine.AI;
 
 /// <summary>
 /// BaseActorEntity.cs

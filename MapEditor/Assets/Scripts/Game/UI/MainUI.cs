@@ -8,8 +8,8 @@
 
 using System;
 using System.Collections.Generic;
-using System.Numerics;
-using static System.Net.Mime.MediaTypeNames;
+using UnityEngine;
+using UnityEngine.UI;
 
 /// <summary>
 /// MainUI.cs

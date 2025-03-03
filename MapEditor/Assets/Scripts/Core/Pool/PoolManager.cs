@@ -4,6 +4,7 @@
  * Create Date:             2018/12/31
  */
 
+using System;
 using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
@@ -43,7 +44,7 @@ public class PoolManager : SingletonTemplate<PoolManager>
     {
         mObjectPoolMap = new Dictionary<string, List<GameObject>>();
         mObjectPoolParent = new GameObject("ObjectPoolRoot").transform;
-        Object.DontDestroyOnLoad(mObjectPoolParent.gameObject);
+        GameObject.DontDestroyOnLoad(mObjectPoolParent.gameObject);
         mEmptyGameObjectTemplateInstance = new GameObject("EmptyGameObjectTemplateInstance");
         mEmptyGameObjectTemplateInstance.transform.SetParent(mObjectPoolParent);
         mEmptyGameObjectTemplateInstance.SetActive(false);
@@ -152,21 +153,22 @@ public class PoolManager : SingletonTemplate<PoolManager>
                 loadCompleteCb?.Invoke(instance);
                 return true;
             }
+
             else
             {
                 var prefabAsset = Resources.Load<GameObject>(prefabPath);
                 if (prefabAsset == null)
                 {
-                    Debug.LogError($"找不到路径:{prefabPath}的资源，返回示例对象失败！", prefabPath));
+                    Debug.LogError($"找不到路径:{prefabPath}的资源，返回示例对象失败！");
                     loadCompleteCb?.Invoke(null);
                     return false;
                 }
-                if (!prefab.activeSelf)
+                if (!prefabAsset.activeSelf)
                 {
-                    prefab.SetActive(true);
+                    prefabAsset.SetActive(true);
                 }
-                var instance = GameObject.Instantiate(prefab) as GameObject;
-                prefab.SetActive(false);
+                var instance = GameObject.Instantiate(prefabAsset) as GameObject;
+                prefabAsset.SetActive(false);
                 loadCompleteCb?.Invoke(instance);
                 return true;
             }

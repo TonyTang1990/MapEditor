@@ -9,8 +9,7 @@
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProductVersion>10.0.20506</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
-    <RootNamespace>
-    </RootNamespace>
+    <RootNamespace></RootNamespace>
     <ProjectGuid>{8FDB5A40-4C78-576C-FBF9-6CA5ED291819}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
@@ -59,82 +58,93 @@
     <Analyzer Include="G:\Software\VisualStudio\VS2022\Install\Common7\IDE\Extensions\Microsoft\Visual Studio Tools for Unity\Analyzers\Microsoft.Unity.Analyzers.dll" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Assets\Scripts\Game\ECS\Entity\BaseActorEntity.cs" />
-    <Compile Include="Assets\Scripts\Game\ECS\Entity\BaseBindEntity.cs" />
-    <Compile Include="Assets\Scripts\Game\ECS\Entity\BaseEntity.cs" />
-    <Compile Include="Assets\Scripts\Game\ECS\Entity\EntityType.cs" />
-    <Compile Include="Assets\Scripts\Game\ECS\MapGame\Entity\CameraEntity.cs" />
-    <Compile Include="Assets\Scripts\Game\ECS\MapGame\Entity\MonsterEntity.cs" />
-    <Compile Include="Assets\Scripts\Game\ECS\MapGame\Entity\PlayerEntity.cs" />
-    <Compile Include="Assets\Scripts\Game\ECS\MapGame\Entity\TrapEntity.cs" />
-    <Compile Include="Assets\Scripts\Game\ECS\MapGame\Entity\TreasureBoxEntity.cs" />
-    <Compile Include="Assets\Scripts\Game\ECS\MapGame\System\ActorSyncSystem.cs" />
-    <Compile Include="Assets\Scripts\Game\ECS\MapGame\System\CameraFollowSystem.cs" />
-    <Compile Include="Assets\Scripts\Game\ECS\MapGame\System\InputControlSystem.cs" />
-    <Compile Include="Assets\Scripts\Game\ECS\MapGame\System\PlayerSpawnSystem.cs" />
-    <Compile Include="Assets\Scripts\Game\ECS\MapGame\World\MapGameWorld.cs" />
-    <Compile Include="Assets\Scripts\Game\ECS\System\BaseSystem.cs" />
-    <Compile Include="Assets\Scripts\Game\ECS\System\SystemManager.cs" />
-    <Compile Include="Assets\Scripts\Game\ECS\System\SystemNames.cs" />
-    <Compile Include="Assets\Scripts\Game\ECS\World\BaseWorld.cs" />
-    <Compile Include="Assets\Scripts\Game\ECS\World\WorldManager.cs" />
-    <Compile Include="Assets\Scripts\Game\ECS\World\WorldNames.cs" />
-    <Compile Include="Assets\Scripts\Game\MapGameConst.cs" />
-    <Compile Include="Assets\Scripts\Game\UI\BaseUI.cs" />
-    <Compile Include="Assets\Scripts\Game\UI\MainUI.cs" />
-    <Compile Include="Assets\Scripts\Map\MapFoldType.cs" />
-    <Compile Include="Assets\Scripts\Map\MapFoldTypeData.cs" />
     <Compile Include="Assets\Scripts\Utilities\FolderUtilities.cs" />
     <Compile Include="Assets\Scripts\Map\MapData\MapDataConfig.cs" />
     <Compile Include="Assets\Scripts\Map\MapData\MonsterMapData.cs" />
+    <Compile Include="Assets\Scripts\Game\ECS\Entity\BaseActorEntity.cs" />
     <Compile Include="Assets\GameLauncher.cs" />
     <Compile Include="Assets\Scripts\Core\Collision\Collision2D\Circle2D.cs" />
     <Compile Include="Assets\Scripts\Map\MapObject\MapObjectType.cs" />
     <Compile Include="Assets\Scripts\Core\Collision\Collision3D\Collision3DUtilities.cs" />
     <Compile Include="Assets\Scripts\Map\MapObject\MapObjectDataMono.cs" />
+    <Compile Include="Assets\Scripts\Game\ECS\Entity\BaseBindEntity.cs" />
+    <Compile Include="Assets\Scripts\Game\ECS\World\BaseWorld.cs" />
     <Compile Include="Assets\Scripts\Map\MapData\MapDataType.cs" />
+    <Compile Include="Assets\Scripts\Game\ECS\World\WorldManager.cs" />
     <Compile Include="Assets\Scripts\Map\MapObject\MapObjectTypeConfig.cs" />
     <Compile Include="Assets\Scripts\Map\Level\LevelMapData.cs" />
+    <Compile Include="Assets\Scripts\Game\ECS\MapGame\Entity\MonsterEntity.cs" />
+    <Compile Include="Assets\Scripts\Game\ECS\MapGame\Entity\TrapEntity.cs" />
     <Compile Include="Assets\Scripts\Core\Collision\Collision2D\VisibleDraw\Polygon2DVisible.cs" />
     <Compile Include="Assets\Scripts\Core\Collision\Collision3D\VisibleDraw\Sphere3DVisible.cs" />
+    <Compile Include="Assets\Scripts\Core\Pool\ObjectFactory.cs" />
+    <Compile Include="Assets\Scripts\Map\MapFoldTypeData.cs" />
     <Compile Include="Assets\Scripts\Map\MapData\PlayerSpawnMapData.cs" />
     <Compile Include="Assets\Scripts\Core\Extension\StringExt.cs" />
     <Compile Include="Assets\Scripts\Utilities\Vector3Utilities.cs" />
     <Compile Include="Assets\Scripts\Core\Collision\Collision2D\VisibleDraw\Sector2DVisible.cs" />
     <Compile Include="Assets\Scripts\Map\MapObject\MapObjectConfig.cs" />
+    <Compile Include="Assets\Scripts\Game\ECS\MapGame\Entity\TreasureBoxEntity.cs" />
+    <Compile Include="Assets\Scripts\Game\ECS\MapGame\Entity\PlayerEntity.cs" />
     <Compile Include="Assets\Scripts\Utilities\CameraUtilities.cs" />
+    <Compile Include="Assets\Scripts\Map\MapExport\MapExport.cs" />
     <Compile Include="Assets\Scripts\Utilities\UnityUtilities.cs" />
     <Compile Include="Assets\Scripts\Core\Collision\Collision2D\Sector2D.cs" />
+    <Compile Include="Assets\Scripts\Game\ECS\System\SystemManager.cs" />
+    <Compile Include="Assets\Scripts\Map\MapExport\TrapMapDataExport.cs" />
     <Compile Include="Assets\Scripts\Map\MapSetting.cs" />
     <Compile Include="Assets\Scripts\Map\MapUtilities.cs" />
+    <Compile Include="Assets\Scripts\Map\MapExport\MapObjectExport.cs" />
+    <Compile Include="Assets\Scripts\Map\MapExport\TreasureBoxMapDataExport.cs" />
     <Compile Include="Assets\Scripts\Core\Collision\Collision2D\Collision2DUtilities.cs" />
+    <Compile Include="Assets\Scripts\Game\ECS\Entity\BaseEntity.cs" />
     <Compile Include="Assets\Scripts\Map\MapObject\ColliderDataMono.cs" />
     <Compile Include="Assets\Scripts\Core\Collision\Collision3D\Sphere3D.cs" />
+    <Compile Include="Assets\Scripts\Game\ECS\Entity\EntityType.cs" />
+    <Compile Include="Assets\Scripts\Core\Singleton\SingletonMonoBehaviourTemplate.cs" />
     <Compile Include="Assets\Scripts\Core\Collision\MeshUtilities.cs" />
     <Compile Include="Assets\Scripts\Game\MapGameManager.cs" />
     <Compile Include="Assets\Scripts\Core\Collision\Collision2D\VisibleDraw\OBB2DVisible.cs" />
     <Compile Include="Assets\Scripts\Map\MapData\MapData.cs" />
     <Compile Include="Assets\Scripts\Core\Collision\Collision2D\VisibleDraw\Circle2DVisible.cs" />
+    <Compile Include="Assets\Scripts\Game\ECS\MapGame\World\MapGameWorld.cs" />
     <Compile Include="Assets\Scripts\Core\Extension\GameObjectExtension.cs" />
+    <Compile Include="Assets\Scripts\Core\Pool\PoolManager.cs" />
     <Compile Include="Assets\Scripts\Core\Collision\Collision2D\OBB2D.cs" />
     <Compile Include="Assets\Scripts\Map\MapExport\ExportType.cs" />
+    <Compile Include="Assets\Scripts\Game\MapGameConst.cs" />
+    <Compile Include="Assets\Scripts\Game\ECS\System\BaseSystem.cs" />
     <Compile Include="Assets\Scripts\Core\Collision\Collision2D\AABB2D.cs" />
+    <Compile Include="Assets\Scripts\Map\MapFoldType.cs" />
+    <Compile Include="Assets\Scripts\Core\Singleton\SingletonTemplate.cs" />
+    <Compile Include="Assets\Scripts\Game\ECS\MapGame\System\ActorSyncSystem.cs" />
     <Compile Include="Assets\Scripts\Core\Collision\Collision2D\VisibleDraw\AABB2DVisible.cs" />
     <Compile Include="Assets\Scripts\Game\GameManager.cs" />
+    <Compile Include="Assets\Scripts\Map\MapExport\MonsterMapDataExport.cs" />
     <Compile Include="Assets\Scripts\Map\Map.cs" />
+    <Compile Include="Assets\Scripts\Game\ECS\MapGame\System\PlayerSpawnSystem.cs" />
     <Compile Include="Assets\Scripts\Core\Collision\Collision2D\VisibleDraw\Capsule2DVisible.cs" />
+    <Compile Include="Assets\Scripts\Game\UI\MainUI.cs" />
+    <Compile Include="Assets\Scripts\Map\MapExport\BaseMapDataExport.cs" />
+    <Compile Include="Assets\Scripts\Game\ECS\MapGame\System\CameraFollowSystem.cs" />
+    <Compile Include="Assets\Scripts\Game\UI\BaseUI.cs" />
+    <Compile Include="Assets\Scripts\Game\ECS\MapGame\System\InputControlSystem.cs" />
     <Compile Include="Assets\Scripts\Map\MapData\TrapMapData.cs" />
     <Compile Include="Assets\Scripts\Map\MapData\MapDataSetting.cs" />
     <Compile Include="Assets\Scripts\Map\MapObject\MapObjectSetting.cs" />
     <Compile Include="Assets\Scripts\Utilities\PathUtilities.cs" />
     <Compile Include="Assets\Scripts\Map\MapData\TreasureBoxMapData.cs" />
     <Compile Include="Assets\Scripts\Map\MapConst.cs" />
+    <Compile Include="Assets\Scripts\Map\MapExport\MapDataExport.cs" />
     <Compile Include="Assets\Scripts\Camera\CameraAreaVisualizationMono.cs" />
+    <Compile Include="Assets\Scripts\Game\ECS\System\SystemNames.cs" />
+    <Compile Include="Assets\Scripts\Game\ECS\MapGame\Entity\CameraEntity.cs" />
+    <Compile Include="Assets\Scripts\Game\ECS\World\WorldNames.cs" />
+    <Compile Include="Assets\Scripts\Core\Pool\ObjectPool.cs" />
     <Compile Include="Assets\Scripts\Core\Collision\Collision2D\Polygon2D.cs" />
     <Compile Include="Assets\Scripts\Core\Collision\Collision2D\Capsule2D.cs" />
+    <Compile Include="Assets\Scripts\Core\Pool\GameObjectPool.cs" />
     <Compile Include="Assets\Scripts\Map\MapObject\MapObjectData.cs" />
-    <Compile Include="Assets\Scripts\Core\Singleton\SingletonTemplate.cs" />
-    <Compile Include="Assets\Scripts\Core\Singleton\SingletonMonoBehaviourTemplate.cs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="UnityEngine">
@@ -1049,8 +1059,16 @@
       <HintPath>Library\ScriptAssemblies\Unity.EditorCoroutines.Editor.dll</HintPath>
       <Private>False</Private>
     </Reference>
+    <Reference Include="Cinemachine">
+      <HintPath>Library\ScriptAssemblies\Cinemachine.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
     <Reference Include="Unity.Services.Core.Analytics">
       <HintPath>Library\ScriptAssemblies\Unity.Services.Core.Analytics.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="com.unity.cinemachine.editor">
+      <HintPath>Library\ScriptAssemblies\com.unity.cinemachine.editor.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="Unity.VisualScripting.Shared.Editor">
@@ -1082,7 +1100,8 @@
       <Private>False</Private>
     </Reference>
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Target Name="GenerateTargetFrameworkMonikerAttribute" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it.
