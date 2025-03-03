@@ -287,8 +287,8 @@ namespace MapEditor
             mapExport.MapData.Height = map.MapHeight;
             mapExport.MapData.StartPos = map.MapStartPos;
 
-            //UpdateMapExportByObjects(mapExport, map.MapObjectDataList);
-            UpdateMapExportByMapDatas(mapExport, map.MapDataList);
+            //UpdateMapExportByObjects(mapExport, map);
+            UpdateMapExportByMapDatas(mapExport, map);
             return mapExport;
         }
 
@@ -298,14 +298,14 @@ namespace MapEditor
         /// 指定地图对象数列表更新地图导出数据
         /// </summary>
         /// <param name="mapExport"></param>
-        /// <param name="mapObjectDatas"></param>
-        // private static void UpdateMapExportByObjects(MapExport mapExport, List<MapObjectData> mapObjectDatas)
+        /// <param name="map"></param>
+        // private static void UpdateMapExportByObjects(MapExport mapExport, Map map)
         // {
-        //     if(mapObjectDatas == null)
+        //     if(map?.MapObjectDataList == null)
         //     {
         //         return;
         //     }
-        //     foreach (var mapObjectData in mapObjectDatas)
+        //     foreach (var mapObjectData in map.MapObjectDataList)
         //     {
         //         var mapObjectUID = mapObjectData.UID;
         //         var mapObjectConfig = MapSetting.GetEditorInstance().ObjectSetting.GetMapObjectConfigByUID(mapObjectUID);
@@ -323,13 +323,14 @@ namespace MapEditor
         /// 指定地图埋点数据列表更新地图导出数据
         /// </summary>
         /// <param name="mapExport"></param>
-        /// <param name="mapDatas"></param>
-        private static void UpdateMapExportByMapDatas(MapExport mapExport, List<MapData> mapDatas)
+        /// <param name="map"></param>
+        private static void UpdateMapExportByMapDatas(MapExport mapExport, Map map)
         {
-            if(mapDatas == null)
+            if(map?.MapDataList == null)
             {
                 return;
             }
+            var mapDatas = map.MapDataList;
             var mapDataTypeDatasMap = GetMapDataTypeDatas(mapDatas);
             List<MapData> playerSpawnDatas;
             if (mapDataTypeDatasMap.TryGetValue(MapDataType.PlayerSpawn, out playerSpawnDatas))
