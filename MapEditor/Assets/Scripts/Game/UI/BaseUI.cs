@@ -58,7 +58,7 @@ public abstract class BaseUI
     /// <param name="parent"></param>
     protected void LoadRes(Transform parent)
     {
-        var uiPrefabPath = $"{MapGameConst.UIPrefabFolderPath}/{UIName}.prefab";
+        var uiPrefabPath = $"{MapGameConst.UIPrefabFolderPath}/{UIName}";
         Instance = Resources.Load<GameObject>(uiPrefabPath);
         Instance.transform.SetParent(parent);
         OnLoadResComplete();

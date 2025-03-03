@@ -15,17 +15,17 @@ public static class MapGameConst
     /// <summary>
     /// UI根预制件路径
     /// </summary>
-    public const string UIRootPrefabPath = "Common/UIRoot.prefab";
+    public const string UIRootPrefabPath = "Common/UIRoot";
 
     /// <summary>
     /// 地图预制体路径
     /// </summary>
-    public const string MapPrefabPath = "Maps/Level1/Level1.prefab";
+    public const string MapPrefabPath = "Maps/Level1/Level1";
 
     /// <summary>
     /// 地图配置路径
     /// </summary>
-    public const string LevelConfigPath = "MapExport/Json/Level1.json";
+    public const string LevelConfigPath = "MapExport/Json/Level1";
 
     /// <summary>
     /// UI窗口预制件目录路径
@@ -35,7 +35,7 @@ public static class MapGameConst
     /// <summary>
     /// 玩家预制件路径
     /// </summary>
-    public const string PlayerPrefabPath = "MapObjects/Player/Player.prefab";
+    public const string PlayerPrefabPath = "MapObjects/Player/Player";
 
     /// <summary>
     /// 角色移动最大Hit距离
