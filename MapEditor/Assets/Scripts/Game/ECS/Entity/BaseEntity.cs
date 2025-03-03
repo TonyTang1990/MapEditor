@@ -1,4 +1,4 @@
-/**
+﻿/**
  * @ Author: TONYTANG
  * @ Create Time: 2025-02-17 16:25:59
  * @ Modified by: TONYTANG
@@ -30,7 +30,7 @@ public abstract class BaseEntity : IRecycle
     public EntityType EntityType
     {
         get;
-        private set;
+        protected set;
     }
 
     /// <summary>

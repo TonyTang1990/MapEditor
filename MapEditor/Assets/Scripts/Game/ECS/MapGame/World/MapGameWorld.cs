@@ -6,11 +6,9 @@
 * @ Description:
 */
 
+using Cinemachine;
 using MapEditor;
-using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Resources;
+using UnityEngine;
 
 /// <summary>
 /// MapGameWorld.cs
@@ -136,7 +134,7 @@ public class MapGameWorld : BaseWorld
     /// </summary>
     private void LoadUIRoot()
     {
-        UIRoot = Resoures.Load<GameObject>(MapGameConst.UIRootPrefabPath);
+        UIRoot = Resources.Load<GameObject>(MapGameConst.UIRootPrefabPath);
         var uiRootTransform = UIRoot.transform;
         uiRootTransform.position = new Vector3(0, 500, 0);
         UICamera = uiRootTransform.Find("UICamera").GetComponent<Camera>();

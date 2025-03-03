@@ -9,8 +9,7 @@
 using MapEditor;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
-using System.Numerics;
+using UnityEngine;
 
 // Note:
 // 这里的BaseWorld,BaseSystem和BaseEntity并非完整的ECS模式
@@ -36,7 +35,7 @@ public abstract class BaseWorld
     /// 世界根节点GameObject
     /// </summary>
     protected GameObject mWorldRootGo;
-    #region
+    #endregion
 
     #region System成员定义部分开始
     /// <summary>
@@ -514,7 +513,7 @@ public abstract class BaseWorld
     public T CreateEtity<T>(params object[] parameters) where T : BaseEntity, new()
     {
         var entityType = typeof(T);
-        T entity = ObjectPool.Singleton.pop<T>();
+        T entity = ObjectPool.Singleton.Pop<T>();
         var entityUuid = GetNextEntityUuid();
         entity.Init(entityUuid, parameters);
         if (MapConst.BaseActorEntityType.IsAssignableFrom(entityType))
@@ -597,7 +596,7 @@ public abstract class BaseWorld
     /// <returns></returns>
     protected PlayerEntity CreatePlayerEntity(params object[] parameters)
     {
-        var entity = ObjectPool.Singleton.pop<PlayerEntity>();
+        var entity = ObjectPool.Singleton.Pop<PlayerEntity>();
         var entityUuid = GetNextEntityUuid();
         entity.Init(entityUuid, parameters);
         var parent = GetEntityTypeParent(entity.EntityType);

@@ -113,7 +113,7 @@ public class GameObjectPool
     {
         if (instance == null)
         {
-            DIYLog.LogError("不能缓存为null的实例对象!");
+            Debug.LogError("不能缓存为null的实例对象!");
             return;
         }
 
@@ -157,7 +157,7 @@ public class GameObjectPool
     {
         if (template == null)
         {
-            DIYLog.LogError("模板对象不能为空，无法弹出正确对象!");
+            Debug.LogError("模板对象不能为空，无法弹出正确对象!");
             return null;
         }
         else
@@ -204,7 +204,7 @@ public class GameObjectPool
         }
         else
         {
-            DIYLog.LogError(string.Format("找不到InstanceID : {0}的缓存对象！", instanceid));
+            Debug.LogError(string.Format("找不到InstanceID : {0}的缓存对象！", instanceid));
         }
     }
 

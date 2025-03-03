@@ -6,10 +6,7 @@
 
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
-using System.Drawing;
 using System.IO;
-using System.Text;
 using System.Threading.Tasks;
 using Unity.AI.Navigation;
 using Unity.AI.Navigation.Editor;
@@ -1090,7 +1087,7 @@ namespace MapEditor
         /// </summary>
         /// <param name="mapGo"></param>
         /// <returns></returns>
-        public static Transform GetOrCreateGameVirtualCameraNode(GameObjectExtension mapGo)
+        public static Transform GetOrCreateGameVirtualCameraNode(GameObject mapGo)
         {
             if(mapGo == null)
             {
