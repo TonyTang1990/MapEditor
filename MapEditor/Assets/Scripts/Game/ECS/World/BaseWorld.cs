@@ -515,7 +515,8 @@ public abstract class BaseWorld
         var entityType = typeof(T);
         T entity = ObjectPool.Singleton.Pop<T>();
         var entityUuid = GetNextEntityUuid();
-        entity.Init(entityUuid, parameters);
+        entity.SetUuid(entityUuid);
+        entity.Init(parameters);
         if (MapConst.BaseActorEntityType.IsAssignableFrom(entityType))
         {
             var parent = GetEntityTypeParent(entity.EntityType);

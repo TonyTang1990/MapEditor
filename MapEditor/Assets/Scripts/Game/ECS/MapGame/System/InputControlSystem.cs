@@ -23,19 +23,19 @@ public class InputControlSystem : BaseSystem
     public override void Update(float deltaTime)
     {
         base.Update(deltaTime);
-        if(Input.GetButtonDown("W"))
+        if(Input.GetKey("w"))
         {
             MoveUp(deltaTime);
         }
-        else if (Input.GetButtonDown("S"))
+        if (Input.GetKey("s"))
         {
             MoveDown(deltaTime);
         }
-        else if (Input.GetButtonDown("A"))
+        if (Input.GetKey("a"))
         {
             MoveLeft(deltaTime);
         }
-        else if (Input.GetButtonDown("D"))
+        if (Input.GetKey("d"))
         {
             MoveRight(deltaTime);
         }
@@ -52,8 +52,7 @@ public class InputControlSystem : BaseSystem
         {
             return;
         }
-        var mapGameWorld = OwnerWorld as MapGameWorld;
-        var playerMoveSpeed = mapGameWorld.PlayerMoveSpeed;
+        var playerMoveSpeed = MapGameManager.Singleton.PlayerMoveSpeed;
         var playerOldPosition = firstPlayerEntity.Position;
         firstPlayerEntity.SetPosition(playerOldPosition.x, playerOldPosition.y, playerOldPosition.z + playerMoveSpeed * deltaTime);
     }
@@ -69,8 +68,7 @@ public class InputControlSystem : BaseSystem
         {
             return;
         }
-        var mapGameWorld = OwnerWorld as MapGameWorld;
-        var playerMoveSpeed = mapGameWorld.PlayerMoveSpeed;
+        var playerMoveSpeed = MapGameManager.Singleton.PlayerMoveSpeed;
         var playerOldPosition = firstPlayerEntity.Position;
         firstPlayerEntity.SetPosition(playerOldPosition.x, playerOldPosition.y, playerOldPosition.z - playerMoveSpeed * deltaTime);
     }
@@ -86,8 +84,7 @@ public class InputControlSystem : BaseSystem
         {
             return;
         }
-        var mapGameWorld = OwnerWorld as MapGameWorld;
-        var playerMoveSpeed = mapGameWorld.PlayerMoveSpeed;
+        var playerMoveSpeed = MapGameManager.Singleton.PlayerMoveSpeed;
         var playerOldPosition = firstPlayerEntity.Position;
         firstPlayerEntity.SetPosition(playerOldPosition.x - playerMoveSpeed * deltaTime, playerOldPosition.y, playerOldPosition.z);
     }
@@ -103,8 +100,7 @@ public class InputControlSystem : BaseSystem
         {
             return;
         }
-        var mapGameWorld = OwnerWorld as MapGameWorld;
-        var playerMoveSpeed = mapGameWorld.PlayerMoveSpeed;
+        var playerMoveSpeed = MapGameManager.Singleton.PlayerMoveSpeed;
         var playerOldPosition = firstPlayerEntity.Position;
         firstPlayerEntity.SetPosition(playerOldPosition.x + playerMoveSpeed * deltaTime, playerOldPosition.y, playerOldPosition.z);
     }

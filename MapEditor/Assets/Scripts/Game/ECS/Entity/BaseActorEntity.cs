@@ -121,7 +121,7 @@ public abstract class BaseActorEntity : BaseEntity
     public override void Init(params object[] parameters)
     {
         base.Init(parameters);
-        PrefabPath = (string)parameters[1];
+        PrefabPath = (string)parameters[0];
     }
 
     /// <summary>

@@ -104,8 +104,7 @@ public class MainUI : BaseUI
     /// </summary>
     private void UpdateCameraAreaInfoss()
     {
-        var gameMapWorld = WorldManager.Singleton.GetWorld<MapGameWorld>(WorldNames.MapGameWorldName);
-        var mainCamera = gameMapWorld.MainCamera;
+        var mainCamera = MapGameManager.Singleton.MainCamera;
         CameraUtilities.GetCameraVisibleArea(mainCamera, Vector3.zero, Vector3.up, ref mCameraAreaPointsList);
         if (mCameraAreaPointsList.Count > 0)
         {

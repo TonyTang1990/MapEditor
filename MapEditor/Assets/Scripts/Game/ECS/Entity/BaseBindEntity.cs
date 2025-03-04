@@ -120,8 +120,8 @@ public abstract class BaseBindEntity : BaseEntity
     public override void Init(params object[] parameters)
     {
         base.Init(parameters);
-        BindGo = (GameObject)parameters[1];
-        IsAutoDestroyBindGo = (bool)parameters[2];
+        BindGo = (GameObject)parameters[0];
+        IsAutoDestroyBindGo = (bool)parameters[1];
     }
 
     /// <summary>

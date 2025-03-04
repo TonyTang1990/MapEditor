@@ -74,13 +74,20 @@ public abstract class BaseEntity : IRecycle
     }
 
     /// <summary>
+    /// 设置Uuid
+    /// </summary>
+    /// <param name="uuid"></param>
+    public void SetUuid(int uuid)
+    {
+        Uuid = uuid;
+    }
+
+    /// <summary>
     /// 初始化(子类重写)
     /// </summary>
     /// <param name="parameters">初始化参数</param>
     public virtual void Init(params object[] parameters)
     {
-        var uuid = (int)parameters[0];
-        Uuid = uuid;
     }
 
     /// <summary>

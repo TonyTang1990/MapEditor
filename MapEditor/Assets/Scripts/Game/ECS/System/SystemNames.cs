@@ -16,7 +16,22 @@ using System.Collections.Generic;
 public static class SystemNames
 {
     /// <summary>
+    /// 操作控制系统名
+    /// </summary>
+    public const string InputControlSystemName = "InputControlSystem";
+
+    /// <summary>
     /// 玩家生成系统名
     /// </summary>
     public const string PlayerSpawnSystemName = "PlayerSpawnSystem";
+
+    /// <summary>
+    /// 角色同步系统名
+    /// </summary>
+    public const string ActorSyncSystemName = "ActorSyncSystem";
+
+    /// <summary>
+    /// 摄像机跟随系统名
+    /// </summary>
+    public const string CameraFollowSystemName = "stringCameraFollowSystem";
 }

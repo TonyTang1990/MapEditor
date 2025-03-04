@@ -50,7 +50,7 @@ public class GameManager : SingletonTemplate<GameManager>
     /// <summary>
     /// 单帧时长
     /// </summary>
-    private const float LogicFrameTime = 1 / LogicFrameRate;
+    private const float LogicFrameTime = 1f / LogicFrameRate;
 
     /// <summary>
     /// 渲染帧数
