@@ -6,6 +6,10 @@
  * @ Description:
  */
 
+
+
+
+
 // Note:
 // 这里的BaseWorld,BaseSystem和BaseEntity并非完整的ECS模式
 // 只是设计上借鉴ECS的概念设计
@@ -65,7 +69,7 @@ public abstract class BaseSystem
     /// </summary>
     public virtual void OnEnable()
     {
-
+        Debug.Log($"世界名:{OwnerWorld.WorldName}的系统名:{SystemName}被激活！");
     }
 
     /// <summary>
@@ -73,7 +77,7 @@ public abstract class BaseSystem
     /// </summary>
     public virtual void OnAddToWorld()
     {
-
+        Debug.Log($"世界名:{OwnerWorld.WorldName}的系统名:{SystemName}被添加到世界！");
     }
 
     /// <summary>
@@ -81,7 +85,7 @@ public abstract class BaseSystem
     /// </summary>
     public virtual void OnDisable()
     {
-
+        Debug.Log($"世界名:{OwnerWorld.WorldName}的系统名:{SystemName}被取消激活！");
     }
 
     /// <summary>
@@ -89,7 +93,7 @@ public abstract class BaseSystem
     /// </summary>
     public virtual void OnRemoveFromWorld()
     {
-
+        Debug.Log($"世界名:{OwnerWorld.WorldName}的系统名:{SystemName}被从世界移除！");
     }
 
     /// <summary>

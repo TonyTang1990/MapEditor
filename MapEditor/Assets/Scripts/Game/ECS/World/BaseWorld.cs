@@ -9,6 +9,7 @@
 using MapEditor;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using UnityEngine;
 
 // Note:
@@ -326,7 +327,7 @@ public abstract class BaseWorld
     /// <param name="system"></param>
     protected virtual void OnAddSystem(BaseSystem system)
     {
-
+        Debug.Log($"世界名:{WorldName}响应添加系统名:{system.SystemName}");
     }
 
     /// <summary>
@@ -335,7 +336,7 @@ public abstract class BaseWorld
     /// <param name="system"></param>
     protected virtual void OnRemoveSystem(BaseSystem system)
     {
-
+        Debug.Log($"世界名:{WorldName}响应移除系统名:{system.SystemName}");
     }
 
     /// <summary>
