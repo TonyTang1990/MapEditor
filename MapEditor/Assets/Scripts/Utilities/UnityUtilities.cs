@@ -6,6 +6,7 @@
 
 using System.Collections;
 using System.Collections.Generic;
+using System.Numerics;
 using UnityEngine;
 
 /// <summary>
@@ -31,6 +32,12 @@ public static class UnityUtilities
         {
             return bounds;
         }
+        // 物体缩放或旋转后MeshRenderer返回的bounds有问题
+        // 所以在计算之前需要排除缩放和旋转影响因素
+        var preEulerAngles = gameObject.transform.eulerAngles;
+        gameObject.transform.eulerAngles = Vector3.zero;
+        var preLocalScale = gameObject.transform.localScale;
+        gameObject.transform.localScale = Vector3.one;
         bounds.center = gameObject.transform.position;
         foreach(var renderer in renderers)
         {
@@ -38,6 +45,8 @@ public static class UnityUtilities
         }
         // 忽略位置带来的偏移影响
         bounds.center -= gameObject.transform.position;
+        gameObject.transform.eulerAngles = preEulerAngles;
+        gameObject.transform.localScale = preLocalScale;
         return bounds;
     }
 }
