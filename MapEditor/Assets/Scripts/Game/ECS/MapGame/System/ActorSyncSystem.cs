@@ -19,9 +19,9 @@ public class ActorSyncSystem : BaseSystem
     /// Update
     /// </summary>
     /// <param name="deltaTime"></param>
-    public override void Update(float deltaTime)
+    public override void Process(float deltaTime)
     {
-        base.Update(deltaTime);
+        base.Process(deltaTime);
         var allEntity = OwnerWorld.GetAllEntity();
         foreach ( var entity in allEntity )
         {

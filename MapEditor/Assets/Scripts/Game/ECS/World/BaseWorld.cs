@@ -14,7 +14,7 @@ using UnityEngine;
 
 // Note:
 // 这里的BaseWorld,BaseSystem和BaseEntity并非完整的ECS模式
-// 只是设计上借鉴ECS的概念设计
+// 只是设计上借鉴ECS的概念设计，参考的tiny-ecs设计
 
 /// <summary>
 /// BaseWorld.cs
@@ -52,9 +52,24 @@ public abstract class BaseWorld
     protected List<BaseSystem> mAllSystems;
 
     /// <summary>
-    /// 所有更新的系统名列表
+    /// 等待添加的系统列表
     /// </summary>
-    protected List<string> mAllUpdateSystemNames;
+    protected List<BaseSystem> mWaitAddSystems;
+
+    /// <summary>
+    /// 临时等待添加系统列表
+    /// </summary>
+    protected List<BaseSystem> mTempWaitAddSystems;
+
+    /// <summary>
+    /// 等待移除的系统列表
+    /// </summary>
+    protected List<BaseSystem> mWaitRemoveSystems;
+
+    /// <summary>
+    /// 临时等待移除系统列表
+    /// </summary>
+    protected List<BaseSystem> mTempWaitRemoveSystems;
     #endregion
 
     #region Entity成员定义开始
@@ -91,6 +106,26 @@ public abstract class BaseWorld
     protected Dictionary<EntityType, List<BaseEntity>> mEntityTypeMap;
 
     /// <summary>
+    /// 等待添加的Entity列表
+    /// </summary>
+    protected List<BaseEntity> mWaitAddEntities;
+
+    /// <summary>
+    /// 临时等待添加Entity列表
+    /// </summary>
+    protected List<BaseEntity> mTempWaitAddEntities;
+
+    /// <summary>
+    /// 等待移除的Entity列表
+    /// </summary>
+    protected List<BaseEntity> mWaitRemoveEntities;
+
+    /// <summary>
+    /// 临时等待移除Entity列表
+    /// </summary>
+    protected List<BaseEntity> mTempWaitRemoveEntities;
+
+    /// <summary>
     /// 玩家Entity类型信息
     /// </summary>
     protected readonly Type PlayerEntityType = typeof(PlayerEntity);
@@ -101,11 +136,19 @@ public abstract class BaseWorld
     {
         mAllSystemMap = new Dictionary<string, BaseSystem>();
         mAllSystems = new List<BaseSystem>();
-        mAllUpdateSystemNames = new List<string>();
+        mWaitAddSystems = new List<BaseSystem>();
+        mTempWaitAddSystems = new List<BaseSystem>();
+        mWaitRemoveSystems = new List<BaseSystem>();
+        mTempWaitRemoveSystems = new List<BaseSystem>();
+
         mNextEntityUuid = 1;
         mEntityMap = new Dictionary<int, BaseEntity>();
         mAllEntity = new List<BaseEntity>();
         mEntityTypeMap = new Dictionary<EntityType, List<BaseEntity>>();
+        mWaitAddEntities = new List<BaseEntity>();
+        mTempWaitAddEntities = new List<BaseEntity>();
+        mWaitRemoveEntities = new List<BaseEntity>();
+        mTempWaitRemoveEntities = new List<BaseEntity>();
     }
 
     /// <summary>
@@ -134,6 +177,8 @@ public abstract class BaseWorld
     {
         DestroyAllEntity();
         RemoveAllSystem();
+        ManagerSystems();
+        ManagerEntities();
         DestroyEntityRoot();
         DestroyWorldRoot();
     }
@@ -144,11 +189,103 @@ public abstract class BaseWorld
     /// <param name="deltaTime"></param>
     public virtual void Update(float deltaTime)
     {
-        UpdateAllUpdateSystemNames();
-        foreach (var updateSystemName in mAllUpdateSystemNames)
+        ManagerSystems();
+        ManagerEntities();
+
+        ManagerSystemsUpdate(deltaTime);
+        foreach (var system in mAllSystems)
         {
-            var system = GetSystem<BaseSystem>(updateSystemName);
-            system?.Update(deltaTime);
+            if(system == null)
+            {
+                continue;
+            }
+            system.Process(deltaTime);
+        }
+    }
+
+    /// <summary>
+    /// 处理System增删
+    /// </summary>
+    protected void ManagerSystems()
+    {
+        // 先处理移除系统，再处理新增系统
+        mTempWaitRemoveSystems.Clear();
+        mTempWaitRemoveSystems.AddRange(mWaitRemoveSystems);
+        mWaitRemoveSystems.Clear();
+
+        mTempWaitAddSystems.Clear();
+        mTempWaitAddSystems.AddRange(mWaitAddSystems);
+        mWaitAddSystems.Clear();
+
+        if(mTempWaitRemoveSystems.Count == 0 && mTempWaitAddSystems.Count == 0)
+        {
+            return;
+        }
+
+        foreach(var waitRemoveSystem in mTempWaitRemoveSystems)
+        {
+            DoRemoveSystem(waitRemoveSystem);
+        }
+
+        foreach (var waitAddSystem in mTempWaitAddSystems)
+        {
+            DoAddSystem(waitAddSystem);
+        }
+    }
+
+    /// <summary>
+    /// 处理Entity增删
+    /// </summary>
+    protected void ManagerEntities()
+    {
+        // 先处理新增Entity，再处理删除Entity
+        mTempWaitRemoveEntities.Clear();
+        mTempWaitRemoveEntities.AddRange(mWaitRemoveEntities);
+        mWaitRemoveEntities.Clear();
+
+        mTempWaitAddEntities.Clear();
+        mTempWaitAddEntities.AddRange(mWaitAddEntities);
+        mWaitAddEntities.Clear();
+
+        if (mTempWaitRemoveEntities.Count == 0 && mTempWaitAddEntities.Count == 0)
+        {
+            return;
+        }
+
+        foreach (var waitAddEntity in mTempWaitAddEntities)
+        {
+            DoAddEntity(waitAddEntity);
+        }
+
+        foreach (var waitRemoveEntity in mTempWaitAddEntities)
+        {
+            DoDestroyEntity(waitRemoveEntity);
+        }
+    }
+
+    /// <summary>
+    /// 处理System更新
+    /// </summary>
+    /// <param name="deltaTime"></param>
+    protected void ManagerSystemsUpdate(float deltaTime)
+    {
+        foreach(var system in mAllSystems)
+        {
+            if(system == null)
+            {
+                continue;
+            }
+            system.PreProcess(deltaTime);
+
+            foreach(var entity in mAllEntity)
+            {
+                if(system.Filter(entity))
+                {
+                    system.Process(entity, deltaTime);
+                }
+            }
+
+            system.PostProcess(deltaTime);
         }
     }
 
@@ -157,10 +294,8 @@ public abstract class BaseWorld
     /// </summary>
     public virtual void LogicUpdate()
     {
-        UpdateAllUpdateSystemNames();
-        foreach (var updateSystemName in mAllUpdateSystemNames)
+        foreach (var system in mAllSystems)
         {
-            var system = GetSystem<BaseSystem>(updateSystemName);
             system?.LogicUpdate();
         }
     }
@@ -171,10 +306,8 @@ public abstract class BaseWorld
     /// <param name="fixedDeltaTime"></param>
     public virtual void FixedUpdate(float fixedDeltaTime)
     {
-        UpdateAllUpdateSystemNames();
-        foreach (var updateSystemName in mAllUpdateSystemNames)
+        foreach (var system in mAllSystems)
         {
-            var system = GetSystem<BaseSystem>(updateSystemName);
             system?.FixedUpdate(fixedDeltaTime);
         }
     }
@@ -185,26 +318,13 @@ public abstract class BaseWorld
     /// <param name="deltaTime"></param>
     public virtual void LateUpdate(float deltaTime)
     {
-        UpdateAllUpdateSystemNames();
-        foreach (var updateSystemName in mAllUpdateSystemNames)
-        {
-            var system = GetSystem<BaseSystem>(updateSystemName);
-            system?.LateUpdate(deltaTime);
-        }
-    }
-
-    /// <summary>
-    /// 更新所有需要更新的系统名列表
-    /// Note:
-    /// 用于确保同一帧相同Update添加的系统不参与相同Update更新导致问题
-    /// 同一帧移除的相同Update会正确移除
-    /// </summary>
-    protected void UpdateAllUpdateSystemNames()
-    {
-        mAllUpdateSystemNames.Clear();
         foreach (var system in mAllSystems)
         {
-            mAllUpdateSystemNames.Add(system.SystemName);
+            if(system == null)
+            {
+                continue;
+            }
+            system.LateUpdate(deltaTime);
         }
     }
 
@@ -270,15 +390,16 @@ public abstract class BaseWorld
             Debug.LogError($"World:{WorldName}已包含系统名:{systemName},添加指定系统类型:{sType.Name}和系统名:{systemName}失败！");
             return null;
         }
-        system = new T();
-        system.Init(this, systemName, parameters);
-        var result = AddSystem(system);
+        var result = ExistSystem(systemName);
         if (result)
         {
+            system = new T();
+            system.Init(this, systemName, parameters);
             system.Enable = true;
             system.OnEnable();
-            system.OnAddToWorld();
-            OnAddSystem(system);
+            system.AddEvents();
+            mWaitAddSystems.Add(system);
+            mWaitRemoveSystems.Remove(system);
         }
         return system;
     }
@@ -296,13 +417,39 @@ public abstract class BaseWorld
             Debug.LogError($"World:{WorldName}找不到系统名:{systemName}的系统，移除指定系统失败！");
             return false;
         }
-        mAllSystemMap.Remove(systemName);
-        mAllSystems.Remove(system);
         system.Enable = false;
         system.OnDisable();
-        system.OnRemoveFromWorld();
-        OnRemoveSystem(system);
+        mWaitRemoveSystems.Add(system);
+        mWaitAddSystems.Remove(system);
         return true;
+    }
+
+    /// <summary>
+    /// 执行指定系统移除
+    /// </summary>
+    /// <param name="system"></param>
+    /// <returns></returns>
+    protected bool DoRemoveSystem(BaseSystem system)
+    {
+        var systemName = system.SystemName;
+        mAllSystemMap.Remove(systemName);
+        var result = mAllSystems.Remove(system);
+        if(result)
+        {
+            foreach(var entity in system.SystemEntityList)
+            {
+                system.OnRemove(entity);
+            }
+            system.RemoveEvents();
+            system.OnRemoveFromWorld();
+            OnRemoveSystem(system);
+            system.RemoveAllSystemEntity();
+        }
+        else
+        {
+            Debug.LogError($"找不到系统名:{systemName}的系统，执行移除系统失败！");
+        }
+        return result;
     }
 
     /// <summary>
@@ -340,11 +487,22 @@ public abstract class BaseWorld
     }
 
     /// <summary>
-    /// 添加指定系统对象
+    /// 指定系统名是否存在
+    /// </summary>
+    /// <param name="systemName"></param>
+    /// <returns></returns>
+    protected bool ExistSystem(string systemName)
+    {
+        var targetSystem = GetSystem<BaseSystem>(systemName);
+        return targetSystem != null;
+    }
+
+    /// <summary>
+    /// 执行添加指定系统对象
     /// </summary>
     /// <param name="system"></param>
     /// <returns></returns>
-    protected bool AddSystem(BaseSystem system)
+    protected bool DoAddSystem(BaseSystem system)
     {
         if (system == null)
         {
@@ -352,20 +510,31 @@ public abstract class BaseWorld
             return false;
         }
         var systemName = system.SystemName;
-        var targetSystem = GetSystem<BaseSystem>(systemName);
-        if (targetSystem != null)
+        if (!ExistSystem(systemName))
+        {
+            mAllSystemMap.Add(systemName, targetSystem);
+            mAllSystems.Add(system);
+            system.OnAddToWorld();
+            OnAddSystem(system);
+            foreach(var entity in mAllEntity)
+            {
+                if(system.Filter(entity))
+                {
+                    system.AddSystemEntity(entity);
+                    system.OnAdd(entity);
+                }
+            }
+            return true;
+        }
+        else
         {
             Debug.LogError($"已包含系统名:{systemName}的系统，添加系统失败！");
             return false;
         }
-        mAllSystemMap.Add(systemName, targetSystem);
-        mAllSystems.Add(system);
-        return true;
     }
     #endregion
 
     #region Entity部分开始
-
     /// <summary>
     /// 创建Entity根节点GameObject
     /// </summary>
@@ -430,12 +599,12 @@ public abstract class BaseWorld
     }
 
     /// <summary>
-    /// 添加指定Entity
+    /// 执行添加指定Entity
     /// </summary>
     /// <typeparam name="T"></typeparam>
     /// <param name="entity"></param>
     /// <returns></returns>
-    protected bool AddEntity<T>(T entity) where T : BaseEntity
+    protected bool DoAddEntity<T>(T entity) where T : BaseEntity
     {
         if (entity == null)
         {
@@ -458,6 +627,14 @@ public abstract class BaseWorld
             mEntityTypeMap.Add(entityType, entityList);
         }
         entityList.Add(entity);
+        foreach(var system in mAllSystems)
+        {
+            if(system.Filter(entity))
+            {
+                system.AddSystemEntity(entity);
+                system.OnAdd(entity);
+            }
+        }
         return true;
     }
 
@@ -518,13 +695,16 @@ public abstract class BaseWorld
         var entityUuid = GetNextEntityUuid();
         entity.SetUuid(entityUuid);
         entity.Init(parameters);
-        if (MapConst.BaseActorEntityType.IsAssignableFrom(entityType))
+        //if (MapConst.BaseActorEntityType.IsAssignableFrom(entityType))
+        //{
+        if(entityType == PlayerEntityType)
         {
             var parent = GetEntityTypeParent(entity.EntityType);
             var actorEntity = entity as BaseActorEntity;
             LoadEntityPrefabByPath(actorEntity, actorEntity.PrefabPath, parent);
         }
-        AddEntity(entity);
+        mWaitAddEntities.Add(entity);
+        mWaitRemoveEntities.Remove(entity);
         return entity;
     }
 
@@ -541,12 +721,8 @@ public abstract class BaseWorld
             Debug.LogError($"找不大Uuid:{uuid}的Entity，销毁指定Uuid的Entity失败！");
             return false;
         }
-        mEntityMap.Remove(uuid);
-        mAllEntity.Remove(entity);
-        var entityType = entity.EntityType;
-        var entityList = GetEntityListByType(entityType);
-        entityList.Remove(entity);
-        entity.OnDestroy();
+        mWaitRemoveEntities.Add(entity);
+        mWaitAddEntities.Remove(entity);
         return true;
     }
 
@@ -578,11 +754,42 @@ public abstract class BaseWorld
     }
 
     /// <summary>
+    /// 执行Entity销毁
+    /// </summary>
+    /// <param name="entity"></param>
+    /// <returns></returns>
+    protected bool DoDestroyEntity(BaseEntity entity)
+    {
+        var uuid = entity.Uuid;
+        mEntityMap.Remove(uuid);
+        var result = mAllEntity.Remove(entity);
+        if(result)
+        {
+            var entityType = entity.EntityType;
+            var entityList = GetEntityListByType(entityType);
+            entityList.Remove(entity);
+            foreach(var system in mAllSystems)
+            {
+                if(system.Filter(entity))
+                {
+                    system.RemoveSystemEntity(entity);
+                    system.OnRemove(entity);
+                }
+            }
+            entity.OnDestroy();
+        }
+        else
+        {
+            Debug.LogError($"找不到Uuid:{uuid}的Entity，执行移除Entity失败！");
+        }
+        return result;
+    }
+
+    /// <summary>
     /// 销毁所有Entity
     /// </summary>
     public void DestroyAllEntity()
     {
-        var allEntityUuids = mEntityMap.Keys;
         for(int index = mAllEntity.Count - 1; index >=0; index--)
         {
             var entity = mAllEntity[index];

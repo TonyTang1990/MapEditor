@@ -20,9 +20,9 @@ public class InputControlSystem : BaseSystem
     /// Update
     /// </summary>
     /// <param name="deltaTime"></param>
-    public override void Update(float deltaTime)
+    public override void Process(float deltaTime)
     {
-        base.Update(deltaTime);
+        base.Process(deltaTime);
         if(Input.GetKey("w"))
         {
             MoveUp(deltaTime);
