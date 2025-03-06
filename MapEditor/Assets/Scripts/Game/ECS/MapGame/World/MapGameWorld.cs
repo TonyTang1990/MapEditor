@@ -45,7 +45,11 @@ public class MapGameWorld : BaseWorld
     {
         CreateSystem<InputControlSystem>(SystemNames.InputControlSystemName);
         CreateSystem<PlayerSpawnSystem>(SystemNames.PlayerSpawnSystemName);
-        CreateSystem<CameraFollowSystem>(SystemNames.CameraFollowSystemName);
+        CreateSystem<MapObjectEntitySpawnSystem>(SystemNames.MapObjectEntitySpawnSystemName);
+        CreateSystem<MapObjectGoSpawnSystem>(SystemNames.MapObjectGoSpawnSystemName);
         CreateSystem<ActorSyncSystem>(SystemNames.ActorSyncSystemName);
+        CreateSystem<CameraFollowSystem>(SystemNames.CameraFollowSystemName);
+        // MapGameEntitySpawnSystem一来摄像机的位置改变，所以必须放在CameraFollowSystem后
+        CreateSystem<MapGameEntitySpawnSystem>(SystemNames.MapGameEntitySpawnSystemName);
     }
 }

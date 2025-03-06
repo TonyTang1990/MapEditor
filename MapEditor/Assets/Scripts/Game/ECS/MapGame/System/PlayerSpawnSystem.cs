@@ -48,5 +48,6 @@ public class PlayerSpawnSystem : BaseSystem
     {
         base.OnRemoveFromWorld();
         OwnerWorld.DestroyEntityByUuid(mPlayerEntityUuid);
+        mPlayerEntityUuid = 0;
     }
 }

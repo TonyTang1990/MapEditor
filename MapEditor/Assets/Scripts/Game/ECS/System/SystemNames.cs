@@ -16,6 +16,11 @@ using System.Collections.Generic;
 public static class SystemNames
 {
     /// <summary>
+    /// 地图游戏Entity生成系统名
+    /// </summary>
+    public const string MapGameEntitySpawnSystemName = "MapGameEntitySpawnSystem";
+
+    /// <summary>
     /// 操作控制系统名
     /// </summary>
     public const string InputControlSystemName = "InputControlSystem";
@@ -33,5 +38,15 @@ public static class SystemNames
     /// <summary>
     /// 摄像机跟随系统名
     /// </summary>
-    public const string CameraFollowSystemName = "stringCameraFollowSystem";
+    public const string CameraFollowSystemName = "CameraFollowSystem";
+
+    /// <summary>
+    /// 地图对象Entity生成系统名
+    /// </summary>
+    public const string MapObjectEntitySpawnSystemName = "MapObjectEntitySpawnSystem";
+
+    /// <summary>
+    /// 地图对象GameObject生成系统名
+    /// </summary>
+    public const string MapObjectGoSpawnSystemName = "MapObjectGoSpawnSystem";
 }

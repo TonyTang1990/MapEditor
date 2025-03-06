@@ -17,6 +17,17 @@ using UnityEngine;
 public class InputControlSystem : BaseSystem
 {
     /// <summary>
+    /// Entity过滤
+    /// </summary>
+    /// <param name="entity"></param>
+    /// <returns></returns>
+    public override bool Filter(BaseEntity entity)
+    {
+        var entityType = entity.EntityType;
+        return entityType == EntityType.MapGame;
+    }
+
+    /// <summary>
     /// Update
     /// </summary>
     /// <param name="deltaTime"></param>

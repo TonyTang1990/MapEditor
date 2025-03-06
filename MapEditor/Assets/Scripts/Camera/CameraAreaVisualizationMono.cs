@@ -4,8 +4,11 @@
  * Create Date:             2024/05/19
  */
 
+using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Drawing;
+using System.Numerics;
 using UnityEngine;
 
 /// <summary>
@@ -38,9 +41,19 @@ public class CameraAreaVisualizationMono : MonoBehaviour
     private List<Vector3> mAreaPointsList = new List<Vector3>();
 
     /// <summary>
+    /// 摄像机指定平面映射矩形区域顶点数据列表
+    /// </summary>
+    private List<Vector3> mRectAreaPointsList = new List<Vector3>();
+
+    /// <summary>
     /// 摄像机指定平面映射区域线段数据列表
     /// </summary>
     private List<KeyValuePair<Vector3, Vector3>> mAreaLinesList = new List<KeyValuePair<Vector3, Vector3>>();
+
+    /// <summary>
+    /// 摄像机指定平面映射矩形区域线段数据列表
+    /// </summary>
+    private List<KeyValuePair<Vector3, Vector3>> mRectAreaLinesList = new List<KeyValuePair<Vector3, Vector3>>();
 
     /// <summary>
     /// 摄像机射线数据列表
@@ -75,27 +88,29 @@ public class CameraAreaVisualizationMono : MonoBehaviour
     /// </summary>
     public void UpdateAreaDatas()
     {
-        mRayCastDataList.Clear();
         CameraUtilities.GetCameraRayCastDataList(mCameraComponent, ref mRayCastDataList);
-        mAreaPointsList.Clear();
-        foreach(var rayCastData in mRayCastDataList)
-        {
-            var rayCastDirection = rayCastData.Value - rayCastData.Key;
-            var areaData = Vector3Utilities.GetRayAndPlaneIntersect(rayCastData.Key, rayCastDirection, AreaPoint, AreaNormal);
-            if(areaData != null)
-            {
-                mAreaPointsList.Add((Vector3)areaData);
-            }
-        }
+        CameraUtilities.GetCameraVisibleArea(mCameraComponent, AreaPoint, AreaNormal, ref mAreaPointsList, ref mRectAreaPointsList);
         mAreaLinesList.Clear();
-        for(int i = 0, length = mAreaPointsList.Count; i < length; i++)
+        mRectAreaLinesList.Clear();
+        if(mAreaPointsList.Count > 0)
         {
-            var startPointIndex = i;
-            var endPointIndex = (i + 1) % length;
-            var startPoint = mAreaPointsList[startPointIndex];
-            var endPoint = mAreaPointsList[endPointIndex];
-            var areaLine = new KeyValuePair<Vector3, Vector3>(startPoint, endPoint);
-            mAreaLinesList.Add(areaLine);
+            var lbToLtLine = new KeyValuePair<Vector3, Vector3>(mAreaPointsList[0], mAreaPointsList[1]);
+            var ltToRtLine = new KeyValuePair<Vector3, Vector3>(mAreaPointsList[2], mAreaPointsList[2]);
+            var rtToRbLine = new KeyValuePair<Vector3, Vector3>(mAreaPointsList[3], mAreaPointsList[3]);
+            var rbToLbLine = new KeyValuePair<Vector3, Vector3>(mAreaPointsList[4], mAreaPointsList[0]);
+            mAreaLinesList.Add(lbToLtLine);
+            mAreaLinesList.Add(ltToRtLine);
+            mAreaLinesList.Add(rtToRbLine);
+            mAreaLinesList.Add(rbToLbLine);
+
+            var rectLbToLtLine = new KeyValuePair<Vector3, Vector3>(mRectAreaPointsList[0], mRectAreaPointsList[1]);
+            var rectLtToRtLine = new KeyValuePair<Vector3, Vector3>(mRectAreaPointsList[1], mRectAreaPointsList[2]);
+            var rectRtToRbLine = new KeyValuePair<Vector3, Vector3>(mRectAreaPointsList[2], mRectAreaPointsList[3]);
+            var rectRbToLbLine = new KeyValuePair<Vector3, Vector3>(mRectAreaPointsList[3], mRectAreaPointsList[0]);
+            mRectAreaLinesList.Add(rectLbToLtLine);
+            mRectAreaLinesList.Add(rectLtToRtLine);
+            mRectAreaLinesList.Add(rectRtToRbLine);
+            mRectAreaLinesList.Add(rectRbToLbLine);
         }
     }
 
@@ -106,6 +121,7 @@ public class CameraAreaVisualizationMono : MonoBehaviour
     private void OnDrawGizmos()
     {
         DrawAreaInfoGUI();
+        DrawRectAreaGUI();
         DrawAreaGUI();
         DrawCameraGUI();
     }
@@ -120,6 +136,23 @@ public class CameraAreaVisualizationMono : MonoBehaviour
         Gizmos.DrawSphere(AreaPoint, SphereSize);
         var areaPointTo = AreaPoint + AreaNormal * 5;
         Gizmos.DrawLine(AreaPoint, areaPointTo);
+        Gizmos.color = preGizmosColor;
+    }
+
+    /// <summary>
+    /// 绘制矩形区域
+    /// </summary>
+    private void DrawRectAreaGUI()
+    {
+        var preGizmosColor = Gizmos.color;
+        Gizmos.color = new Color(0, 0.5f, 0);
+        if(mRectAreaLinesList.Count > 0)
+        {
+            Gizmos.DrawLine(mRectAreaLinesList[0].Key, mRectAreaLinesList[0].Value);
+            Gizmos.DrawLine(mRectAreaLinesList[1].Key, mRectAreaLinesList[1].Value);
+            Gizmos.DrawLine(mRectAreaLinesList[2].Key, mRectAreaLinesList[2].Value);
+            Gizmos.DrawLine(mRectAreaLinesList[3].Key, mRectAreaLinesList[3].Value);
+        }
         Gizmos.color = preGizmosColor;
     }
 
@@ -190,10 +223,10 @@ public class CameraAreaVisualizationMono : MonoBehaviour
         {
             preGizmosColor = Gizmos.color;
             Gizmos.color = Color.red;
-                Gizmos.DrawLine(mRayCastDataList[0].Key, mRayCastDataList[0].Value);
-                Gizmos.DrawLine(mRayCastDataList[1].Key, mRayCastDataList[1].Value);
-                Gizmos.DrawLine(mRayCastDataList[2].Key, mRayCastDataList[2].Value);
-                Gizmos.DrawLine(mRayCastDataList[3].Key, mRayCastDataList[3].Value);
+            Gizmos.DrawLine(mRayCastDataList[0].Key, mRayCastDataList[0].Value);
+            Gizmos.DrawLine(mRayCastDataList[1].Key, mRayCastDataList[1].Value);
+            Gizmos.DrawLine(mRayCastDataList[2].Key, mRayCastDataList[2].Value);
+            Gizmos.DrawLine(mRayCastDataList[3].Key, mRayCastDataList[3].Value);
             Gizmos.color = preGizmosColor;
         }
     }

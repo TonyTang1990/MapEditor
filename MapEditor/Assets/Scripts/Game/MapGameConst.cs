@@ -38,7 +38,32 @@ public static class MapGameConst
     public const string PlayerPrefabPath = "MapObjects/Player/Player";
 
     /// <summary>
+    /// 怪物预制件路径
+    /// </summary>
+    public const string MonsterPrefabPath = "MapObjects/Monster/Monster";
+
+    /// <summary>
+    /// 宝箱预制件路径
+    /// </summary>
+    public const string TreasureBoxPrefabPath = "MapObjects/TreasureBox/TreasureBox";
+
+    /// <summary>
+    /// 陷阱预制件路径
+    /// </summary>
+    public const string TrapPrefabPath = "MapObjects/Trap/Trap";
+
+    /// <summary>
     /// 角色移动最大Hit距离
     /// </summary>
     public const float ActorNavMeshHitDistance = 2;
+
+    /// <summary>
+    /// 区域顶点
+    /// </summary>
+    public static readonly Vector3 AreaPoint = Vector3.zero;
+
+    /// <summary>
+    /// 区域法线
+    /// </summary>
+    public static readonly Vector3 AreaNormal = Vector3.up;
 }

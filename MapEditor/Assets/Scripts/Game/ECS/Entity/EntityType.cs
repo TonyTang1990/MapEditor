@@ -12,7 +12,8 @@
 /// </summary>
 public enum EntityType
 {
-    Player = 0,     // 玩家Entity
+    MapGame = 0,    // 地图游戏Entity(全局Entity)
+    Player,         // 玩家Entity
     Monster,        // 怪物Entity
     TreasureBox,    // 宝箱Entity
     Trap,           // 陷阱Entity

@@ -1,5 +1,11 @@
-
-
+/**
+* @ Author: TONYTANG
+* @ Create Time: 2025-02-17 16:39:04
+* @ Modified by: TONYTANG
+* @ Modified time: 2025-02-17 16:54:54
+* @ Description:
+*
+*/
 
 // Note:
 // 这里的BaseWorld,BaseSystem和BaseEntity并非完整的ECS模式
@@ -7,16 +13,11 @@
 
 using System.Collections.Generic;
 using System.Diagnostics;
-/**
-* @ Author: TONYTANG
-* @ Create Time: 2025-02-17 16:39:04
-* @ Modified by: TONYTANG
-* @ Modified time: 2025-02-17 16:54:54
-* @ Description:
-*//// <summary>
-  /// BaseSystem.cs
-  /// 逻辑系统基类抽象(相当于ECS里的S部分)
-  /// </summary>
+
+//// <summary>
+/// BaseSystem.cs
+/// 逻辑系统基类抽象(相当于ECS里的S部分)
+/// </summary>
 public abstract class BaseSystem
 {
     /// <summary>

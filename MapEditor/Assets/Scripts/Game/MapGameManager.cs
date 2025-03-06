@@ -313,4 +313,36 @@ public class MapGameManager : SingletonTemplate<MapGameManager>
     {
         WorldManager.Singleton.CreateWrold<MapGameWorld>(WorldNames.MapGameWorldName);
     }
+
+    #region 公共方法
+    /// <summary>
+    /// 根据路径加载Entity预制体
+    /// </summary>
+    /// <param name="actorEntity"></param>
+    /// <param name="prefabPath"></param>
+    /// <param name="parent"></param>
+    /// <param name="loadCompleteCb"></param>
+    public void LoadEntityPrefabByPath(BaseActorEntity actorEntity, string prefabPath, Transform parent, Action<BaseActorEntity> loadCompleteCb = null)
+    {
+        PoolManager.Singleton.pop(prefabPath, (instance) =>
+        {
+            actorEntity.Go = instance;
+            var instanceTransform = instance.transform;
+            if (parent != null)
+            {
+                instanceTransform.SetParent(parent);
+            }
+            instanceTransform.position = actorEntity.Position;
+            instanceTransform.eulerAngles = actorEntity.Rotation;
+            var animator = instanceTransform.GetComponent<Animator>();
+            actorEntity.Animator = animator;
+            var playAnimName = actorEntity.PlayAnimName;
+            if (!string.IsNullOrEmpty(playAnimName))
+            {
+                actorEntity.PlayAnim(playAnimName);
+            }
+            loadCompleteCb?.Invoke(actorEntity);
+        });
+    }
+    #endregion
 }

@@ -99,7 +99,6 @@ public abstract class BaseActorEntity : BaseEntity
     public override void OnDestroy()
     {
         base.OnDestroy();
-        DestroyInstance();
     }
 
     /// <summary>
@@ -109,9 +108,13 @@ public abstract class BaseActorEntity : BaseEntity
     {
         base.ResetDatas();
         Position = Vector3.zero;
+        SyncPosition = false;
         Rotation = Vector3.zero;
+        SyncRotation = false;
         PrefabPath = null;
         Go = null;
+        PlayAnimName = null;
+        Animator = null;
     }
 
     /// <summary>
@@ -170,7 +173,7 @@ public abstract class BaseActorEntity : BaseEntity
     /// <summary>
     /// 销毁实例
     /// </summary>
-    protected virtual void DestroyInstance()
+    public virtual void DestroyInstance()
     {
         if(Go != null)
         {

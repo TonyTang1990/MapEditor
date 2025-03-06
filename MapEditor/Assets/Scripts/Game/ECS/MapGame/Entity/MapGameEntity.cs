@@ -10,16 +10,16 @@ using System;
 using System.Collections.Generic;
 
 /// <summary>
-/// CameraEntity.cs
-/// 摄像机Entity
+/// MapGameEntity.cs
+/// 地图游戏Entity
 /// </summary>
-public class CameraEntity : BaseBindEntity
+public class MapGameEntity : BaseEntity
 {
     /// <summary>
     /// 初始化Entity类型
     /// </summary>
     protected override void InitEntityType()
     {
-        EntityType = EntityType.Camera;
+        EntityType = EntityType.MapGame;
     }
 }

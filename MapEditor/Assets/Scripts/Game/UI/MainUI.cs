@@ -8,6 +8,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Numerics;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -65,6 +66,11 @@ public class MainUI : BaseUI
     private List<Vector3> mCameraAreaPointsList = new List<Vector3>();
 
     /// <summary>
+    /// 摄像机指定平面映射矩形区域顶点数据列表
+    /// </summary>
+    private List<Vector3> mCameraRectAreaPointsList = new List<Vector3>();
+
+    /// <summary>
     /// 构造函数
     /// </summary>
     /// <param name="uiName">窗口们</param>
@@ -105,7 +111,7 @@ public class MainUI : BaseUI
     private void UpdateCameraAreaInfoss()
     {
         var mainCamera = MapGameManager.Singleton.MainCamera;
-        CameraUtilities.GetCameraVisibleArea(mainCamera, Vector3.zero, Vector3.up, ref mCameraAreaPointsList);
+        CameraUtilities.GetCameraVisibleArea(mainCamera, Vector3.zero, Vector3.up, ref mCameraAreaPointsList, ref mCameraRectAreaPointsList);
         if (mCameraAreaPointsList.Count > 0)
         {
             if (LeftBottomPointTxt != null)

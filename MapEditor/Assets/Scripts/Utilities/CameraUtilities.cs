@@ -6,6 +6,7 @@
 
 using System.Collections;
 using System.Collections.Generic;
+using System.Numerics;
 using UnityEngine;
 
 /// <summary>
@@ -110,11 +111,13 @@ public static class CameraUtilities
     /// <param name="areaPoint"></param>
     /// <param name="areaNormal"></param>
     /// <param name="areaPointsList"></param>
+    /// <param name="rectPointList"></param>
     /// <returns></returns>
-    public static bool GetCameraVisibleArea(Camera camera, Vector3 areaPoint, Vector3 areaNormal, ref List<Vector3> areaPointsList)
+    public static bool GetCameraVisibleArea(Camera camera, Vector3 areaPoint, Vector3 areaNormal, ref List<Vector3> areaPointsList, ref List<Vector3> rectPointList)
     {
         areaPointsList.Clear();
-        if(camera == null)
+        rectPointList.Clear();
+        if (camera == null)
         {
             Debug.LogError($"不允许传递空摄像机组件，获取摄像机的可视区域顶点数据失败！");
             return false;
@@ -131,6 +134,12 @@ public static class CameraUtilities
                 areaPointsList.Add((Vector3)areaData);
             }
         }
+
+        rectPointList.Add(new Vector3(areaPointsList[1].x, areaPointsList[0].y, areaPointsList[0].z));
+        rectPointList.Add(new Vector3(areaPointsList[1].x, areaPointsList[1].y, areaPointsList[1].z));
+        rectPointList.Add(new Vector3(areaPointsList[2].x, areaPointsList[2].y, areaPointsList[2].z));
+        rectPointList.Add(new Vector3(areaPointsList[2].x, areaPointsList[3].y, areaPointsList[3].z));
+        rectPointList.Add(areaPointsList[4]);
         return true;
     }
 }

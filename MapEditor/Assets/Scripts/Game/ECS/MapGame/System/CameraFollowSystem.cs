@@ -21,6 +21,17 @@ public class CameraFollowSystem : BaseSystem
     private int mCameraEntityUuid;
 
     /// <summary>
+    /// Entity过滤
+    /// </summary>
+    /// <param name="entity"></param>
+    /// <returns></returns>
+    public override bool Filter(BaseEntity entity)
+    {
+        var entityType = entity.EntityType;
+        return entityType == EntityType.Camera;
+    }
+
+    /// <summary>
     /// 响应系统添加到世界
     /// </summary>
     public override void OnAddToWorld()

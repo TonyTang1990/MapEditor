@@ -193,14 +193,6 @@ public abstract class BaseWorld
         ManagerEntities();
 
         ManagerSystemsUpdate(deltaTime);
-        foreach (var system in mAllSystems)
-        {
-            if(system == null)
-            {
-                continue;
-            }
-            system.Process(deltaTime);
-        }
     }
 
     /// <summary>
@@ -284,7 +276,6 @@ public abstract class BaseWorld
                     system.Process(entity, deltaTime);
                 }
             }
-
             system.PostProcess(deltaTime);
         }
     }
@@ -571,7 +562,7 @@ public abstract class BaseWorld
     /// </summary>
     /// <param name="entityType"></param>
     /// <returns></returns>
-    protected Transform GetEntityTypeParent(EntityType entityType)
+    public Transform GetEntityTypeParent(EntityType entityType)
     {
         Transform entityTypeParent;
         if (!mEntityTypeParentMap.TryGetValue(entityType, out entityTypeParent))
@@ -612,11 +603,6 @@ public abstract class BaseWorld
             return false;
         }
         var entityUuid = entity.Uuid;
-        if (mEntityMap.ContainsKey(entityUuid))
-        {
-            Debug.LogError($"已注册Uuid:{entityUuid}的Entity，添加Entity失败！");
-            return false;
-        }
         mEntityMap.Add(entityUuid, entity);
         mAllEntity.Add(entity);
         var entityType = entity.EntityType;
@@ -697,12 +683,10 @@ public abstract class BaseWorld
         entity.Init(parameters);
         //if (MapConst.BaseActorEntityType.IsAssignableFrom(entityType))
         //{
-        if(entityType == PlayerEntityType)
-        {
-            var parent = GetEntityTypeParent(entity.EntityType);
-            var actorEntity = entity as BaseActorEntity;
-            LoadEntityPrefabByPath(actorEntity, actorEntity.PrefabPath, parent);
-        }
+        //    var parent = GetEntityTypeParent(entity.EntityType);
+        //    var actorEntity = entity as BaseActorEntity;
+        //    LoadEntityPrefabByPath(actorEntity, actorEntity.PrefabPath, parent);
+        //}
         mWaitAddEntities.Add(entity);
         mWaitRemoveEntities.Remove(entity);
         return entity;
@@ -777,6 +761,7 @@ public abstract class BaseWorld
                 }
             }
             entity.OnDestroy();
+            ObjectPool.Singleton.Push(entity);
         }
         else
         {
@@ -796,51 +781,6 @@ public abstract class BaseWorld
             var entityUuid = entity.Uuid;
             DestroyEntityByUuid(entityUuid);
         }
-    }
-
-    /// <summary>
-    /// 创建玩家Entity
-    /// </summary>
-    /// <param name="parameters"></param>
-    /// <returns></returns>
-    protected PlayerEntity CreatePlayerEntity(params object[] parameters)
-    {
-        var entity = ObjectPool.Singleton.Pop<PlayerEntity>();
-        var entityUuid = GetNextEntityUuid();
-        entity.Init(entityUuid, parameters);
-        var parent = GetEntityTypeParent(entity.EntityType);
-        LoadEntityPrefabByPath(entity, entity.PrefabPath, parent);
-        return entity;
-    }
-
-    /// <summary>
-    /// 根据路径加载Entity预制体
-    /// </summary>
-    /// <param name="actorEntity"></param>
-    /// <param name="prefabPath"></param>
-    /// <param name="parent"></param>
-    /// <param name="loadCompleteCb"></param>
-    protected void LoadEntityPrefabByPath(BaseActorEntity actorEntity, string prefabPath, Transform parent, Action<BaseActorEntity> loadCompleteCb = null)
-    {
-        PoolManager.Singleton.pop(prefabPath, (instance) =>
-        {
-            actorEntity.Go = instance;
-            var instanceTransform = instance.transform;
-            if (parent != null)
-            {
-                instanceTransform.SetParent(parent);
-            }
-            instanceTransform.position = actorEntity.Position;
-            instanceTransform.eulerAngles = actorEntity.Rotation;
-            var animator = instanceTransform.GetComponent<Animator>();
-            actorEntity.Animator = animator;
-            var playAnimName = actorEntity.PlayAnimName;
-            if(!string.IsNullOrEmpty(playAnimName))
-            {
-                actorEntity.PlayAnim(playAnimName);
-            }
-            loadCompleteCb?.Invoke(actorEntity);
-        });
     }
     #endregion
 }

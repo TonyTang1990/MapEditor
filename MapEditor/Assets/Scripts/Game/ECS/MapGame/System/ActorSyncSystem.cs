@@ -16,44 +16,52 @@ using System.Collections.Generic;
 public class ActorSyncSystem : BaseSystem
 {
     /// <summary>
-    /// Update
+    /// Entity过滤
+    /// </summary>
+    /// <param name="entity"></param>
+    /// <returns></returns>
+    public override bool Filter(BaseEntity entity)
+    {
+        if(entity is BaseActorEntity || entity is BaseBindEntity)
+        {
+            return true;
+        }
+        return false;
+    }
+
+    /// <summary>
+    /// Entity Update
     /// </summary>
     /// <param name="deltaTime"></param>
-    public override void Process(float deltaTime)
+    public override void Process(BaseEntity entity, float deltaTime)
     {
-        base.Process(deltaTime);
-        var allEntity = OwnerWorld.GetAllEntity();
-        foreach ( var entity in allEntity )
+        base.Process(entity, deltaTime);
+        var actorEntity = entity as BaseActorEntity;
+        if (actorEntity != null)
         {
-            var actorEntity = entity as BaseActorEntity;
-            if (actorEntity != null)
+            if (actorEntity.SyncPosition && actorEntity.Go != null)
             {
-                if (actorEntity.SyncPosition && actorEntity.Go != null)
-                {
-                    actorEntity.Go.transform.position = actorEntity.Position;
-                    actorEntity.SyncPosition = false;
-                }
-                if (actorEntity.SyncRotation && actorEntity.Go != null)
-                {
-                    actorEntity.Go.transform.eulerAngles = actorEntity.Rotation;
-                    actorEntity.SyncRotation = false;
-                }
-                continue;
+                actorEntity.Go.transform.position = actorEntity.Position;
+                actorEntity.SyncPosition = false;
             }
-            var bindEntity = entity as BaseBindEntity;
-            if (bindEntity != null)
+            if (actorEntity.SyncRotation && actorEntity.Go != null)
             {
-                if (bindEntity.SyncPosition && bindEntity.BindGo != null)
-                {
-                    bindEntity.BindGo.transform.position = bindEntity.Position;
-                    bindEntity.SyncPosition = false;
-                }
-                if (bindEntity.SyncRotation && bindEntity.BindGo != null)
-                {
-                    bindEntity.BindGo.transform.eulerAngles = bindEntity.Rotation;
-                    bindEntity.SyncRotation = false;
-                }
-                continue;
+                actorEntity.Go.transform.eulerAngles = actorEntity.Rotation;
+                actorEntity.SyncRotation = false;
+            }
+        }
+        var bindEntity = entity as BaseBindEntity;
+        if (bindEntity != null)
+        {
+            if (bindEntity.SyncPosition && bindEntity.BindGo != null)
+            {
+                bindEntity.BindGo.transform.position = bindEntity.Position;
+                bindEntity.SyncPosition = false;
+            }
+            if (bindEntity.SyncRotation && bindEntity.BindGo != null)
+            {
+                bindEntity.BindGo.transform.eulerAngles = bindEntity.Rotation;
+                bindEntity.SyncRotation = false;
             }
         }
     }
