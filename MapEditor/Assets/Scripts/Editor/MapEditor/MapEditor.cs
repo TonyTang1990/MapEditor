@@ -15,6 +15,7 @@ using UnityEditor;
 using UnityEditor.SceneManagement;
 using UnityEngine;
 using UnityEngine.AI;
+using static System.Runtime.CompilerServices.RuntimeHelpers;
 
 namespace MapEditor
 {
@@ -2609,7 +2610,7 @@ namespace MapEditor
             }
             var mapFoldType = MapEditorUtilities.GetMapDataFoldType(mapDataType);
             DrawMapDataOneKeyArea(mapDataType, mapFoldType);
-            MapEditorUtilities.DrawMapDataTitleAreaByType(mapDataType);
+            DrawMapDataTitleAreaByType(mapDataType);
             DrawMapDataDetailByType(mapDataType);
         }
 
@@ -2638,6 +2639,23 @@ namespace MapEditor
             if (GUILayout.Button($"{foldTitle}", GUILayout.ExpandWidth(true)))
             {
                 DoOneKeyUnfold(mapFoldType, true);
+            }
+            EditorGUILayout.EndHorizontal();
+        }
+
+        /// <summary>
+        /// 绘制指定地图埋点类型的埋点数据标题区域
+        /// </summary>
+        /// <param name="mapDataType"></param>
+        public static void DrawMapDataTitleAreaByType(MapDataType mapDataType)
+        {
+            EditorGUILayout.BeginHorizontal("box");
+            foreach (var mapUIDisplayData in MapEditorUtilities.MapUITypeDisplayData)
+            {
+                if(MapEditorUtilities.IsShowMapUI(mapDataType, mapUIDisplayData.MapUIType))
+                {
+                    EditorGUILayout.LabelField(mapUIDisplayData.TitleTxt, mapUIDisplayData.TitleGUIStyle, GUILayout.Width(mapUIDisplayData.TitleUIWidth));
+                }
             }
             EditorGUILayout.EndHorizontal();
         }
@@ -2699,9 +2717,31 @@ namespace MapEditor
         {
             EditorGUILayout.BeginHorizontal();
             var mapDataProperty = GetMapDataSerializedPropertyByIndex(mapDataIndex);
-            if (MapEditorUtilities.IsShowMapUI(mapDataType, MapUIType.Batch))
+            foreach (var mapUIDisplayData in MapEditorUtilities.MapUITypeDisplayData)
             {
-                var batchOperationSwitchProperty = mapDataProperty.FindPropertyRelative("BatchOperationSwitch");
+                DrawOneMapDataPropertyByData(mapDataProperty, mapDataIndex, mapDataType, mapUIDisplayData);
+            }
+            EditorGUILayout.EndHorizontal();
+        }
+
+        /// <summary>
+        /// 绘制单个地图埋点属性，索引，地图埋点类型和现实数据的数据
+        /// </summary>
+        /// <param name="mapDataProperty"></param>
+        /// <param name="mapDataIndex"></param>
+        /// <param name="mapDataType"></param>
+        /// <param name="mapUITypeDisplayData"></param>
+        private void DrawOneMapDataPropertyByData(SerializedProperty mapDataProperty, int mapDataIndex, MapDataType mapDataType, MapUITypeDisplayData mapUITypeDisplayData)
+        {
+            var mapUIType = mapUITypeDisplayData.MapUIType;
+            if (!MapEditorUtilities.IsShowMapUI(mapDataType, mapUIType))
+            {
+                return;
+            }
+            var propertyName = mapUITypeDisplayData.PropertyName;
+            var property = !string.IsNullOrEmpty(propertyName) ? mapDataProperty.FindPropertyRelative(propertyName) : null;
+            if(mapUIType == MapUIType.Batch)
+            {
                 var space = 10f;
                 EditorGUILayout.Space(space, false);
                 batchOperationSwitchProperty.boolValue = EditorGUILayout.Toggle(batchOperationSwitchProperty.boolValue, GUILayout.Width(MapEditorConst.InspectorDataBatchUIWidth - space));
@@ -2729,17 +2769,15 @@ namespace MapEditor
                     }
                 }
             }
-            if (MapEditorUtilities.IsShowMapUI(mapDataType, MapUIType.Index))
+            else if (mapUIType == MapUIType.Index)
             {
                 EditorGUILayout.LabelField($"{mapDataIndex}", MapStyles.TabMiddleStyle, GUILayout.Width(MapEditorConst.InspectorDataIndexUIWidth));
             }
-            MapDataConfig mapDataConfig = null;
-            var uidProperty = mapDataProperty.FindPropertyRelative("UID");
-            var uid = uidProperty.intValue;
-            var positionProperty = mapDataProperty.FindPropertyRelative("Position");
-            mapDataConfig = MapSetting.GetEditorInstance().DataSetting.GetMapDataConfigByUID(uid);
-            if (MapEditorUtilities.IsShowMapUI(mapDataType, MapUIType.UID))
+            else if (mapUIType == MapUIType.UID)
             {
+                var uid = property != null ? property.intValue : 0;
+                MapDataConfig mapDataConfig = null;
+                mapDataConfig = MapSetting.GetEditorInstance().DataSetting.GetMapDataConfigByUID(uid);
                 EditorGUI.BeginChangeCheck();
                 var realMapDataType = mapDataConfig != null ? mapDataConfig.DataType : MapDataType.PlayerSpawn;
                 var mapDataChoiceOptions = GetMapDataChoiceOptionsByType(realMapDataType);
@@ -2750,8 +2788,11 @@ namespace MapEditor
                     DoChangeMapDataUID(mapDataIndex, uid);
                 }
             }
-            //if (MapEditorUtilities.IsShowMapUI(mapDataType, MapDataUIType.MapDataType))
+            //else if (mapUIType == MapUIType.MapDataType)
             //{
+            //    var uiProperty = mapDataProperty.FindPropertyRelative("UID");
+            //    var uid = uiProperty != null ? uiProperty.intValue : 0;
+            //    MapDataConfig mapDataConfig = MapSetting.GetEditorInstance().DataSetting.GetMapDataConfigByUID(uid);
             //    if (mapDataConfig != null)
             //    {
             //        EditorGUILayout.LabelField(mapDataConfig.DataType.ToString(), MapStyles.TabMiddleStyle, GUILayout.Width(MapEditorConst.InspectorDataTypeUIWidth));
@@ -2761,8 +2802,11 @@ namespace MapEditor
             //        EditorGUILayout.LabelField("找不到对象类型数据", MapStyles.TabMiddleStyle, GUILayout.Width(MapEditorConst.InspectorDataTypeUIWidth));
             //    }
             //}
-            if (MapEditorUtilities.IsShowMapUI(mapDataType, MapUIType.ConfId))
+            else if (mapUIType == MapUIType.ConfId)
             {
+                var uiProperty = mapDataProperty.FindPropertyRelative("UID");
+                var uid = uiProperty != null ? uiProperty.intValue : 0;
+                MapDataConfig mapDataConfig = MapSetting.GetEditorInstance().DataSetting.GetMapDataConfigByUID(uid);
                 if (mapDataConfig != null)
                 {
                     EditorGUILayout.IntField(mapDataConfig.ConfId, MapStyles.TabMiddleStyle, GUILayout.Width(MapEditorConst.InspectorDataConfIdUIWidth));
@@ -2772,30 +2816,22 @@ namespace MapEditor
                     EditorGUILayout.LabelField("找不到关联Id数据", MapStyles.TabMiddleStyle, GUILayout.Width(MapEditorConst.InspectorDataConfIdUIWidth));
                 }
             }
-            //if (MapEditorUtilities.IsShowMapUI(mapDataType, MapDataUIType.Des))
+            //else if (mapUIType == MapUIType.Des)
             //{
+            //    var uiProperty = mapDataProperty.FindPropertyRelative("UID");
+            //    var uid = uiProperty != null ? uiProperty.intValue : 0;
+            //    MapDataConfig mapDataConfig = MapSetting.GetEditorInstance().DataSetting.GetMapDataConfigByUID(uid);
             //    var des = mapDataConfig != null ? mapDataConfig.Des : "";
             //    EditorGUILayout.LabelField(des, MapStyles.TabMiddleStyle, GUILayout.Width(MapEditorConst.InspectorDataDesUIWidth));
             //}
-            if (MapEditorUtilities.IsShowMapUI(mapDataType, MapUIType.GUISwitchOff))
+            else if (mapUIType == MapUIType.GUISwitchOff)
             {
-                var propertyName = "GUISwitchOff";
-                var guiSwitchOffProperty = mapDataProperty.FindPropertyRelative(propertyName);
-                if (guiSwitchOffProperty != null)
-                {
-                    var space = 20f;
-                    EditorGUILayout.Space(space, false);
-                    EditorGUI.BeginChangeCheck();
-                    var newGuiSwitchOffPropertyValue = EditorGUILayout.Toggle(guiSwitchOffProperty.boolValue, GUILayout.Width(MapEditorConst.InspectorDataGUISwitchOffUIWidth - space));
-                    if(EditorGUI.EndChangeCheck())
-                    {
-                        DoChangeMapDataProperty(mapDataIndex, propertyName, newGuiSwitchOffPropertyValue);
-                    }
-                }
+                var space = 20f;
+                DrawToggleChangeMapDataProperty(mapDataIndex, property, propertyName, MapEditorConst.InspectorDataGUISwitchOffUIWidth - space, space);
             }
-            if (MapEditorUtilities.IsShowMapUI(mapDataType, MapUIType.Position))
+            else if (mapUIType == MapUIType.Position)
             {
-                var newVector3Value = positionProperty.vector3Value;
+                var newVector3Value = property != null ? property.vector3Value : Vector3.zero;
                 EditorGUI.BeginChangeCheck();
                 var singlePosWidth = (MapEditorConst.InspectorDataPositionUIWidth - 43f) / 3;
                 EditorGUILayout.LabelField("X", GUILayout.Width(10f));
@@ -2810,10 +2846,9 @@ namespace MapEditor
                     OnMapDataPositionMove(mapDataIndex, positionOffset);
                 }
             }
-            if (MapEditorUtilities.IsShowMapUI(mapDataType, MapUIType.Rotation))
+            else if (mapUIType == MapUIType.Rotation)
             {
-                var rotationProperty = mapDataProperty.FindPropertyRelative("Rotation");
-                var newRotationVector3Value = rotationProperty.vector3Value;
+                var newRotationVector3Value = property != null ? property.vector3Value : Vector3.zero;
                 EditorGUI.BeginChangeCheck();
                 var singleRotWidth = (MapEditorConst.InspectorDataRotationUIWidth - 43f) / 3;
                 EditorGUILayout.LabelField("X", GUILayout.Width(10f));
@@ -2827,49 +2862,29 @@ namespace MapEditor
                     rotationProperty.vector3Value = newRotationVector3Value;
                 }
             }
-            if (MapEditorUtilities.IsShowMapUI(mapDataType, MapUIType.MonsterCreateRadius))
+            else if (mapUIType == MapUIType.MonsterCreateRadius)
             {
-                var propertyName = "MonsterCreateRadius";
-                var monsterCreateRadiusProperty = mapDataProperty.FindPropertyRelative(propertyName);
-                if (monsterCreateRadiusProperty != null)
-                {
-                    EditorGUI.BeginChangeCheck();
-                    var newMonsterCreateRadius = EditorGUILayout.FloatField(monsterCreateRadiusProperty.floatValue, GUILayout.Width(MapEditorConst.InspectorDataMonsterCreateRadiusUIWidth));
-                    if (EditorGUI.EndChangeCheck())
-                    {
-                        DoChangeMapDataProperty(mapDataIndex, propertyName, newMonsterCreateRadius);
-                    }
-                }
+                DrawFloatChangeMapDataProperty(mapDataIndex, property, propertyName, MapEditorConst.InspectorDataMonsterCreateRadiusUIWidth);
             }
-            if (MapEditorUtilities.IsShowMapUI(mapDataType, MapUIType.MonsterActiveRadius))
+            else if (mapUIType == MapUIType.MonsterActiveRadius)
             {
-                var propertyName = "MonsterActiveRadius";
-                var monsterActiveRadiusProperty = mapDataProperty.FindPropertyRelative(propertyName);
-                if (monsterActiveRadiusProperty != null)
-                {
-                    EditorGUI.BeginChangeCheck();
-                    var newMonsterActiveRadius = EditorGUILayout.FloatField(monsterActiveRadiusProperty.floatValue, GUILayout.Width(MapEditorConst.InspectorDataMonsterActiveRediusUIWidth));
-                    if (EditorGUI.EndChangeCheck())
-                    {
-                        DoChangeMapDataProperty(mapDataIndex, propertyName, newMonsterActiveRadius);
-                    }
-                }
+                DrawFloatChangeMapDataProperty(mapDataIndex, property, propertyName, MapEditorConst.InspectorDataMonsterActiveRediusUIWidth);
             }
-            if (MapEditorUtilities.IsShowMapUI(mapDataType, MapUIType.MoveUp))
+            else if (mapUIType == MapUIType.MoveUp)
             {
                 if (GUILayout.Button("↑", GUILayout.Width(MapEditorConst.InspectorDataMoveUpUIWidth)))
                 {
                     DoMovePropertyDataUpByIndex(mMapDataListProperty, mapDataIndex);
                 }
             }
-            if (MapEditorUtilities.IsShowMapUI(mapDataType, MapUIType.MoveDown))
+            else if (mapUIType == MapUIType.MoveDown)
             {
                 if (GUILayout.Button("↓", GUILayout.Width(MapEditorConst.InspectorDataMoveDownUIWidth)))
                 {
                     DoMovePropertyDataDownByIndex(mMapDataListProperty, mapDataIndex);
                 }
             }
-            if (MapEditorUtilities.IsShowMapUI(mapDataType, MapUIType.Add))
+            else if (mapUIType == MapUIType.Add)
             {
                 if (GUILayout.Button("+", GUILayout.Width(MapEditorConst.InspectorDataRemoveUIWidth)))
                 {
@@ -2877,14 +2892,88 @@ namespace MapEditor
                     DoAddMapData(addMapDataValue, mapDataIndex);
                 }
             }
-            if (MapEditorUtilities.IsShowMapUI(mapDataType, MapUIType.Remove))
+            else if (mapUIType == MapUIType.Remove)
             {
                 if (GUILayout.Button("-", GUILayout.Width(MapEditorConst.InspectorDataAddUIWidth)))
                 {
                     DoRemoveMapDataByIndex(mapDataIndex);
                 }
             }
-            EditorGUILayout.EndHorizontal();
+        }
+
+        /// <summary>
+        /// 绘制指定批量修改属性Int显示
+        /// </summary>
+        /// <param name="mapDataIndex"></param>
+        /// <param name="property"></param>
+        /// <param name="propertyName"></param>
+        /// <param name="propertyWidth"></param>
+        /// <param name="space"></param>
+        private void DrawIntChangeMapDataProperty(int mapDataIndex, SerializedProperty property, string propertyName, float propertyWidth, float space = 0)
+        {
+            if (property != null)
+            {
+                if (space != 0)
+                {
+                    EditorGUILayout.Space(space, false);
+                }
+                EditorGUI.BeginChangeCheck();
+                var newPropertyValue = EditorGUILayout.IntField(property.intValue, GUILayout.Width(propertyWidth));
+                if (EditorGUI.EndChangeCheck())
+                {
+                    DoChangeMapDataProperty(mapDataIndex, propertyName, newPropertyValue);
+                }
+            }
+        }
+
+        /// <summary>
+        /// 绘制指定批量修改属性Float显示
+        /// </summary>
+        /// <param name="mapDataIndex"></param>
+        /// <param name="property"></param>
+        /// <param name="propertyName"></param>
+        /// <param name="propertyWidth"></param>
+        /// <param name="space"></param>
+        private void DrawFloatChangeMapDataProperty(int mapDataIndex, SerializedProperty property, string propertyName, float propertyWidth, float space = 0)
+        {
+            if (property != null)
+            {
+                if(space != 0)
+                {
+                    EditorGUILayout.Space(space, false);
+                }
+                EditorGUI.BeginChangeCheck();
+                var newPropertyValue = EditorGUILayout.FloatField(property.floatValue, GUILayout.Width(propertyWidth));
+                if (EditorGUI.EndChangeCheck())
+                {
+                    DoChangeMapDataProperty(mapDataIndex, propertyName, newPropertyValue);
+                }
+            }
+        }
+
+        /// <summary>
+        /// 绘制指定批量修改属性Toggle显示
+        /// </summary>
+        /// <param name="mapDataIndex"></param>
+        /// <param name="property"></param>
+        /// <param name="propertyName"></param>
+        /// <param name="propertyWidth"></param>
+        /// <param name="space"></param>
+        private void DrawToggleChangeMapDataProperty(int mapDataIndex, SerializedProperty property, string propertyName, float propertyWidth, float space = 0)
+        {
+            if (property != null)
+            {
+                if(space != 0)
+                {
+                    EditorGUILayout.Space(space, false);
+                }
+                EditorGUI.BeginChangeCheck();
+                var newPropertyValue = EditorGUILayout.Toggle(property.boolValue, GUILayout.Width(MapEditorConst.InspectorDataGUISwitchOffUIWidth - space));
+                if (EditorGUI.EndChangeCheck())
+                {
+                    DoChangeMapDataProperty(mapDataIndex, propertyName, newPropertyValue);
+                }
+            }
         }
 
         private void OnSceneGUI()
