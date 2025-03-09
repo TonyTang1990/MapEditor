@@ -279,8 +279,8 @@ MonoBehaviour:
   - rid: 2065694472720351247
   AddMapObjectType: 1
   AddMapObjectIndex: 2
-  AddMapDataType: 3
-  AddMapDataIndex: 5
+  AddMapDataType: 1
+  AddMapDataIndex: 2
   ExportType: 0
   CustomExportFileName: 
   AllGroupUnfoldDataList:
