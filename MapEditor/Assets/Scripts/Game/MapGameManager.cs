@@ -4,12 +4,9 @@
  * Create Date:             2025/02/14
  */
 
+using Cinemachine;
 using MapEditor;
 using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Numerics;
-using System.Runtime.Versioning;
 using UnityEngine;
 
 /// <summary>
@@ -129,6 +126,7 @@ public class MapGameManager : SingletonTemplate<MapGameManager>
     public void Update(float deltaTime)
     {
         WorldManager.Singleton.Update(deltaTime);
+        MainUI?.Update();
     }
 
     /// <summary>
@@ -186,7 +184,7 @@ public class MapGameManager : SingletonTemplate<MapGameManager>
         var uiRootTransform = UIRoot.transform;
         uiRootTransform.position = new Vector3(0, 500, 0);
         UICamera = uiRootTransform.Find("UICamera").GetComponent<Camera>();
-        UICanvas = uiRootTransform.Find("Canvas");
+        UICanvas = uiRootTransform.Find("UICanvas");
         OnLoadUIRootComplete();
     }
 
@@ -324,7 +322,7 @@ public class MapGameManager : SingletonTemplate<MapGameManager>
     /// <param name="loadCompleteCb"></param>
     public void LoadEntityPrefabByPath(BaseActorEntity actorEntity, string prefabPath, Transform parent, Action<BaseActorEntity> loadCompleteCb = null)
     {
-        PoolManager.Singleton.pop(prefabPath, (instance) =>
+        PoolManager.Singleton.Pop(prefabPath, (instance) =>
         {
             actorEntity.Go = instance;
             var instanceTransform = instance.transform;

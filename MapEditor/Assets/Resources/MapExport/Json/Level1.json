@@ -1,7 +1,7 @@
 {
     "MapData": {
         "Width": 8,
-        "Height": 30,
+        "Height": 40,
         "StartPos": {
             "x": 0.0,
             "y": 0.0,
@@ -9,11 +9,16 @@
         },
         "BirthPos": [
             {
-                "x": 4.0,
+                "x": 3.0,
                 "y": 0.0,
-                "z": 2.0
+                "z": 3.0
             }
         ],
+        "GameVirtualCameraInitPos": {
+            "x": 3.0,
+            "y": 15.0,
+            "z": -10.0
+        },
         "GridSize": 0.0
     },
     "ALlMonsterMapDatas": [
@@ -21,9 +26,9 @@
             "MapDataType": 1,
             "ConfId": 1,
             "Position": {
-                "x": 4.0,
+                "x": 3.0,
                 "y": 0.0,
-                "z": 10.0
+                "z": 15.0
             },
             "Roation": {
                 "x": 0.0,
@@ -37,9 +42,9 @@
             "MapDataType": 1,
             "ConfId": 2,
             "Position": {
-                "x": 4.0,
+                "x": 3.0,
                 "y": 0.0,
-                "z": 18.0
+                "z": 20.0
             },
             "Roation": {
                 "x": 0.0,
@@ -55,9 +60,9 @@
             "MapDataType": 2,
             "ConfId": 4,
             "Position": {
-                "x": 5.0,
+                "x": 3.0,
                 "y": 0.0,
-                "z": 8.0
+                "z": 25.0
             },
             "Roation": {
                 "x": 0.0,
@@ -73,7 +78,7 @@
             "Position": {
                 "x": 3.0,
                 "y": 0.0,
-                "z": 12.0
+                "z": 30.0
             },
             "Roation": {
                 "x": 0.0,

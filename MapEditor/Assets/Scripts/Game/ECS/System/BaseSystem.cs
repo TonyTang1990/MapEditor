@@ -12,7 +12,7 @@
 // 只是设计上借鉴ECS的概念设计，参考的tiny-ecs设计
 
 using System.Collections.Generic;
-using System.Diagnostics;
+using UnityEngine;
 
 //// <summary>
 /// BaseSystem.cs
@@ -92,7 +92,7 @@ public abstract class BaseSystem
     {
         if(SystemEntityList.Contains(entity))
         {
-            Debug.logError($"系统名:{SystemName}已存在Entity Uuid:{entity.Uuid}的Entity，添加系统Entity失败！");
+            Debug.LogError($"系统名:{SystemName}已存在Entity Uuid:{entity.Uuid}的Entity，添加系统Entity失败！");
             return false;
         }
         SystemEntityList.Add(entity);
@@ -109,7 +109,7 @@ public abstract class BaseSystem
         var result = SystemEntityList.Remove(entity);
         if(!result)
         {
-            Debug.logError($"系统名:{SystemName}找不到Entity Uuid:{entity.Uuid}的Entity，移除系统Entity失败！");
+            Debug.LogError($"系统名:{SystemName}找不到Entity Uuid:{entity.Uuid}的Entity，移除系统Entity失败！");
         }
         return result;
     }

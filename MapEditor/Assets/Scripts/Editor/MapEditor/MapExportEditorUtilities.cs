@@ -8,6 +8,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
+using UnityEditor;
 using UnityEngine;
 
 namespace MapEditor
@@ -269,6 +270,8 @@ namespace MapEditor
             {
                 sw.Write(mapDataJsonContent);
             }
+            AssetDatabase.Refresh();
+            AssetDatabase.SaveAssets();
             Debug.Log($"导出地图数据:{exportFileFullPath}成功！");
         }
 

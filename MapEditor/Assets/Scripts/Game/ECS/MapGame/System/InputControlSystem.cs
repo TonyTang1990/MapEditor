@@ -2,7 +2,7 @@
  * @ Author: TONYTANG
  * @ Create Time: 2025-02-24 18:18:00
  * @ Modified by: TONYTANG
- * @ Modified time: 2025-02-24 18:18:00
+ * @ Modified time: 2025-03-08 23:45:18
  * @ Description:
  */
 
@@ -30,10 +30,11 @@ public class InputControlSystem : BaseSystem
     /// <summary>
     /// Update
     /// </summary>
+    /// <param name="entity"></param>
     /// <param name="deltaTime"></param>
-    public override void Process(float deltaTime)
+    public override void Process(BaseEntity entity, float deltaTime)
     {
-        base.Process(deltaTime);
+        base.Process(entity, deltaTime);
         if(Input.GetKey("w"))
         {
             MoveUp(deltaTime);

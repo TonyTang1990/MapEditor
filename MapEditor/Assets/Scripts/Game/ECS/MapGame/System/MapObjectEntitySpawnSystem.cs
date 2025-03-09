@@ -10,6 +10,7 @@ using MapEditor;
 using System;
 using System.Collections.Generic;
 using TH.Module.Collision2D;
+using UnityEngine;
 
 /// <summary>
 /// MapObjectEntitySpawnSystem.cs
@@ -136,8 +137,8 @@ public class MapObjectEntitySpawnSystem : BaseSystem
         var maxZ = Math.Max(mRectAreaPointsList[1].z, mRectAreaPointsList[2].z);
         var width = maxX - minX;
         var height = maxZ - minZ;
-        var centerX = mRectAreaPointsList[1].X + width / 2;
-        var centerZ = mRectAreaPointsList[0].Z + height / 2;
+        var centerX = mRectAreaPointsList[1].x + width / 2;
+        var centerZ = mRectAreaPointsList[0].z + height / 2;
         mCameraRectArea.Center.x = centerX;
         mCameraRectArea.Center.y = centerZ;
         mCameraRectArea.Extents.x = width;
@@ -185,19 +186,19 @@ public class MapObjectEntitySpawnSystem : BaseSystem
             var position = mapDataExport.Position;
             if(mapDataExport is MonsterMapDataExport)
             {
-                var monsterEntity = OwnerWorld.CreateEtity<MonsterEntity>(MapGameConst.MonsterPrefabPath);
+                var monsterEntity = OwnerWorld.CreateEntity<MonsterEntity>(MapGameConst.MonsterPrefabPath);
                 entity = monsterEntity;
                 monsterEntity.SetPosition(position.x, position.y, position.z);
             }
             else if(mapDataExport is TreasureBoxMapDataExport)
             {
-                var treasureEntity = OwnerWorld.CreateEtity<TreasureBoxEntity>(MapGameConst.TreasureBoxPrefabPath);
+                var treasureEntity = OwnerWorld.CreateEntity<TreasureBoxEntity>(MapGameConst.TreasureBoxPrefabPath);
                 entity = treasureEntity;
                 treasureEntity.SetPosition(position.x, position.y, position.z);
             }
             else if(mapDataExport is TrapMapDataExport)
             {
-                var trapEntity = OwnerWorld.CreateEtity<TrapEntity>(MapGameConst.TrapPrefabPath);
+                var trapEntity = OwnerWorld.CreateEntity<TrapEntity>(MapGameConst.TrapPrefabPath);
                 entity = trapEntity;
                 trapEntity.SetPosition(position.x, position.y, position.z);
             }

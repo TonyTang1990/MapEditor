@@ -299,6 +299,8 @@ namespace MapEditor
             mExportTypeProperty ??= serializedObject.FindProperty("ExportType");
             mCustomExportFileNameProperty ??= serializedObject.FindProperty("CustomExportFileName");
             mAllGroupUnfoldDataListProperty ??= serializedObject.FindProperty("AllGroupUnfoldDataList");
+            mMapObjectDataUnfoldDataProperty ??= serializedObject.FindProperty("MapObjectDataUnfoldData");
+            mMapDataUnfoldDataProperty ??= serializedObject.FindProperty("MapDataUnfoldData");
             mBatchTickRangeStartIndexProperty ??= serializedObject.FindProperty("BatchTickRangeStartIndex");
             mBatchTickRangeEndIndexProperty ??= serializedObject.FindProperty("BatchTickRangeEndIndex");
             mLevelMapDataProperty ??= serializedObject.FindProperty("LevelMapData");
@@ -2744,16 +2746,16 @@ namespace MapEditor
             {
                 var space = 10f;
                 EditorGUILayout.Space(space, false);
-                batchOperationSwitchProperty.boolValue = EditorGUILayout.Toggle(batchOperationSwitchProperty.boolValue, GUILayout.Width(MapEditorConst.InspectorDataBatchUIWidth - space));
+                property.boolValue = EditorGUILayout.Toggle(property.boolValue, GUILayout.Width(MapEditorConst.InspectorDataBatchUIWidth - space));
                 var currentEvent = Event.current;
                 if (IsInspectorKeyCodeDown(KeyCode.LeftShift) || IsInspectorKeyCodeDown(KeyCode.RightShift))
                 {
                     if (GUILayoutUtility.GetLastRect().Contains(currentEvent.mousePosition))
                     {
                         //Debug.Log($"按住Shift并处于埋点数据索引:{mapObjectDataIndex}的批量勾选区域！")；
-                        if (!batchOperationSwitchProperty.boolValue)
+                        if (!property.boolValue)
                         {
-                            batchOperationSwitchProperty.boolValue = true;
+                            property.boolValue = true;
                         }
                     }
                 }
@@ -2762,9 +2764,9 @@ namespace MapEditor
                     if (GUILayoutUtility.GetLastRect().Contains(currentEvent.mousePosition))
                     {
                         //Debug.Log($"按住Alt并处于埋点数据索引:{mapObjectDataIndex}的批量勾选区域！")；
-                        if (batchOperationSwitchProperty.boolValue)
+                        if (property.boolValue)
                         {
-                            batchOperationSwitchProperty.boolValue = false;
+                            property.boolValue = false;
                         }
                     }
                 }
@@ -2842,7 +2844,7 @@ namespace MapEditor
                 newVector3Value.z = EditorGUILayout.FloatField(newVector3Value.z, GUILayout.Width(singlePosWidth));
                 if (EditorGUI.EndChangeCheck())
                 {
-                    var positionOffset = newVector3Value - positionProperty.vector3Value;
+                    var positionOffset = newVector3Value - property.vector3Value;
                     OnMapDataPositionMove(mapDataIndex, positionOffset);
                 }
             }
@@ -2859,7 +2861,7 @@ namespace MapEditor
                 newRotationVector3Value.z = EditorGUILayout.FloatField(newRotationVector3Value.z, GUILayout.Width(singleRotWidth));
                 if (EditorGUI.EndChangeCheck())
                 {
-                    rotationProperty.vector3Value = newRotationVector3Value;
+                    property.vector3Value = newRotationVector3Value;
                 }
             }
             else if (mapUIType == MapUIType.MonsterCreateRadius)

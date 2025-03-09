@@ -62,7 +62,7 @@ public abstract class BaseUI
         var uiAsset = Resources.Load<GameObject>(uiPrefabPath);
         Instance = GameObject.Instantiate(uiAsset);
         Instance.name = UIName;
-        Instance.transform.SetParent(parent);
+        Instance.transform.SetParent(parent, false);
         OnLoadResComplete();
     }
 

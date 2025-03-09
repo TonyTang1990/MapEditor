@@ -1,15 +1,14 @@
 ﻿/**
 * @ Author: TONYTANG
 * @ Create Time: 2025-02-17 16:39:04
-* @ Modified by: TONYTANG
-* @ Modified time: 2025-02-17 16:54:54
+ * @ Modified by: TONYTANG
+ * @ Modified time: 2025-03-09 00:32:58
 * @ Description:
 */
 
 using MapEditor;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using UnityEngine;
 
 // Note:
@@ -249,7 +248,7 @@ public abstract class BaseWorld
             DoAddEntity(waitAddEntity);
         }
 
-        foreach (var waitRemoveEntity in mTempWaitAddEntities)
+        foreach (var waitRemoveEntity in mTempWaitRemoveEntities)
         {
             DoDestroyEntity(waitRemoveEntity);
         }
@@ -382,7 +381,7 @@ public abstract class BaseWorld
             return null;
         }
         var result = ExistSystem(systemName);
-        if (result)
+        if (!result)
         {
             system = new T();
             system.Init(this, systemName, parameters);
@@ -503,7 +502,7 @@ public abstract class BaseWorld
         var systemName = system.SystemName;
         if (!ExistSystem(systemName))
         {
-            mAllSystemMap.Add(systemName, targetSystem);
+            mAllSystemMap.Add(systemName, system);
             mAllSystems.Add(system);
             system.OnAddToWorld();
             OnAddSystem(system);
@@ -674,9 +673,8 @@ public abstract class BaseWorld
     /// <typeparam name="T"></typeparam>
     /// <param name="parameters"></param>
     /// <returns></returns>
-    public T CreateEtity<T>(params object[] parameters) where T : BaseEntity, new()
+    public T CreateEntity<T>(params object[] parameters) where T : BaseEntity, new()
     {
-        var entityType = typeof(T);
         T entity = ObjectPool.Singleton.Pop<T>();
         var entityUuid = GetNextEntityUuid();
         entity.SetUuid(entityUuid);

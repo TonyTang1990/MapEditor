@@ -2,18 +2,18 @@
  * @ Author: TONYTANG
  * @ Create Time: 2025-02-17 16:38:26
  * @ Modified by: TONYTANG
- * @ Modified time: 2025-02-17 16:38:49
+ * @ Modified time: 2025-03-09 00:26:18
  * @ Description:
  */
 
 /// <summary>
 /// TrapEntity.cs
-/// 陷阱Entity
+/// 闄烽槺Entity
 /// </summary>
 public class TrapEntity : BaseActorEntity
 {
     /// <summary>
-    /// 初始化Entity类型
+    /// 鍒濆鍖朎ntity绫诲瀷
     /// </summary>
     protected override void InitEntityType()
     {

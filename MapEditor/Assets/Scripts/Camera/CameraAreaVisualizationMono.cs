@@ -7,8 +7,6 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Drawing;
-using System.Numerics;
 using UnityEngine;
 
 /// <summary>
@@ -95,9 +93,9 @@ public class CameraAreaVisualizationMono : MonoBehaviour
         if(mAreaPointsList.Count > 0)
         {
             var lbToLtLine = new KeyValuePair<Vector3, Vector3>(mAreaPointsList[0], mAreaPointsList[1]);
-            var ltToRtLine = new KeyValuePair<Vector3, Vector3>(mAreaPointsList[2], mAreaPointsList[2]);
-            var rtToRbLine = new KeyValuePair<Vector3, Vector3>(mAreaPointsList[3], mAreaPointsList[3]);
-            var rbToLbLine = new KeyValuePair<Vector3, Vector3>(mAreaPointsList[4], mAreaPointsList[0]);
+            var ltToRtLine = new KeyValuePair<Vector3, Vector3>(mAreaPointsList[1], mAreaPointsList[2]);
+            var rtToRbLine = new KeyValuePair<Vector3, Vector3>(mAreaPointsList[2], mAreaPointsList[3]);
+            var rbToLbLine = new KeyValuePair<Vector3, Vector3>(mAreaPointsList[3], mAreaPointsList[0]);
             mAreaLinesList.Add(lbToLtLine);
             mAreaLinesList.Add(ltToRtLine);
             mAreaLinesList.Add(rtToRbLine);

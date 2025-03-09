@@ -37,7 +37,7 @@ public class CameraFollowSystem : BaseSystem
     public override void OnAddToWorld()
     {
         base.OnAddToWorld();
-        var cameraEntity = OwnerWorld.CreateEtity<CameraEntity>(MapGameManager.Singleton.GameVirtualCamera.gameObject, false);
+        var cameraEntity = OwnerWorld.CreateEntity<CameraEntity>(MapGameManager.Singleton.GameVirtualCamera.gameObject, false);
         mCameraEntityUuid = cameraEntity.Uuid;
     }
 

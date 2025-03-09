@@ -1,15 +1,17 @@
-﻿/**
+﻿
+
+using UnityEngine;
+
+/**
  * @ Author: TONYTANG
  * @ Create Time: 2025-02-17 18:20:56
  * @ Modified by: TONYTANG
  * @ Modified time: 2025-02-17 18:21:45
  * @ Description:
- */
-
-/// <summary>
-/// MapGameConst.cs
-/// 游戏常量
-/// </summary>
+ *//// <summary>
+   /// MapGameConst.cs
+   /// 游戏常量
+   /// </summary>
 public static class MapGameConst
 {
     /// <summary>

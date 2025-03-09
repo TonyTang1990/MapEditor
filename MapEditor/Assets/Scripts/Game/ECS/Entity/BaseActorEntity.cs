@@ -177,7 +177,7 @@ public abstract class BaseActorEntity : BaseEntity
     {
         if(Go != null)
         {
-            PoolManager.Singleton.push(PrefabPath, Go);
+            PoolManager.Singleton.Push(PrefabPath, Go);
             Go = null;
         }
     }

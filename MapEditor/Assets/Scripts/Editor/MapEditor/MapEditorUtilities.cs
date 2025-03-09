@@ -8,6 +8,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
+using Cinemachine;
 using Unity.AI.Navigation;
 using Unity.AI.Navigation.Editor;
 using UnityEditor;
@@ -1207,7 +1208,7 @@ namespace MapEditor
             new MapUITypeDisplayData(MapUIType.Rotation, "Rotation", "旋转", MapEditorConst.InspectorDataRotationUIWidth, MapStyles.TabMiddleStyle),
             new MapUITypeDisplayData(MapUIType.MonsterCreateRadius, "MonsterCreateRadius", "创建半径", MapEditorConst.InspectorDataMonsterCreateRadiusUIWidth, MapStyles.TabMiddleStyle),
             new MapUITypeDisplayData(MapUIType.MonsterActiveRadius, "MonsterActiveRadius", "警戒半径", MapEditorConst.InspectorDataMonsterActiveRediusUIWidth, MapStyles.TabMiddleStyle),
-            new MapUITypeDisplayData(MapUIType.Des, "", "描述", MapEditorConst.InspectorDataDesUIWidth, MapStyles.TabMiddleStyle),
+            //new MapUITypeDisplayData(MapUIType.Des, "", "描述", MapEditorConst.InspectorDataDesUIWidth, MapStyles.TabMiddleStyle),
             new MapUITypeDisplayData(MapUIType.MoveUp, "", "上移", MapEditorConst.InspectorDataMoveUpUIWidth, MapStyles.TabMiddleStyle),
             new MapUITypeDisplayData(MapUIType.MoveDown, "", "下移", MapEditorConst.InspectorDataMoveDownUIWidth, MapStyles.TabMiddleStyle),
             new MapUITypeDisplayData(MapUIType.Add, "", "添加", MapEditorConst.InspectorDataAddUIWidth, MapStyles.TabMiddleStyle),

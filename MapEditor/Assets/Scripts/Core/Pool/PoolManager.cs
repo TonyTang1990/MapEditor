@@ -54,7 +54,7 @@ public class PoolManager : SingletonTemplate<PoolManager>
     /// 弹出空节点对象
     /// </summary>
     /// <returns></returns>
-    public GameObject popEmptyGo()
+    public GameObject PopEmptyGo()
     {
         if (mObjectPoolMap.ContainsKey(EmptyGameObjectKeyName) && mObjectPoolMap[EmptyGameObjectKeyName].Count > 0)
         {
@@ -80,7 +80,7 @@ public class PoolManager : SingletonTemplate<PoolManager>
     /// </summary>
     /// <param name="instance"></param>
     /// <returns></returns>
-    public void pushEmptyGo(GameObject instance)
+    public void PushEmptyGo(GameObject instance)
     {
         if (instance == null)
         {
@@ -107,7 +107,7 @@ public class PoolManager : SingletonTemplate<PoolManager>
     /// </summary>
     /// <param name="poolName">缓存池名</param>
     /// <param name="instance">放入对象池的实例对象</param>
-    public void push(string poolName, GameObject instance)
+    public void Push(string poolName, GameObject instance)
     {
         if (instance == null)
         {
@@ -135,7 +135,7 @@ public class PoolManager : SingletonTemplate<PoolManager>
     /// <param name="prefabPath">预制件路径</param>
     /// <param name="loadCompleteCb">加载完成回调</param>
     /// <returns></returns>
-    public bool pop(string prefabPath, Action<GameObject> loadCompleteCb = null)
+    public bool Pop(string prefabPath, Action<GameObject> loadCompleteCb = null)
     {
         if (string.IsNullOrEmpty(prefabPath))
         {
@@ -179,7 +179,7 @@ public class PoolManager : SingletonTemplate<PoolManager>
     /// 清除特定预制件所缓存的实例对象
     /// </summary>
     /// <param name="poolName">缓存池名</param>
-    public void clear(string poolName)
+    public void Clear(string poolName)
     {
         if (mObjectPoolMap.ContainsKey(poolName))
         {
@@ -200,7 +200,7 @@ public class PoolManager : SingletonTemplate<PoolManager>
     /// <summary>
     /// 清除所有缓存的对象
     /// </summary>
-    public void clearAll()
+    public void ClearAll()
     {
         foreach (var objectlist in mObjectPoolMap)
         {

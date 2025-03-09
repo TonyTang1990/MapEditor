@@ -34,7 +34,7 @@ public class MapGameEntitySpawnSystem : BaseSystem
     /// </summary>
     private void CreateMapGameEntity()
     {
-        var mapGameEntity = OwnerWorld.CreateEtity<MapGameEntity>();
+        var mapGameEntity = OwnerWorld.CreateEntity<MapGameEntity>();
         mMapGameEntityUuid = mapGameEntity.Uuid;
     }
 
