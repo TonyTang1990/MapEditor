@@ -409,6 +409,7 @@ public abstract class BaseWorld
         }
         system.Enable = false;
         system.OnDisable();
+        system.RemoveEvents();
         mWaitRemoveSystems.Add(system);
         mWaitAddSystems.Remove(system);
         return true;
@@ -422,15 +423,15 @@ public abstract class BaseWorld
     protected bool DoRemoveSystem(BaseSystem system)
     {
         var systemName = system.SystemName;
-        mAllSystemMap.Remove(systemName);
-        var result = mAllSystems.Remove(system);
-        if(result)
+        var systemIndex = mAllSystems.IndexOf(system);
+        if(systemIndex != -1)
         {
             foreach(var entity in system.SystemEntityList)
             {
                 system.OnRemove(entity);
             }
-            system.RemoveEvents();
+            mAllSystemMap.Remove(systemName);
+            mAllSystems.Remove(system);
             system.OnRemoveFromWorld();
             OnRemoveSystem(system);
             system.RemoveAllSystemEntity();
