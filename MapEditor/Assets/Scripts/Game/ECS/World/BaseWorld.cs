@@ -2,7 +2,7 @@
 * @ Author: TONYTANG
 * @ Create Time: 2025-02-17 16:39:04
  * @ Modified by: TONYTANG
- * @ Modified time: 2025-03-09 00:32:58
+ * @ Modified time: 2025-03-11 11:41:42
 * @ Description:
 */
 
@@ -434,7 +434,7 @@ public abstract class BaseWorld
             mAllSystems.Remove(system);
             system.OnRemoveFromWorld();
             OnRemoveSystem(system);
-            system.RemoveAllSystemEntity();
+            system.OnDestroy();
         }
         else
         {

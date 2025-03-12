@@ -115,16 +115,6 @@ public abstract class BaseSystem
     }
 
     /// <summary>
-    /// 移除所有系统Entity
-    /// </summary>
-    /// <returns></returns>
-    public bool RemoveAllSystemEntity()
-    {
-        SystemEntityList.Clear();
-        return true;
-    }
-
-    /// <summary>
     /// 响应激活
     /// </summary>
     public virtual void OnEnable()
@@ -188,6 +178,17 @@ public abstract class BaseSystem
     public virtual void OnRemoveFromWorld()
     {
         Debug.Log($"世界名:{OwnerWorld.WorldName}的系统名:{SystemName}被从世界移除！");
+    }
+
+    /// <summary>
+    /// 响应系统销毁
+    /// </summary>
+    public virtual void OnDestroy()
+    {
+        Debug.Log($"世界名:{OwnerWorld.WorldName}的系统名:{SystemName}被销毁！");
+        SystemEntityList.Clear();
+        OwnerWorld = null;
+        SystemName = null;
     }
 
     /// <summary>
