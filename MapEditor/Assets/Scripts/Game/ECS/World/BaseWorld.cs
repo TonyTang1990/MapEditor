@@ -2,7 +2,7 @@
 * @ Author: TONYTANG
 * @ Create Time: 2025-02-17 16:39:04
  * @ Modified by: TONYTANG
- * @ Modified time: 2025-03-11 11:41:42
+ * @ Modified time: 2025-03-13 13:25:01
 * @ Description:
 */
 
@@ -435,12 +435,10 @@ public abstract class BaseWorld
             system.OnRemoveFromWorld();
             OnRemoveSystem(system);
             system.OnDestroy();
+            return true;
         }
-        else
-        {
-            Debug.LogError($"找不到系统名:{systemName}的系统，执行移除系统失败！");
-        }
-        return result;
+        Debug.LogError($"找不到系统名:{systemName}的系统，执行移除系统失败！");
+        return false;
     }
 
     /// <summary>
