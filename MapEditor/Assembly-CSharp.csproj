@@ -1,21 +1,26 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+﻿<Project ToolsVersion="Current">
   <!-- Generated file, do not modify, your changes will be overwritten (use AssetPostprocessor.OnGeneratedCSProject) -->
   <PropertyGroup>
-    <LangVersion>9.0</LangVersion>
+    <BaseIntermediateOutputPath>Temp\obj\$(Configuration)\$(MSBuildProjectName)</BaseIntermediateOutputPath>
+    <IntermediateOutputPath>$(BaseIntermediateOutputPath)</IntermediateOutputPath>
   </PropertyGroup>
+  <Import Project="Sdk.props" Sdk="Microsoft.NET.Sdk" />
+  <ItemGroup>
+    <ProjectCapability Include="Unity" />
+  </ItemGroup>
   <PropertyGroup>
+    <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+    <EnableDefaultItems>false</EnableDefaultItems>
+    <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
+    <LangVersion>9.0</LangVersion>
+    <Configurations>Debug;Release</Configurations>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProductVersion>10.0.20506</ProductVersion>
-    <SchemaVersion>2.0</SchemaVersion>
     <RootNamespace></RootNamespace>
-    <ProjectGuid>{8FDB5A40-4C78-576C-FBF9-6CA5ED291819}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <AssemblyName>Assembly-CSharp</AssemblyName>
-    <TargetFrameworkVersion>v4.7.1</TargetFrameworkVersion>
-    <FileAlignment>512</FileAlignment>
+    <TargetFramework>netstandard2.1</TargetFramework>
     <BaseDirectory>.</BaseDirectory>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
@@ -39,36 +44,34 @@
     <AllowUnsafeBlocks>False</AllowUnsafeBlocks>
   </PropertyGroup>
   <PropertyGroup>
-    <NoConfig>true</NoConfig>
+    <NoStandardLibraries>true</NoStandardLibraries>
     <NoStdLib>true</NoStdLib>
-    <AddAdditionalExplicitAssemblyReferences>false</AddAdditionalExplicitAssemblyReferences>
-    <ImplicitlyExpandNETStandardFacades>false</ImplicitlyExpandNETStandardFacades>
-    <ImplicitlyExpandDesignTimeFacades>false</ImplicitlyExpandDesignTimeFacades>
+    <NoConfig>true</NoConfig>
+    <DisableImplicitFrameworkReferences>true</DisableImplicitFrameworkReferences>
+    <MSBuildWarningsAsMessages>MSB3277</MSBuildWarningsAsMessages>
   </PropertyGroup>
   <PropertyGroup>
-    <ProjectTypeGuids>{E097FAD1-6243-4DAD-9C02-E9B9EFC3FFC1};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
     <UnityProjectGenerator>Package</UnityProjectGenerator>
     <UnityProjectGeneratorVersion>2.0.22</UnityProjectGeneratorVersion>
-    <UnityProjectGeneratorStyle>Legacy</UnityProjectGeneratorStyle>
+    <UnityProjectGeneratorStyle>SDK</UnityProjectGeneratorStyle>
     <UnityProjectType>Game:1</UnityProjectType>
     <UnityBuildTarget>StandaloneWindows64:19</UnityBuildTarget>
     <UnityVersion>2021.3.4f1c1</UnityVersion>
   </PropertyGroup>
   <ItemGroup>
-    <Analyzer Include="G:\Software\VisualStudio\VS2022\Install\Common7\IDE\Extensions\Microsoft\Visual Studio Tools for Unity\Analyzers\Microsoft.Unity.Analyzers.dll" />
+    <Analyzer Include="C:\Users\TonyTang\.vscode\extensions\visualstudiotoolsforunity.vstuc-1.1.0\Analyzers\Microsoft.Unity.Analyzers.dll" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Assets\Scripts\Utilities\FolderUtilities.cs" />
     <Compile Include="Assets\Scripts\Game\ECS\MapGame\System\MapObjectGoSpawnSystem.cs" />
     <Compile Include="Assets\Scripts\Map\MapData\MapDataConfig.cs" />
     <Compile Include="Assets\Scripts\Map\MapData\MonsterMapData.cs" />
-    <Compile Include="Assets\Scripts\Game\ECS\Entity\BaseActorEntity.cs" />
     <Compile Include="Assets\GameLauncher.cs" />
+    <Compile Include="Assets\Scripts\Game\ECS\MapGame\Component\RotationComponent.cs" />
     <Compile Include="Assets\Scripts\Core\Collision\Collision2D\Circle2D.cs" />
     <Compile Include="Assets\Scripts\Map\MapObject\MapObjectType.cs" />
     <Compile Include="Assets\Scripts\Core\Collision\Collision3D\Collision3DUtilities.cs" />
     <Compile Include="Assets\Scripts\Map\MapObject\MapObjectDataMono.cs" />
-    <Compile Include="Assets\Scripts\Game\ECS\Entity\BaseBindEntity.cs" />
     <Compile Include="Assets\Scripts\Game\ECS\World\BaseWorld.cs" />
     <Compile Include="Assets\Scripts\Map\MapData\MapDataType.cs" />
     <Compile Include="Assets\Scripts\Game\ECS\World\WorldManager.cs" />
@@ -82,6 +85,7 @@
     <Compile Include="Assets\Scripts\Core\Pool\ObjectFactory.cs" />
     <Compile Include="Assets\Scripts\Map\MapFoldTypeData.cs" />
     <Compile Include="Assets\Scripts\Map\MapData\PlayerSpawnMapData.cs" />
+    <Compile Include="Assets\Scripts\Game\ECS\MapGame\EntityType.cs" />
     <Compile Include="Assets\Scripts\Core\Extension\StringExt.cs" />
     <Compile Include="Assets\Scripts\Utilities\Vector3Utilities.cs" />
     <Compile Include="Assets\Scripts\Core\Collision\Collision2D\VisibleDraw\Sector2DVisible.cs" />
@@ -90,20 +94,23 @@
     <Compile Include="Assets\Scripts\Game\ECS\MapGame\Entity\PlayerEntity.cs" />
     <Compile Include="Assets\Scripts\Utilities\CameraUtilities.cs" />
     <Compile Include="Assets\Scripts\Game\ECS\MapGame\Entity\MapGameEntity.cs" />
+    <Compile Include="Assets\Scripts\Game\ECS\MapGame\Component\AnimatorPlayComponent.cs" />
     <Compile Include="Assets\Scripts\Map\MapExport\MapExport.cs" />
     <Compile Include="Assets\Scripts\Utilities\UnityUtilities.cs" />
     <Compile Include="Assets\Scripts\Core\Collision\Collision2D\Sector2D.cs" />
     <Compile Include="Assets\Scripts\Game\ECS\System\SystemManager.cs" />
+    <Compile Include="Assets\Scripts\Game\ECS\MapGame\Component\EntityTypeComponent.cs" />
     <Compile Include="Assets\Scripts\Map\MapExport\TrapMapDataExport.cs" />
     <Compile Include="Assets\Scripts\Map\MapSetting.cs" />
     <Compile Include="Assets\Scripts\Map\MapUtilities.cs" />
     <Compile Include="Assets\Scripts\Map\MapExport\MapObjectExport.cs" />
     <Compile Include="Assets\Scripts\Map\MapExport\TreasureBoxMapDataExport.cs" />
+    <Compile Include="Assets\Scripts\Game\ECS\MapGame\Component\GameObjectBindComponent.cs" />
     <Compile Include="Assets\Scripts\Core\Collision\Collision2D\Collision2DUtilities.cs" />
     <Compile Include="Assets\Scripts\Game\ECS\Entity\BaseEntity.cs" />
     <Compile Include="Assets\Scripts\Map\MapObject\ColliderDataMono.cs" />
     <Compile Include="Assets\Scripts\Core\Collision\Collision3D\Sphere3D.cs" />
-    <Compile Include="Assets\Scripts\Game\ECS\Entity\EntityType.cs" />
+    <Compile Include="Assets\Scripts\Game\ECS\EntityUtilities.cs" />
     <Compile Include="Assets\Scripts\Core\Singleton\SingletonMonoBehaviourTemplate.cs" />
     <Compile Include="Assets\Scripts\Core\Collision\MeshUtilities.cs" />
     <Compile Include="Assets\Scripts\Game\MapGameManager.cs" />
@@ -115,6 +122,8 @@
     <Compile Include="Assets\Scripts\Core\Pool\PoolManager.cs" />
     <Compile Include="Assets\Scripts\Core\Collision\Collision2D\OBB2D.cs" />
     <Compile Include="Assets\Scripts\Map\MapExport\ExportType.cs" />
+    <Compile Include="Assets\Scripts\Game\ECS\MapGame\Component\PositionComponent.cs" />
+    <Compile Include="Assets\Scripts\Game\ECS\MapGame\Component\ActorComponent.cs" />
     <Compile Include="Assets\Scripts\Game\MapGameConst.cs" />
     <Compile Include="Assets\Scripts\Game\ECS\System\BaseSystem.cs" />
     <Compile Include="Assets\Scripts\Core\Collision\Collision2D\AABB2D.cs" />
@@ -123,13 +132,18 @@
     <Compile Include="Assets\Scripts\Game\ECS\MapGame\System\ActorSyncSystem.cs" />
     <Compile Include="Assets\Scripts\Core\Collision\Collision2D\VisibleDraw\AABB2DVisible.cs" />
     <Compile Include="Assets\Scripts\Game\GameManager.cs" />
+    <Compile Include="Assets\Scripts\Game\ECS\ECSConst.cs" />
+    <Compile Include="Assets\Scripts\Game\ECS\MapGame\Component\GameObjectComponent.cs" />
+    <Compile Include="Assets\Scripts\Game\ECS\ComponentUtilities.cs" />
     <Compile Include="Assets\Scripts\Map\MapExport\MonsterMapDataExport.cs" />
     <Compile Include="Assets\Scripts\Map\Map.cs" />
     <Compile Include="Assets\Scripts\Game\ECS\MapGame\System\PlayerSpawnSystem.cs" />
     <Compile Include="Assets\Scripts\Core\Collision\Collision2D\VisibleDraw\Capsule2DVisible.cs" />
+    <Compile Include="Assets\Scripts\Game\ECS\MapGame\Entity\BaseBindEntity.cs" />
     <Compile Include="Assets\Scripts\Game\UI\MainUI.cs" />
     <Compile Include="Assets\Scripts\Map\MapExport\BaseMapDataExport.cs" />
     <Compile Include="Assets\Scripts\Game\ECS\MapGame\System\CameraFollowSystem.cs" />
+    <Compile Include="Assets\Scripts\Game\ECS\MapGame\Component\GameObjectSyncComponent.cs" />
     <Compile Include="Assets\Scripts\Game\ECS\MapGame\System\MapGameEntitySpawnSystem.cs" />
     <Compile Include="Assets\Scripts\Game\UI\BaseUI.cs" />
     <Compile Include="Assets\Scripts\Game\ECS\MapGame\System\InputControlSystem.cs" />
@@ -141,7 +155,6 @@
     <Compile Include="Assets\Scripts\Map\MapConst.cs" />
     <Compile Include="Assets\Scripts\Map\MapExport\MapDataExport.cs" />
     <Compile Include="Assets\Scripts\Camera\CameraAreaVisualizationMono.cs" />
-    <Compile Include="Assets\Scripts\Game\ECS\System\SystemNames.cs" />
     <Compile Include="Assets\Scripts\Game\ECS\MapGame\Entity\CameraEntity.cs" />
     <Compile Include="Assets\Scripts\Game\ECS\World\WorldNames.cs" />
     <Compile Include="Assets\Scripts\Core\Pool\ObjectPool.cs" />
@@ -149,6 +162,7 @@
     <Compile Include="Assets\Scripts\Core\Collision\Collision2D\Capsule2D.cs" />
     <Compile Include="Assets\Scripts\Core\Pool\GameObjectPool.cs" />
     <Compile Include="Assets\Scripts\Map\MapObject\MapObjectData.cs" />
+    <Compile Include="Assets\Scripts\Game\ECS\Component\BaseComponent.cs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="UnityEngine">
@@ -1106,13 +1120,16 @@
   </ItemGroup>
   <ItemGroup>
   </ItemGroup>
-  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
-  <Target Name="GenerateTargetFrameworkMonikerAttribute" />
-  <!-- To modify your build process, add your task inside one of the targets below and uncomment it.
-       Other similar extension points exist, see Microsoft.Common.targets.
-  <Target Name="BeforeBuild">
-  </Target>
-  <Target Name="AfterBuild">
-  </Target>
-  -->
+  <Import Project="Sdk.targets" Sdk="Microsoft.NET.Sdk" />
+  <ItemGroup>
+    <ProjectCapability Remove="LaunchProfiles" />
+    <ProjectCapability Remove="SharedProjectReferences" />
+    <ProjectCapability Remove="ReferenceManagerSharedProjects" />
+    <ProjectCapability Remove="ProjectReferences" />
+    <ProjectCapability Remove="ReferenceManagerProjects" />
+    <ProjectCapability Remove="COMReferences" />
+    <ProjectCapability Remove="ReferenceManagerCOM" />
+    <ProjectCapability Remove="AssemblyReferences" />
+    <ProjectCapability Remove="ReferenceManagerAssemblies" />
+  </ItemGroup>
 </Project>

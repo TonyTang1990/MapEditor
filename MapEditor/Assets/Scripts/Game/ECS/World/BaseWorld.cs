@@ -2,7 +2,7 @@
 * @ Author: TONYTANG
 * @ Create Time: 2025-02-17 16:39:04
  * @ Modified by: TONYTANG
- * @ Modified time: 2025-03-13 13:25:01
+ * @ Modified time: 2025-03-17 17:14:28
 * @ Description:
 */
 
@@ -39,9 +39,9 @@ public abstract class BaseWorld
 
     #region System成员定义部分开始
     /// <summary>
-    /// 所有系统Map<系统名，系统>
+    /// 所有系统类型和系统Map<系统类型，系统>
     /// </summary>
-    protected Dictionary<string, BaseSystem> mAllSystemMap;
+    protected Dictionary<Type, BaseSystem> mAllSystemTypeAndSystemMap;
 
     /// <summary>
     /// 所有系统列表
@@ -100,9 +100,9 @@ public abstract class BaseWorld
     protected List<BaseEntity> mAllEntity;
 
     /// <summary>
-    /// Entity Type Map<EntityType, Entity列表></EntityType>
+    /// Entity类型信息和Entity列表Map<Entity类型信息, Entity列表>
     /// </summary>
-    protected Dictionary<EntityType, List<BaseEntity>> mEntityTypeMap;
+    protected Dictionary<Type, List<BaseEntity>> mEntityTypeAndEntitiesMap;
 
     /// <summary>
     /// 等待添加的Entity列表
@@ -133,7 +133,7 @@ public abstract class BaseWorld
     #region World部分开始
     public BaseWorld()
     {
-        mAllSystemMap = new Dictionary<string, BaseSystem>();
+        mAllSystemTypeAndSystemMap = new Dictionary<Type, BaseSystem>();
         mAllSystems = new List<BaseSystem>();
         mWaitAddSystems = new List<BaseSystem>();
         mTempWaitAddSystems = new List<BaseSystem>();
@@ -143,7 +143,7 @@ public abstract class BaseWorld
         mNextEntityUuid = 1;
         mEntityMap = new Dictionary<int, BaseEntity>();
         mAllEntity = new List<BaseEntity>();
-        mEntityTypeMap = new Dictionary<EntityType, List<BaseEntity>>();
+        mEntityTypeAndEntitiesMap = new Dictionary<Type, List<BaseEntity>>();
         mWaitAddEntities = new List<BaseEntity>();
         mTempWaitAddEntities = new List<BaseEntity>();
         mWaitRemoveEntities = new List<BaseEntity>();
@@ -336,7 +336,7 @@ public abstract class BaseWorld
         for (var index = mAllSystems.Count - 1; index >= 0; index--)
         {
             var system = mAllSystems[index];
-            RemoveSystem(system.SystemName);
+            RemoveSystem(system);
         }
     }
 
@@ -371,45 +371,70 @@ public abstract class BaseWorld
     /// <param name="systemName"></param>
     /// <param name="parameters"></param>
     /// <returns></returns>
-    public T CreateSystem<T>(string systemName, params object[] parameters) where T : BaseSystem, new()
+    public T CreateSystem<T>(params object[] parameters) where T : BaseSystem, new()
     {
-        var system = GetSystem<T>(systemName);
-        if (system != null)
+        var systemType = typeof(T);
+        var targetSystem = GetSystemByType(systemType);
+        if (targetSystem == null)
         {
-            var sType = typeof(T);
-            Debug.LogError($"World:{WorldName}已包含系统名:{systemName},添加指定系统类型:{sType.Name}和系统名:{systemName}失败！");
-            return null;
-        }
-        var result = ExistSystem(systemName);
-        if (!result)
-        {
-            system = new T();
-            system.Init(this, systemName, parameters);
+            var system = new T();
+            system.Init(this);
             system.Enable = true;
-            system.OnEnable();
             system.AddEvents();
             mWaitAddSystems.Add(system);
             mWaitRemoveSystems.Remove(system);
+            return system;
         }
-        return system;
+        Debug.LogError($"重复创建系统类型:{systemType.Name}，创建系统失败！");
+        return null;
     }
 
     /// <summary>
-    /// 移除指定系统名的系统
+    /// 移除指定系统
     /// </summary>
-    /// <param name="systemName"></param>
+    /// <param name="system"></param>
     /// <returns></returns>
-    public bool RemoveSystem(string systemName)
+    public bool RemoveSystem<T>(T system) where T : BaseSystem
     {
-        BaseSystem system = GetSystem<BaseSystem>(systemName);
         if (system == null)
         {
-            Debug.LogError($"World:{WorldName}找不到系统名:{systemName}的系统，移除指定系统失败！");
+            Debug.LogError($"不允许移除空系统！");
+            return false;
+        }
+        var systemType = system.ClassType;
+        if(!ExistSystem(system))
+        {
+            Debug.LogError($"系统类型:{systemType.Name}未找到符合的系统对象，移除系统失败！");
+            return false;
+        }
+        return RemoveSystemByType(systemType);
+    }
+
+    /// <summary>
+    /// 移除指定系统类型的系统
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
+    /// <returns></returns>
+    public bool RemoveSystem<T>() where T : BaseSystem
+    {
+        var systemType = typeof(T);
+        return RemoveSystemByType(systemType);
+    }
+
+    /// <summary>
+    /// 移除指定系统类型的系统
+    /// </summary>
+    /// <param name="systemType"></param>
+    /// <returns></returns>
+    public bool RemoveSystemByType(Type systemType)
+    {
+        var system = GetSystemByType(systemType);
+        if(system == null)
+        {
+            Debug.LogError($"World:{WorldName}找不到系统类型:{systemType.Name}的系统，移除指定系统类型失败！");
             return false;
         }
         system.Enable = false;
-        system.OnDisable();
-        system.RemoveEvents();
         mWaitRemoveSystems.Add(system);
         mWaitAddSystems.Remove(system);
         return true;
@@ -422,7 +447,6 @@ public abstract class BaseWorld
     /// <returns></returns>
     protected bool DoRemoveSystem(BaseSystem system)
     {
-        var systemName = system.SystemName;
         var systemIndex = mAllSystems.IndexOf(system);
         if(systemIndex != -1)
         {
@@ -430,31 +454,48 @@ public abstract class BaseWorld
             {
                 system.OnRemove(entity);
             }
-            mAllSystemMap.Remove(systemName);
+            mAllSystemTypeAndSystemMap.Remove(system.ClassType);
             mAllSystems.Remove(system);
+            system.RemoveEvents();
             system.OnRemoveFromWorld();
             OnRemoveSystem(system);
-            system.OnDestroy();
+            system.RemoveSystemAllEntity();
             return true;
         }
-        Debug.LogError($"找不到系统名:{systemName}的系统，执行移除系统失败！");
+        Debug.LogError($"找不到系统类型:{system.ClassType}的系统，执行移除系统失败！");
         return false;
     }
 
     /// <summary>
-    /// 获取指定系统名的系统
+    /// 获取指定系统类型的系统
     /// </summary>
     /// <typeparam name="T"></typeparam>
     /// <param name="systemName"></param>
     /// <returns></returns>
-    public T GetSystem<T>(string systemName) where T : BaseSystem
+    public T GetSystem<T>() where T : BaseSystem
     {
-        BaseSystem targetSystem;
-        if (!mAllSystemMap.TryGetValue(systemName, out targetSystem))
+        var systemType = typeof(T);
+        BaseSystem targetSystem = GetSystemByType(systemType);
+        if (targetSystem == null)
         {
             return null;
         }
         return targetSystem as T;
+    }
+
+    /// <summary>
+    /// 获取指定系统类型的系统
+    /// </summary>
+    /// <param name="systemType"></param>
+    /// <returns></returns>
+    public BaseSystem GetSystemByType(Type systemType)
+    {
+        BaseSystem targetSystem;
+        if (!mAllSystemTypeAndSystemMap.TryGetValue(systemType, out targetSystem))
+        {
+            return null;
+        }
+        return targetSystem;
     }
 
     /// <summary>
@@ -463,7 +504,7 @@ public abstract class BaseWorld
     /// <param name="system"></param>
     protected virtual void OnAddSystem(BaseSystem system)
     {
-        Debug.Log($"世界名:{WorldName}响应添加系统名:{system.SystemName}");
+        Debug.Log($"世界名:{WorldName}响应添加系统名:{system.ClassType.Name}");
     }
 
     /// <summary>
@@ -472,18 +513,19 @@ public abstract class BaseWorld
     /// <param name="system"></param>
     protected virtual void OnRemoveSystem(BaseSystem system)
     {
-        Debug.Log($"世界名:{WorldName}响应移除系统名:{system.SystemName}");
+        Debug.Log($"世界名:{WorldName}响应移除系统名:{system.ClassType.Name}");
     }
 
     /// <summary>
-    /// 指定系统名是否存在
+    /// 指定系统是否存在
     /// </summary>
-    /// <param name="systemName"></param>
+    /// <param name="system"></param>
     /// <returns></returns>
-    protected bool ExistSystem(string systemName)
+    protected bool ExistSystem(BaseSystem system)
     {
-        var targetSystem = GetSystem<BaseSystem>(systemName);
-        return targetSystem != null;
+        var systemType = system.ClassType;
+        var targetSystem = GetSystemByType(systemType);
+        return targetSystem != null && targetSystem != system;
     }
 
     /// <summary>
@@ -495,14 +537,15 @@ public abstract class BaseWorld
     {
         if (system == null)
         {
-            Debug.LogError($"不允许添加空系统！");
+            Debug.LogError($"不允许添加空系统，执行添加系统失败！");
             return false;
         }
-        var systemName = system.SystemName;
-        if (!ExistSystem(systemName))
+        if (!ExistSystem(system))
         {
-            mAllSystemMap.Add(systemName, system);
+            var systemType = system.ClassType;
+            mAllSystemTypeAndSystemMap.Add(systemType, system);
             mAllSystems.Add(system);
+            system.AddEvents();
             system.OnAddToWorld();
             OnAddSystem(system);
             foreach(var entity in mAllEntity)
@@ -517,7 +560,7 @@ public abstract class BaseWorld
         }
         else
         {
-            Debug.LogError($"已包含系统名:{systemName}的系统，添加系统失败！");
+            Debug.LogError($"已包含系统类型:{system.ClassType}的系统，添加系统失败！");
             return false;
         }
     }
@@ -603,12 +646,12 @@ public abstract class BaseWorld
         var entityUuid = entity.Uuid;
         mEntityMap.Add(entityUuid, entity);
         mAllEntity.Add(entity);
-        var entityType = entity.EntityType;
+        var entityClassType = entity.ClassType;
         List<BaseEntity> entityList;
-        if (!mEntityTypeMap.TryGetValue(entityType, out entityList))
+        if (!mEntityTypeAndEntitiesMap.TryGetValue(entityClassType, out entityList))
         {
             entityList = new List<BaseEntity>();
-            mEntityTypeMap.Add(entityType, entityList);
+            mEntityTypeAndEntitiesMap.Add(entityClassType, entityList);
         }
         entityList.Add(entity);
         foreach(var system in mAllSystems)
@@ -632,14 +675,14 @@ public abstract class BaseWorld
     }
 
     /// <summary>
-    /// 获取指定EntityType的Entity列表
+    /// 获取指定Entity类型信息的Entity列表
     /// </summary>
-    /// <param name="entityType"></param>
+    /// <param name="entityClassType"></param>
     /// <returns></returns>
-    public List<BaseEntity> GetEntityListByType(EntityType entityType)
+    public List<BaseEntity> GetEntityListByType(Type entityClassType)
     {
         List<BaseEntity> entityList;
-        if (!mEntityTypeMap.TryGetValue(entityType, out entityList))
+        if (!mEntityTypeAndEntitiesMap.TryGetValue(entityClassType, out entityList))
         {
             return null;
         }
@@ -654,8 +697,9 @@ public abstract class BaseWorld
     /// <returns></returns>
     public T GetFirstEntityByType<T>(EntityType entityType) where T : BaseEntity
     {
+        var entityClassType = typeof(T);
         List<BaseEntity> entityList;
-        if(!mEntityTypeMap.TryGetValue(entityType, out entityList))
+        if(!mEntityTypeAndEntitiesMap.TryGetValue(entityClassType, out entityList))
         {
             return null;
         }
@@ -677,13 +721,7 @@ public abstract class BaseWorld
         T entity = ObjectPool.Singleton.Pop<T>();
         var entityUuid = GetNextEntityUuid();
         entity.SetUuid(entityUuid);
-        entity.Init(parameters);
-        //if (MapConst.BaseActorEntityType.IsAssignableFrom(entityType))
-        //{
-        //    var parent = GetEntityTypeParent(entity.EntityType);
-        //    var actorEntity = entity as BaseActorEntity;
-        //    LoadEntityPrefabByPath(actorEntity, actorEntity.PrefabPath, parent);
-        //}
+        EntityUtilities.InitEntityComponents(entity, parameters);
         mWaitAddEntities.Add(entity);
         mWaitRemoveEntities.Remove(entity);
         return entity;
@@ -746,8 +784,8 @@ public abstract class BaseWorld
         var result = mAllEntity.Remove(entity);
         if(result)
         {
-            var entityType = entity.EntityType;
-            var entityList = GetEntityListByType(entityType);
+            var entityClassType = entity.ClassType;
+            var entityList = GetEntityListByType(entityClassType);
             entityList.Remove(entity);
             foreach(var system in mAllSystems)
             {

@@ -2,7 +2,7 @@
  * @ Author: TONYTANG
  * @ Create Time: 2025-02-17 16:38:13
  * @ Modified by: TONYTANG
- * @ Modified time: 2025-02-17 16:38:53
+ * @ Modified time: 2025-03-17 15:58:10
  * @ Description:
  */
 
@@ -22,7 +22,13 @@ public class ActorSyncSystem : BaseSystem
     /// <returns></returns>
     public override bool Filter(BaseEntity entity)
     {
-        if(entity is BaseActorEntity || entity is BaseBindEntity)
+        var actorComponent = entity.GetComponent<ActorComponent>();
+        if(actorComponent != null)
+        {
+            return true;
+        }
+        var gameObjectBindComponent = entity.GetComponent<GameObjectBindComponent>();
+        if(gameObjectBindComponent != null)
         {
             return true;
         }
@@ -36,32 +42,22 @@ public class ActorSyncSystem : BaseSystem
     public override void Process(BaseEntity entity, float deltaTime)
     {
         base.Process(entity, deltaTime);
-        var actorEntity = entity as BaseActorEntity;
-        if (actorEntity != null)
+        if (entity != null)
         {
-            if (actorEntity.SyncPosition && actorEntity.Go != null)
+            var gameObjectSyncComponent = entity.GetComponent<GameObjectSyncComponent>();
+            var positionComponent = entity.GetComponent<PositionComponent>();
+            if(gameObjectSyncComponent != null && gameObjectSyncComponent.SyncPosition &&
+                positionComponent != null)
             {
-                actorEntity.Go.transform.position = actorEntity.Position;
-                actorEntity.SyncPosition = false;
+                EntityUtilities.SetGoPosition(entity, positionComponent.Position.x, positionComponent.Position.y, positionComponent.Position.z);   
+                gameObjectSyncComponent.SyncPosition = false;
             }
-            if (actorEntity.SyncRotation && actorEntity.Go != null)
-            {
-                actorEntity.Go.transform.eulerAngles = actorEntity.Rotation;
-                actorEntity.SyncRotation = false;
-            }
-        }
-        var bindEntity = entity as BaseBindEntity;
-        if (bindEntity != null)
-        {
-            if (bindEntity.SyncPosition && bindEntity.BindGo != null)
-            {
-                bindEntity.BindGo.transform.position = bindEntity.Position;
-                bindEntity.SyncPosition = false;
-            }
-            if (bindEntity.SyncRotation && bindEntity.BindGo != null)
-            {
-                bindEntity.BindGo.transform.eulerAngles = bindEntity.Rotation;
-                bindEntity.SyncRotation = false;
+            var rotationComponent = entity.GetComponent<RotationComponent>();
+            if(gameObjectSyncComponent != null && gameObjectSyncComponent.SyncRotation &&
+                rotationComponent != null)
+            {               
+                EntityUtilities.SetGoRotation(entity, rotationComponent.Rotation.x, rotationComponent.Rotation.y, rotationComponent.Rotation.z);   
+                gameObjectSyncComponent.SyncRotation = false;
             }
         }
     }

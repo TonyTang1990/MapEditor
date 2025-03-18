@@ -101,7 +101,12 @@ public class MapObjectEntitySpawnSystem : BaseSystem
     /// <returns></returns>
     public override bool Filter(BaseEntity entity)
     {
-        var entityType = entity.EntityType;
+        var entityTypeComponent = entity.GetComponent<EntityTypeComponent>();
+        if(entityTypeComponent == null)
+        {
+            return false;
+        }
+        var entityType = entityTypeComponent.EntityType;
         return entityType == EntityType.Camera;
     }
 
@@ -114,7 +119,8 @@ public class MapObjectEntitySpawnSystem : BaseSystem
     {
         base.Process(entity, deltaTime);
         var cameraEntity = entity as CameraEntity;
-        if(!cameraEntity.SyncPosition)
+        var gameObjectSyncComponent = entity.GetComponent<GameObjectSyncComponent>();
+        if(gameObjectSyncComponent == null || !gameObjectSyncComponent.SyncPosition)
         {
             return;
         }
@@ -188,19 +194,19 @@ public class MapObjectEntitySpawnSystem : BaseSystem
             {
                 var monsterEntity = OwnerWorld.CreateEntity<MonsterEntity>(MapGameConst.MonsterPrefabPath);
                 entity = monsterEntity;
-                monsterEntity.SetPosition(position.x, position.y, position.z);
+                EntityUtilities.SetPositionOnNav(monsterEntity, position.x, position.y, position.z);
             }
             else if(mapDataExport is TreasureBoxMapDataExport)
             {
                 var treasureEntity = OwnerWorld.CreateEntity<TreasureBoxEntity>(MapGameConst.TreasureBoxPrefabPath);
                 entity = treasureEntity;
-                treasureEntity.SetPosition(position.x, position.y, position.z);
+                EntityUtilities.SetPositionOnNav(treasureEntity, position.x, position.y, position.z);
             }
             else if(mapDataExport is TrapMapDataExport)
             {
                 var trapEntity = OwnerWorld.CreateEntity<TrapEntity>(MapGameConst.TrapPrefabPath);
                 entity = trapEntity;
-                trapEntity.SetPosition(position.x, position.y, position.z);
+                EntityUtilities.SetPositionOnNav(trapEntity, position.x, position.y, position.z);
             }
             else
             {
@@ -222,17 +228,19 @@ public class MapObjectEntitySpawnSystem : BaseSystem
         foreach(var spawnedMapDataEntity in mSpawnedMapDataEntityMap)
         {
             var entityUuid = spawnedMapDataEntity.Value;
-            var actorEntity = OwnerWorld.GetEntityByUuid<BaseActorEntity>(entityUuid);
-            if (actorEntity == null)
+            var entity = OwnerWorld.GetEntityByUuid<BaseEntity>(entityUuid);
+            if (entity == null)
             {
                 continue;
             }
-            var entityPosition = actorEntity.Position;
+            var positionComponent = entity.GetComponent<PositionComponent>();
+            var entityPosition = positionComponent.Position;
             mTempMapDataExportPos.x = entityPosition.x;
             mTempMapDataExportPos.y = entityPosition.z;
             if(!Collision2DUtilities.PointInAABB(mCameraRectArea, mTempMapDataExportPos))
             {
                 mTempRemoveSpawnedMapDataExportList.Add(spawnedMapDataEntity.Key);
+                Debug.LogError($"移除在位置:x:{entityPosition.x}, y:{entityPosition.y}, z:{entityPosition.z}的Entity Uuid:{entityUuid}的Entity！");
                 OwnerWorld.DestroyEntityByUuid(entityUuid);
             }
         }

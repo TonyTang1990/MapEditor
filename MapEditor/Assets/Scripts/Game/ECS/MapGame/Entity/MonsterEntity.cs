@@ -2,21 +2,15 @@
  * @ Author: TONYTANG
  * @ Create Time: 2025-02-17 16:38:13
  * @ Modified by: TONYTANG
- * @ Modified time: 2025-02-17 16:38:53
+ * @ Modified time: 2025-03-17 15:55:07
  * @ Description:
  */
 
 /// <summary>
 /// MonsterEntity.cs
-/// 怪物Entity
+/// 鎬墿Entity
 /// </summary>
-public class MonsterEntity : BaseActorEntity
+public class MonsterEntity : BaseEntity
 {
-    /// <summary>
-    /// 初始化Entity类型
-    /// </summary>
-    protected override void InitEntityType()
-    {
-        EntityType = EntityType.Monster;
-    }
+
 }

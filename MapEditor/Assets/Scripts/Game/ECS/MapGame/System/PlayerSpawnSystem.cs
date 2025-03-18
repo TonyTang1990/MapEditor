@@ -37,7 +37,7 @@ public class PlayerSpawnSystem : BaseSystem
         var levelConfig = MapGameManager.Singleton.LevelConfig;
         var playerEntity = OwnerWorld.CreateEntity<PlayerEntity>(MapGameConst.PlayerPrefabPath);
         var birthPos = levelConfig.MapData.BirthPos[0];
-        playerEntity.SetPosition(birthPos.x, birthPos.y, birthPos.z);
+        EntityUtilities.SetPositionOnNav(playerEntity, birthPos.x, birthPos.y, birthPos.z);
         mPlayerEntityUuid = playerEntity.Uuid;
     }
 

@@ -43,13 +43,13 @@ public class MapGameWorld : BaseWorld
     /// </summary>
     private void CreateAllSystem()
     {
-        CreateSystem<InputControlSystem>(SystemNames.InputControlSystemName);
-        CreateSystem<PlayerSpawnSystem>(SystemNames.PlayerSpawnSystemName);
-        CreateSystem<MapObjectEntitySpawnSystem>(SystemNames.MapObjectEntitySpawnSystemName);
-        CreateSystem<MapObjectGoSpawnSystem>(SystemNames.MapObjectGoSpawnSystemName);
-        CreateSystem<ActorSyncSystem>(SystemNames.ActorSyncSystemName);
-        CreateSystem<CameraFollowSystem>(SystemNames.CameraFollowSystemName);
+        CreateSystem<InputControlSystem>();
+        CreateSystem<PlayerSpawnSystem>();
+        CreateSystem<MapObjectEntitySpawnSystem>();
+        CreateSystem<MapObjectGoSpawnSystem>();
+        CreateSystem<ActorSyncSystem>();
+        CreateSystem<CameraFollowSystem>();
         // MapGameEntitySpawnSystem一来摄像机的位置改变，所以必须放在CameraFollowSystem后
-        CreateSystem<MapGameEntitySpawnSystem>(SystemNames.MapGameEntitySpawnSystemName);
+        CreateSystem<MapGameEntitySpawnSystem>();
     }
 }

@@ -2,7 +2,7 @@
  * @ Author: TONYTANG
  * @ Create Time: 2025-02-17 16:38:13
  * @ Modified by: TONYTANG
- * @ Modified time: 2025-02-17 16:38:53
+ * @ Modified time: 2025-03-17 15:59:21
  * @ Description:
  */
 
@@ -27,7 +27,8 @@ public class CameraFollowSystem : BaseSystem
     /// <returns></returns>
     public override bool Filter(BaseEntity entity)
     {
-        var entityType = entity.EntityType;
+        var entityTypeComponent = entity.GetComponent<EntityTypeComponent>();
+        var entityType = entityTypeComponent.EntityType;
         return entityType == EntityType.Camera;
     }
 
@@ -67,9 +68,10 @@ public class CameraFollowSystem : BaseSystem
         {
             return;
         }
-        var playerPos = firstPlayerEntity.Position;
+        var positionComponent = firstPlayerEntity.GetComponent<PositionComponent>();
+        var playerPos = positionComponent.Position;
         var playerCameraPosOffset = MapGameManager.Singleton.PlayerCameraPosOffset;
         var newCameraPos = playerPos + playerCameraPosOffset;
-        cameraEntity.SetPosition(newCameraPos.x, newCameraPos.y, newCameraPos.z);
+        EntityUtilities.SetPosition(cameraEntity, newCameraPos.x, newCameraPos.y, newCameraPos.z);
     }
 }

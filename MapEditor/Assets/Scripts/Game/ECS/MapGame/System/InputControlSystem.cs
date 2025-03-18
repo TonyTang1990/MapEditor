@@ -2,7 +2,7 @@
  * @ Author: TONYTANG
  * @ Create Time: 2025-02-24 18:18:00
  * @ Modified by: TONYTANG
- * @ Modified time: 2025-03-08 23:45:18
+ * @ Modified time: 2025-03-17 16:02:41
  * @ Description:
  */
 
@@ -23,7 +23,8 @@ public class InputControlSystem : BaseSystem
     /// <returns></returns>
     public override bool Filter(BaseEntity entity)
     {
-        var entityType = entity.EntityType;
+        var entityTypeComponent = entity.GetComponent<EntityTypeComponent>();
+        var entityType = entityTypeComponent.EntityType;
         return entityType == EntityType.MapGame;
     }
 
@@ -64,9 +65,14 @@ public class InputControlSystem : BaseSystem
         {
             return;
         }
+        var positionComponent = firstPlayerEntity.GetComponent<PositionComponent>();
+        if(positionComponent == null)
+        {
+            return;
+        }
         var playerMoveSpeed = MapGameManager.Singleton.PlayerMoveSpeed;
-        var playerOldPosition = firstPlayerEntity.Position;
-        firstPlayerEntity.SetPosition(playerOldPosition.x, playerOldPosition.y, playerOldPosition.z + playerMoveSpeed * deltaTime);
+        var playerOldPosition = positionComponent.Position;
+        EntityUtilities.SetPositionOnNav(firstPlayerEntity, playerOldPosition.x, playerOldPosition.y, playerOldPosition.z + playerMoveSpeed * deltaTime);
     }
 
     /// <summary>
@@ -80,9 +86,14 @@ public class InputControlSystem : BaseSystem
         {
             return;
         }
+         var positionComponent = firstPlayerEntity.GetComponent<PositionComponent>();
+        if(positionComponent == null)
+        {
+            return;
+        }
         var playerMoveSpeed = MapGameManager.Singleton.PlayerMoveSpeed;
-        var playerOldPosition = firstPlayerEntity.Position;
-        firstPlayerEntity.SetPosition(playerOldPosition.x, playerOldPosition.y, playerOldPosition.z - playerMoveSpeed * deltaTime);
+        var playerOldPosition = positionComponent.Position;
+        EntityUtilities.SetPositionOnNav(firstPlayerEntity, playerOldPosition.x, playerOldPosition.y, playerOldPosition.z - playerMoveSpeed * deltaTime);
     }
 
     /// <summary>
@@ -96,9 +107,14 @@ public class InputControlSystem : BaseSystem
         {
             return;
         }
+        var positionComponent = firstPlayerEntity.GetComponent<PositionComponent>();
+        if(positionComponent == null)
+        {
+            return;
+        }
         var playerMoveSpeed = MapGameManager.Singleton.PlayerMoveSpeed;
-        var playerOldPosition = firstPlayerEntity.Position;
-        firstPlayerEntity.SetPosition(playerOldPosition.x - playerMoveSpeed * deltaTime, playerOldPosition.y, playerOldPosition.z);
+        var playerOldPosition = positionComponent.Position;
+        EntityUtilities.SetPositionOnNav(firstPlayerEntity, playerOldPosition.x - playerMoveSpeed * deltaTime, playerOldPosition.y, playerOldPosition.z);
     }
 
     /// <summary>
@@ -112,8 +128,13 @@ public class InputControlSystem : BaseSystem
         {
             return;
         }
+        var positionComponent = firstPlayerEntity.GetComponent<PositionComponent>();
+        if(positionComponent == null)
+        {
+            return;
+        }
         var playerMoveSpeed = MapGameManager.Singleton.PlayerMoveSpeed;
-        var playerOldPosition = firstPlayerEntity.Position;
-        firstPlayerEntity.SetPosition(playerOldPosition.x + playerMoveSpeed * deltaTime, playerOldPosition.y, playerOldPosition.z);
+        var playerOldPosition = positionComponent.Position;
+        EntityUtilities.SetPositionOnNav(firstPlayerEntity, playerOldPosition.x + playerMoveSpeed * deltaTime, playerOldPosition.y, playerOldPosition.z);
     }
 }

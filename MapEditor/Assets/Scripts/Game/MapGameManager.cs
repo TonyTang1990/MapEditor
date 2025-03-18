@@ -8,6 +8,7 @@ using Cinemachine;
 using MapEditor;
 using System;
 using UnityEngine;
+using UnityEngine.UIElements;
 
 /// <summary>
 /// MapGameManager.cs
@@ -316,30 +317,30 @@ public class MapGameManager : SingletonTemplate<MapGameManager>
     /// <summary>
     /// 根据路径加载Entity预制体
     /// </summary>
-    /// <param name="actorEntity"></param>
+    /// <param name="entity"></param>
     /// <param name="prefabPath"></param>
     /// <param name="parent"></param>
     /// <param name="loadCompleteCb"></param>
-    public void LoadEntityPrefabByPath(BaseActorEntity actorEntity, string prefabPath, Transform parent, Action<BaseActorEntity> loadCompleteCb = null)
+    public void LoadEntityPrefabByPath(BaseEntity entity, string prefabPath, Transform parent, Action<BaseEntity> loadCompleteCb = null)
     {
         PoolManager.Singleton.Pop(prefabPath, (instance) =>
         {
-            actorEntity.Go = instance;
+            var gameObjectComponent = entity.GetComponent<GameObjectComponent>();
+            gameObjectComponent.Go = instance;
             var instanceTransform = instance.transform;
             if (parent != null)
             {
                 instanceTransform.SetParent(parent);
             }
-            instanceTransform.position = actorEntity.Position;
-            instanceTransform.eulerAngles = actorEntity.Rotation;
+            var positionComponent = entity.GetComponent<PositionComponent>();
+            instanceTransform.position = positionComponent.Position;
+            var rotationComponent = entity.GetComponent<RotationComponent>();
+            instanceTransform.eulerAngles = rotationComponent.Rotation;
+            var animatorPlayComponent = entity.GetComponent<AnimatorPlayComponent>();
             var animator = instanceTransform.GetComponent<Animator>();
-            actorEntity.Animator = animator;
-            var playAnimName = actorEntity.PlayAnimName;
-            if (!string.IsNullOrEmpty(playAnimName))
-            {
-                actorEntity.PlayAnim(playAnimName);
-            }
-            loadCompleteCb?.Invoke(actorEntity);
+            animatorPlayComponent.Animator = animator;
+            EntityUtilities.PlayAnim(entity, animatorPlayComponent.PlayAnimName);
+            loadCompleteCb?.Invoke(entity);
         });
     }
     #endregion

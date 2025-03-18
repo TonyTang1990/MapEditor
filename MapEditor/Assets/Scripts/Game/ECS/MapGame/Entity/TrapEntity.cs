@@ -2,7 +2,7 @@
  * @ Author: TONYTANG
  * @ Create Time: 2025-02-17 16:38:26
  * @ Modified by: TONYTANG
- * @ Modified time: 2025-03-09 00:26:18
+ * @ Modified time: 2025-03-17 15:55:17
  * @ Description:
  */
 
@@ -10,13 +10,6 @@
 /// TrapEntity.cs
 /// 陷阱Entity
 /// </summary>
-public class TrapEntity : BaseActorEntity
+public class TrapEntity : BaseEntity
 {
-    /// <summary>
-    /// 初始化Entity类型
-    /// </summary>
-    protected override void InitEntityType()
-    {
-        EntityType = EntityType.Trap;
-    }
 }

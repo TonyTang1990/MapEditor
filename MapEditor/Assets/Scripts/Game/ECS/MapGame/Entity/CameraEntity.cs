@@ -2,7 +2,7 @@
  * @ Author: TONYTANG
  * @ Create Time: 2025-02-17 16:38:05
  * @ Modified by: TONYTANG
- * @ Modified time: 2025-03-02 23:46:36
+ * @ Modified time: 2025-03-17 17:08:46
  * @ Description:
  */
 
@@ -15,11 +15,4 @@ using System.Collections.Generic;
 /// </summary>
 public class CameraEntity : BaseBindEntity
 {
-    /// <summary>
-    /// 初始化Entity类型
-    /// </summary>
-    protected override void InitEntityType()
-    {
-        EntityType = EntityType.Camera;
-    }
 }

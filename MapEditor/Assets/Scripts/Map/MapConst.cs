@@ -61,11 +61,6 @@ namespace MapEditor
         public static readonly Type LevelMapDataType = typeof(LevelMapData);
 
         /// <summary>
-        /// BaseActorEntity类型信息
-        /// </summary>
-        public static readonly Type BaseActorEntityType = typeof(BaseActorEntity);
-
-        /// <summary>
         /// 地图对象父节点挂点名
         /// </summary>
         public const string MapObjectParentNodeName = "MapObjectParent";

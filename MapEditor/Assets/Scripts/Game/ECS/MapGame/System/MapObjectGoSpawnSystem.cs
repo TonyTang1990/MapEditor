@@ -22,21 +22,23 @@ public class MapObjectGoSpawnSystem : BaseSystem
     /// <returns></returns>
     public override bool Filter(BaseEntity entity)
     {
-        if(entity is BaseActorEntity)
-        {
-            return true;
-        }
-        return false;
+        var actorComponent = entity.GetComponent<ActorComponent>();
+        return actorComponent != null;
     }
 
+    /// <summary>
+    /// 响应Entity添加
+    /// </summary>
+    /// <param name="entity"></param>
     public override void OnAdd(BaseEntity entity)
     {
         base.OnAdd(entity);
-        var actorEntity = entity as BaseActorEntity;
-        var prefabPath = actorEntity.PrefabPath;
-        var entityType = entity.EntityType;
+        var gameObjectComponent = entity.GetComponent<GameObjectComponent>();
+        var prefabPath = gameObjectComponent.PrefabPath;
+        var entityTypeComponent = entity.GetComponent<EntityTypeComponent>();
+        var entityType = entityTypeComponent.EntityType;
         var parent = OwnerWorld.GetEntityTypeParent(entityType);
-        MapGameManager.Singleton.LoadEntityPrefabByPath(actorEntity, prefabPath, parent);
+        MapGameManager.Singleton.LoadEntityPrefabByPath(entity, prefabPath, parent);
     }
 
     /// <summary>
@@ -46,7 +48,6 @@ public class MapObjectGoSpawnSystem : BaseSystem
     public override void OnRemove(BaseEntity entity)
     {
         base.OnRemove(entity);
-        var actorEntity = entity as BaseActorEntity;
-        actorEntity?.DestroyInstance();
+        EntityUtilities.DestroyInstance(entity);
     }
 }

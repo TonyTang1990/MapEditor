@@ -8,10 +8,12 @@
 */
 
 // Note:
-// 这里的BaseWorld,BaseSystem和BaseEntity并非完整的ECS模式
-// 只是设计上借鉴ECS的概念设计，参考的tiny-ecs设计
+// 这里的BaseWorld,BaseSystem,BaseEntity,BaseComponent并非完整的ECS模式
+// 只是设计上借鉴ECS和tiny-ecs的概念设计
 
+using System;
 using System.Collections.Generic;
+using OpenCover.Framework.Model;
 using UnityEngine;
 
 //// <summary>
@@ -30,13 +32,20 @@ public abstract class BaseSystem
     }
 
     /// <summary>
-    /// 系统名
+    /// 系统类型信息
     /// </summary>
-    public string SystemName
+    public Type ClassType
     {
-        get;
-        private set;
+        get
+        {
+            if(mClassType == null)
+            {
+                mClassType = GetType();
+            }
+            return mClassType;
+        }
     }
+    protected Type mClassType;
 
     /// <summary>
     /// 系统系统激活
@@ -65,12 +74,9 @@ public abstract class BaseSystem
     /// 初始化
     /// </summary>
     /// <param name="ownerWorld"></param>
-    /// <param name="systemName"></param>
-    /// <param name="parameters"></param>
-    public virtual void Init(BaseWorld ownerWorld, string systemName, params object[] parameters)
+    public virtual void Init(BaseWorld ownerWorld)
     {
         OwnerWorld = ownerWorld;
-        SystemName = systemName;
     }
 
     /// <summary>
@@ -92,7 +98,7 @@ public abstract class BaseSystem
     {
         if(SystemEntityList.Contains(entity))
         {
-            Debug.LogError($"系统名:{SystemName}已存在Entity Uuid:{entity.Uuid}的Entity，添加系统Entity失败！");
+            Debug.LogError($"系统类型:{ClassType.Name}已存在Entity Uuid:{entity.Uuid}的Entity，添加系统Entity失败！");
             return false;
         }
         SystemEntityList.Add(entity);
@@ -109,17 +115,22 @@ public abstract class BaseSystem
         var result = SystemEntityList.Remove(entity);
         if(!result)
         {
-            Debug.LogError($"系统名:{SystemName}找不到Entity Uuid:{entity.Uuid}的Entity，移除系统Entity失败！");
+            Debug.LogError($"系统类型:{ClassType.Name}找不到Entity Uuid:{entity.Uuid}的Entity，移除系统Entity失败！");
+            return false;
         }
-        return result;
+        ObjectPool.Singleton.PushAsObj(entity);
+        return true;
     }
-
+    
     /// <summary>
-    /// 响应激活
+    /// 移除系统所有Entity
     /// </summary>
-    public virtual void OnEnable()
+    public void RemoveSystemAllEntity()
     {
-        Debug.Log($"世界名:{OwnerWorld.WorldName}的系统名:{SystemName}被激活！");
+        for(int index = SystemEntityList.Count - 1; index >= 0; index--)
+        {
+            RemoveSystemEntity(SystemEntityList[index]);
+        }
     }
 
     /// <summary>
@@ -135,7 +146,7 @@ public abstract class BaseSystem
     /// </summary>
     public virtual void OnAddToWorld()
     {
-        Debug.Log($"世界名:{OwnerWorld.WorldName}的系统名:{SystemName}被添加到世界！");
+        Debug.Log($"世界名:{OwnerWorld.WorldName}的系统类型:{ClassType.Name}被添加到世界！");
     }
 
     /// <summary>
@@ -145,14 +156,6 @@ public abstract class BaseSystem
     public virtual void OnAdd(BaseEntity entity)
     {
 
-    }
-
-    /// <summary>
-    /// 响应取消激活
-    /// </summary>
-    public virtual void OnDisable()
-    {
-        Debug.Log($"世界名:{OwnerWorld.WorldName}的系统名:{SystemName}被取消激活！");
     }
 
     /// <summary>
@@ -177,18 +180,11 @@ public abstract class BaseSystem
     /// </summary>
     public virtual void OnRemoveFromWorld()
     {
-        Debug.Log($"世界名:{OwnerWorld.WorldName}的系统名:{SystemName}被从世界移除！");
-    }
-
-    /// <summary>
-    /// 响应系统销毁
-    /// </summary>
-    public virtual void OnDestroy()
-    {
-        Debug.Log($"世界名:{OwnerWorld.WorldName}的系统名:{SystemName}被销毁！");
-        SystemEntityList.Clear();
+        Debug.Log($"世界名:{OwnerWorld.WorldName}的系统类型:{ClassType.Name}被从世界移除！");
+        RemoveSystemAllEntity();
         OwnerWorld = null;
-        SystemName = null;
+        mClassType = null;
+        Enable = false;
     }
 
     /// <summary>
