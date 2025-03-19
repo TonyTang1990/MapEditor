@@ -2,7 +2,7 @@
 * @ Author: TONYTANG
 * @ Create Time: 2025-02-17 16:39:04
  * @ Modified by: TONYTANG
- * @ Modified time: 2025-03-19 16:56:13
+ * @ Modified time: 2025-03-19 18:34:26
 * @ Description:
 */
 
@@ -83,9 +83,9 @@ public abstract class BaseWorld
     protected GameObject mEntityRootGo;
 
     /// <summary>
-    /// Entity类型父节点Map
+    /// Entity类型信息父节点Map
     /// </summary>
-    protected Dictionary<EntityType, Transform> mEntityTypeParentMap;
+    protected Dictionary<Type, Transform> mEntityClassTypeParentMap;
 
     /// <summary>
     /// Entity Uuid Map<Entitiy Uuid, Entity>
@@ -173,6 +173,7 @@ public abstract class BaseWorld
         RemoveAllSystem();
         ManagerSystems();
         ManagerEntities();
+        DestroyEntityClassTypeParent();
         DestroyEntityRoot();
         DestroyWorldRoot();
     }
@@ -333,6 +334,22 @@ public abstract class BaseWorld
             var system = mAllSystems[index];
             RemoveSystem(system);
         }
+    }
+
+    /// <summary>
+    /// 销毁Entity类型信息挂在父节点
+    /// </summary>
+    protected void DestroyEntityClassTypeParent()
+    {
+        foreach(var entityClassTypeParent in mEntityClassTypeParentMap)
+        {
+            var entityClassTypeParentGo = entityClassTypeParent.Value.GameObject;
+            if(entityClassTypeParentGo != null)
+            {
+                GameObject.Destroy(entityClassTypeParentGo);
+            }
+        }
+        mEntityClassTypeParentMap.Clear();
     }
 
     /// <summary>
@@ -573,15 +590,7 @@ public abstract class BaseWorld
         entityRootTransform.rotation = Quaternion.identity;
         entityRootTransform.SetParent(mWorldRootGo.transform);
 
-        mEntityTypeParentMap = new Dictionary<EntityType, Transform>();
-        var entityTypeNames = Enum.GetNames(typeof(EntityType));
-        foreach (var entityTypeName in entityTypeNames)
-        {
-            var entityType = Enum.Parse<EntityType>(entityTypeName);
-            var entityTypeParentGo = new GameObject(entityTypeName);
-            entityTypeParentGo.transform.SetParent(entityRootTransform);
-            mEntityTypeParentMap.Add(entityType, entityTypeParentGo.transform);
-        }
+        mEntityClassTypeParentMap = new Dictionary<Type, Transform>();
     }
 
     /// <summary>
@@ -594,21 +603,41 @@ public abstract class BaseWorld
     }
 
     /// <summary>
-    /// 获取指定EntityType的挂载父节点
+    /// 获取指定Entity的Entity类型实体挂载父节点
     /// </summary>
-    /// <param name="entityType"></param>
+    /// <param name="entity"></param>
     /// <returns></returns>
-    public Transform GetEntityTypeParent(EntityType entityType)
+    public Transform GetEntityTypeParent(Entity entity)
     {
-        Transform entityTypeParent;
-        if (!mEntityTypeParentMap.TryGetValue(entityType, out entityTypeParent))
+        var entityClassType = entity.ClassType;
+        Transform entityTypeParent = null;
+        if (mEntityClassTypeParentMap.TryGetValue(entityClassType, out entityTypeParent))
         {
-            Debug.LogError($"找不到EntityType:{entityType}的挂载父节点！");
-            return null;
+            return entityTypeParent;
         }
+        entityTypeParent = CreateEntityClassTypeParent(entityClassType);
         return entityTypeParent;
     }
 
+    /// <summary>
+    /// 创建指定Entity类型信息的挂在父节点
+    /// </summary>
+    /// <param name="entityClassType"></param>
+    /// <returns></returns>
+    protected Transform CreateEntityClassTypeParent(Type entityClassType)
+    {
+        Transform entityClassTypeParent = null;
+        if(mEntityClassTypeParentMap.TryGetValue(entityClassType, out entityClassTypeParent))
+        {
+            Debug.LogError($"已存在Entity类型:{entityClassType.Name}的挂载父节点，请勿重复创建挂在父节点！");
+            return entityClassTypeParent;
+        }
+        var entityClassTypeParentGo = new Gameobject(entityClassType.Name);
+        entityClassTypeParentGo.transform.SetParent(mEntityRootGo.transform);
+        mEntityClassTypeParentMap.Add(entityClassType, entityClassTypeParentGo.transform);
+        return entityClassTypeParent;
+    }
+    
     /// <summary>
     /// 获取指定Uuid的Entity
     /// </summary>

@@ -35,9 +35,7 @@ public class MapObjectGoSpawnSystem : BaseSystem
         base.OnAdd(entity);
         var gameObjectComponent = entity.GetComponent<GameObjectComponent>();
         var prefabPath = gameObjectComponent.PrefabPath;
-        var entityTypeComponent = entity.GetComponent<EntityTypeComponent>();
-        var entityType = entityTypeComponent.EntityType;
-        var parent = OwnerWorld.GetEntityTypeParent(entityType);
+        var parent = OwnerWorld.GetEntityTypeParent(entity);
         MapGameManager.Singleton.LoadEntityPrefabByPath(entity, prefabPath, parent);
     }
 
