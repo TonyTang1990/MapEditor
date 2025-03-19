@@ -2,7 +2,7 @@
 * @ Author: TONYTANG
 * @ Create Time: 2025-02-17 16:39:04
  * @ Modified by: TONYTANG
- * @ Modified time: 2025-03-19 15:58:43
+ * @ Modified time: 2025-03-19 16:56:13
 * @ Description:
 */
 
@@ -123,11 +123,6 @@ public abstract class BaseWorld
     /// 临时等待移除Entity列表
     /// </summary>
     protected List<BaseEntity> mTempWaitRemoveEntities;
-
-    /// <summary>
-    /// 玩家Entity类型信息
-    /// </summary>
-    protected readonly Type PlayerEntityType = typeof(PlayerEntity);
     #endregion
 
     #region World部分开始
