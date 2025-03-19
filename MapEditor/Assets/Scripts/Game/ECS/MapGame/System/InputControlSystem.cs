@@ -2,7 +2,7 @@
  * @ Author: TONYTANG
  * @ Create Time: 2025-02-24 18:18:00
  * @ Modified by: TONYTANG
- * @ Modified time: 2025-03-17 16:02:41
+ * @ Modified time: 2025-03-19 11:25:35
  * @ Description:
  */
 
@@ -24,18 +24,22 @@ public class InputControlSystem : BaseSystem
     public override bool Filter(BaseEntity entity)
     {
         var entityTypeComponent = entity.GetComponent<EntityTypeComponent>();
+        if(entityTypeComponent == null)
+        {
+            return false;
+        }
         var entityType = entityTypeComponent.EntityType;
         return entityType == EntityType.MapGame;
     }
 
     /// <summary>
-    /// Update
+    /// PreUpdate
     /// </summary>
     /// <param name="entity"></param>
     /// <param name="deltaTime"></param>
-    public override void Process(BaseEntity entity, float deltaTime)
+    public override void PreProcess(float deltaTime)
     {
-        base.Process(entity, deltaTime);
+        base.PreProcess(deltaTime);
         if(Input.GetKey("w"))
         {
             MoveUp(deltaTime);

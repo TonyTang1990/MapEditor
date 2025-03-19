@@ -118,7 +118,6 @@ public abstract class BaseSystem
             Debug.LogError($"系统类型:{ClassType.Name}找不到Entity Uuid:{entity.Uuid}的Entity，移除系统Entity失败！");
             return false;
         }
-        ObjectPool.Singleton.PushAsObj(entity);
         return true;
     }
     

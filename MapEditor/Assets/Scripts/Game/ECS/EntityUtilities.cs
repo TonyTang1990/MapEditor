@@ -51,6 +51,10 @@ public static class EntityUtilities
         {
             InitCameraEntityComponents(entity as CameraEntity, parameters);
         }
+        else if(entityClassType == ECSConst.MapGameEntityType)
+        {
+            InitMapGameEntityComponents(entity as MapGameEntity, parameters);
+        }
         return true;
     }
 
@@ -68,7 +72,8 @@ public static class EntityUtilities
         var gameObjectComponent = ComponentUtilities.CreateGameObjectComponent(null, prefabPath);
         var gameObjectSyncComponent = ComponentUtilities.CreateGameObjectSyncComponent();
         var animatorPlayerComponent = ComponentUtilities.CreateAnimatorPlayComponent();
-        entity.AddComponents(entityTypeComponent, positionComponent, rotationComponent, gameObjectComponent, gameObjectSyncComponent, animatorPlayerComponent);
+        var actorComponent = ComponentUtilities.CreateActorComponent();
+        entity.AddComponents(entityTypeComponent, positionComponent, rotationComponent, gameObjectComponent, gameObjectSyncComponent, animatorPlayerComponent, actorComponent);
     }
 
     /// <summary>
@@ -145,6 +150,17 @@ public static class EntityUtilities
         var cameraGameObject = parameters[0] as GameObject;
         var isAutoDestroyBindGo = (bool)parameters[1];
         InitBindEntityCommonComponents(entity, EntityType.Camera, cameraGameObject, isAutoDestroyBindGo); 
+    }
+    
+    /// <summary>
+    /// 初始化MapGameEntity组件
+    /// </summary>
+    /// <param name="entity"></param>
+    /// <param name="parameters"></param>
+    private static void InitMapGameEntityComponents(MapGameEntity entity, params object[] parameters)
+    {
+        var entityTypeComponent = ComponentUtilities.CreateEntityTypeComponent(EntityType.MapGame);
+        entity.AddComponents(entityTypeComponent);
     }
     #endregion
 

@@ -54,5 +54,10 @@ public static class ECSConst
     /// CameraEntity类型信息
     /// </summary>
     public static readonly Type CameraEntityType = typeof(CameraEntity);
+
+    /// <summary>
+    /// MapGameEntity类型信息
+    /// </summary>
+    public static readonly Type MapGameEntityType = typeof(MapGameEntity);
     #endregion
 }

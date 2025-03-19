@@ -118,7 +118,6 @@ public class MapObjectEntitySpawnSystem : BaseSystem
     public override void Process(BaseEntity entity, float deltaTime)
     {
         base.Process(entity, deltaTime);
-        var cameraEntity = entity as CameraEntity;
         var gameObjectSyncComponent = entity.GetComponent<GameObjectSyncComponent>();
         if(gameObjectSyncComponent == null || !gameObjectSyncComponent.SyncPosition)
         {
@@ -195,18 +194,21 @@ public class MapObjectEntitySpawnSystem : BaseSystem
                 var monsterEntity = OwnerWorld.CreateEntity<MonsterEntity>(MapGameConst.MonsterPrefabPath);
                 entity = monsterEntity;
                 EntityUtilities.SetPositionOnNav(monsterEntity, position.x, position.y, position.z);
+                Debug.Log($"生成在位置:x:{position.x}, y:{position.y}, z:{position.z}生成MonsterEntity！");
             }
             else if(mapDataExport is TreasureBoxMapDataExport)
             {
                 var treasureEntity = OwnerWorld.CreateEntity<TreasureBoxEntity>(MapGameConst.TreasureBoxPrefabPath);
                 entity = treasureEntity;
                 EntityUtilities.SetPositionOnNav(treasureEntity, position.x, position.y, position.z);
+                Debug.Log($"生成在位置:x:{position.x}, y:{position.y}, z:{position.z}生成TreasureBoxEntity！");
             }
             else if(mapDataExport is TrapMapDataExport)
             {
                 var trapEntity = OwnerWorld.CreateEntity<TrapEntity>(MapGameConst.TrapPrefabPath);
                 entity = trapEntity;
                 EntityUtilities.SetPositionOnNav(trapEntity, position.x, position.y, position.z);
+                Debug.Log($"生成在位置:x:{position.x}, y:{position.y}, z:{position.z}生成TrapEntity！");
             }
             else
             {
@@ -240,7 +242,7 @@ public class MapObjectEntitySpawnSystem : BaseSystem
             if(!Collision2DUtilities.PointInAABB(mCameraRectArea, mTempMapDataExportPos))
             {
                 mTempRemoveSpawnedMapDataExportList.Add(spawnedMapDataEntity.Key);
-                Debug.LogError($"移除在位置:x:{entityPosition.x}, y:{entityPosition.y}, z:{entityPosition.z}的Entity Uuid:{entityUuid}的Entity！");
+                Debug.Log($"移除在位置:x:{entityPosition.x}, y:{entityPosition.y}, z:{entityPosition.z}的Entity Uuid:{entityUuid}的Entity！");
                 OwnerWorld.DestroyEntityByUuid(entityUuid);
             }
         }

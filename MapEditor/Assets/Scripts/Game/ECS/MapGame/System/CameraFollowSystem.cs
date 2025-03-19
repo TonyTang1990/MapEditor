@@ -2,7 +2,7 @@
  * @ Author: TONYTANG
  * @ Create Time: 2025-02-17 16:38:13
  * @ Modified by: TONYTANG
- * @ Modified time: 2025-03-17 15:59:21
+ * @ Modified time: 2025-03-19 11:15:31
  * @ Description:
  */
 
@@ -28,6 +28,10 @@ public class CameraFollowSystem : BaseSystem
     public override bool Filter(BaseEntity entity)
     {
         var entityTypeComponent = entity.GetComponent<EntityTypeComponent>();
+        if(entityTypeComponent == null)
+        {
+            return false;
+        }
         var entityType = entityTypeComponent.EntityType;
         return entityType == EntityType.Camera;
     }
