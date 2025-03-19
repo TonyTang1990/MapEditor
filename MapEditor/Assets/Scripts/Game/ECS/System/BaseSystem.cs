@@ -7,14 +7,14 @@
 *
 */
 
-// Note:
-// 这里的BaseWorld,BaseSystem,BaseEntity,BaseComponent并非完整的ECS模式
-// 只是设计上借鉴ECS和tiny-ecs的概念设计
-
 using System;
 using System.Collections.Generic;
 using OpenCover.Framework.Model;
 using UnityEngine;
+
+// Note:
+// 这里的BaseWorld,BaseSystem,BaseEntity,BaseComponent并非完整的ECS模式
+// 只是设计上借鉴ECS和tiny-ecs的概念设计
 
 //// <summary>
 /// BaseSystem.cs

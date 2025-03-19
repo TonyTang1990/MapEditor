@@ -22,15 +22,6 @@ public abstract class BaseComponent : IRecycle
     }
 
     /// <summary>
-    /// 初始化(子类重写)
-    /// </summary>
-    /// <param name="datas"></param>
-    public virtual void Init(params object[] datas)
-    {
-
-    }
-
-    /// <summary>
     /// 出池
     /// </summary>
     public virtual void OnCreate()

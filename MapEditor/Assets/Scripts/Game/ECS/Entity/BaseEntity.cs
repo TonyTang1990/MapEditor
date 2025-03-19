@@ -1,23 +1,23 @@
-﻿
-
-// Note:
-// 这里的BaseWorld,BaseSystem,BaseEntity,BaseComponent并非完整的ECS模式
-// 只是设计上借鉴ECS和tiny-ecs的概念设计
+﻿/**
+ * @ Author: TONYTANG
+ * @ Create Time: 2025-02-17 16:25:59
+ * @ Modified by: TONYTANG
+ * @ Modified time: 2025-03-19 15:58:26
+ * @ Description:
+ */
 
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
-/**
- * @ Author: TONYTANG
- * @ Create Time: 2025-02-17 16:25:59
- * @ Modified by: TONYTANG
- * @ Modified time: 2025-03-18 22:58:16
- * @ Description:
- *//// <summary>
-   /// BaseEntity.cs
-   /// Entity基类(逻辑对象抽象，相当于ECS里的E部分)
+// Note:
+// 这里的BaseWorld,BaseSystem,BaseEntity,BaseComponent并非完整的ECS模式
+// 只是设计上借鉴ECS和tiny-ecs的概念设计
+
+/// <summary>
+/// BaseEntity.cs
+/// Entity基类(逻辑对象抽象，相当于ECS里的E部分)
 public abstract class BaseEntity : IRecycle
 {
     /// <summary>
