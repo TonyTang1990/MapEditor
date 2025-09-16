@@ -343,9 +343,9 @@ public abstract class BaseWorld
     {
         foreach(var entityClassTypeParent in mEntityClassTypeParentMap)
         {
-            var entityClassTypeParentGo = entityClassTypeParent.Value.GameObject;
-            if(entityClassTypeParentGo != null)
+            if(entityClassTypeParent.Value != null)
             {
+                var entityClassTypeParentGo = entityClassTypeParent.Value.gameObject;
                 GameObject.Destroy(entityClassTypeParentGo);
             }
         }
@@ -607,7 +607,7 @@ public abstract class BaseWorld
     /// </summary>
     /// <param name="entity"></param>
     /// <returns></returns>
-    public Transform GetEntityTypeParent(Entity entity)
+    public Transform GetEntityTypeParent(BaseEntity entity)
     {
         var entityClassType = entity.ClassType;
         Transform entityTypeParent = null;
@@ -632,7 +632,7 @@ public abstract class BaseWorld
             Debug.LogError($"已存在Entity类型:{entityClassType.Name}的挂载父节点，请勿重复创建挂在父节点！");
             return entityClassTypeParent;
         }
-        var entityClassTypeParentGo = new Gameobject(entityClassType.Name);
+        var entityClassTypeParentGo = new GameObject(entityClassType.Name);
         entityClassTypeParentGo.transform.SetParent(mEntityRootGo.transform);
         mEntityClassTypeParentMap.Add(entityClassType, entityClassTypeParentGo.transform);
         return entityClassTypeParent;
