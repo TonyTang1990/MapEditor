@@ -133,9 +133,10 @@ public class MapGameManager : SingletonTemplate<MapGameManager>
     /// <summary>
     /// 逻辑更新
     /// </summary>
-    public void LogicUpdate()
+    /// <param name="logicFrameTime"></param>
+    public void LogicUpdate(float logicFrameTime)
     {
-        WorldManager.Singleton.LogicUpdate();
+        WorldManager.Singleton.LogicUpdate(logicFrameTime);
     }
 
     /// <summary>
@@ -325,6 +326,8 @@ public class MapGameManager : SingletonTemplate<MapGameManager>
     {
         PoolManager.Singleton.Pop(prefabPath, (instance) =>
         {
+            var rootGameObjectName = EntityUtilities.GetEntityRootGameObjectName(entity);
+            instance.name = rootGameObjectName;
             var gameObjectComponent = entity.GetComponent<GameObjectComponent>();
             gameObjectComponent.Go = instance;
             var instanceTransform = instance.transform;

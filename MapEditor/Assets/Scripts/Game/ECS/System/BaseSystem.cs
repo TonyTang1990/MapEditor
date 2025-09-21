@@ -215,9 +215,10 @@ public abstract class BaseSystem
     }
 
     /// <summary>
-    /// LogicUpdate
+    /// Logic Update
     /// </summary>
-    public virtual void LogicUpdate()
+    /// <param name="logicFrameTime"></param>
+    public virtual void LogicUpdate(float logicFrameTime)
     {
 
     }

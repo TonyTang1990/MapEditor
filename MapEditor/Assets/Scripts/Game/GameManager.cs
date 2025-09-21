@@ -84,7 +84,7 @@ public class GameManager : SingletonTemplate<GameManager>
         while (LogicFramePassedTime >= LogicFrameTime)
         {
             LogicFramePassedTime -= LogicFrameTime;
-            LogicUpdate();
+            LogicUpdate(LogicFrameTime);
         }
 
         mRenderFrameCount++;
@@ -102,10 +102,11 @@ public class GameManager : SingletonTemplate<GameManager>
     /// <summary>
     /// 逻辑更新
     /// </summary>
-    private void LogicUpdate()
+    /// <param name="logicFrameTime"></param>
+    private void LogicUpdate(float logicFrameTime)
     {
         LogicFrame++;
-        MapGameManager.Singleton.LogicUpdate();
+        MapGameManager.Singleton.LogicUpdate(logicFrameTime);
     }
 
     /// <summary>

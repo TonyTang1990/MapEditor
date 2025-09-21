@@ -100,9 +100,14 @@ public abstract class BaseWorld
     protected List<BaseEntity> mAllEntity;
 
     /// <summary>
-    /// Entity类型信息和Entity列表Map<Entity类型信息, Entity列表>
+    /// 所有Entity类型信息和Entity列表Map<Entity类型信息, Entity列表>
     /// </summary>
     protected Dictionary<Type, List<BaseEntity>> mEntityTypeAndEntitiesMap;
+
+    /// <summary>
+    /// 等待更新的Entity类型信息和Entity列表Map<Entity类型信息，Entity列表>
+    /// </summary>
+    protected Dictionary<Type, List<BaseEntity>> mUpadteEntityTypeAndEntitiesMap;
 
     /// <summary>
     /// 等待添加的Entity列表
@@ -139,6 +144,7 @@ public abstract class BaseWorld
         mEntityMap = new Dictionary<int, BaseEntity>();
         mAllEntity = new List<BaseEntity>();
         mEntityTypeAndEntitiesMap = new Dictionary<Type, List<BaseEntity>>();
+        mUpadteEntityTypeAndEntitiesMap = new Dictionary<Type, List<BaseEntity>>();
         mWaitAddEntities = new List<BaseEntity>();
         mTempWaitAddEntities = new List<BaseEntity>();
         mWaitRemoveEntities = new List<BaseEntity>();
@@ -241,12 +247,12 @@ public abstract class BaseWorld
 
         foreach (var waitAddEntity in mTempWaitAddEntities)
         {
-            DoAddEntity(waitAddEntity);
+            DoOnAddEntity(waitAddEntity);
         }
 
         foreach (var waitRemoveEntity in mTempWaitRemoveEntities)
         {
-            DoDestroyEntity(waitRemoveEntity);
+            DoOnRemoveEntity(waitRemoveEntity);
         }
     }
 
@@ -264,11 +270,14 @@ public abstract class BaseWorld
             }
             system.PreProcess(deltaTime);
 
-            foreach(var entity in mAllEntity)
+            foreach(var entityData in mUpadteEntityTypeAndEntitiesMap)
             {
-                if(system.Filter(entity))
+                foreach(var entity in entityData.Value)
                 {
-                    system.Process(entity, deltaTime);
+                    if (system.Filter(entity))
+                    {
+                        system.Process(entity, deltaTime);
+                    }
                 }
             }
             system.PostProcess(deltaTime);
@@ -278,11 +287,25 @@ public abstract class BaseWorld
     /// <summary>
     /// LogicUpdate
     /// </summary>
-    public virtual void LogicUpdate()
+    /// <param name="logicFrameTime"></param>
+    public virtual void LogicUpdate(float logicFrameTime)
+    {
+        ManagerSystemLogicUpdate(logicFrameTime);
+    }
+    
+    /// <summary>
+    /// 处理系统的逻辑更新
+    /// </summary>
+    /// <param name="logicFrameTime"></param>
+    protected void ManagerSystemLogicUpdate(float logicFrameTime)
     {
         foreach (var system in mAllSystems)
         {
-            system?.LogicUpdate();
+            if (system == null)
+            {
+                continue;
+            }
+            system.LogicUpdate(logicFrameTime);
         }
     }
 
@@ -392,7 +415,6 @@ public abstract class BaseWorld
             var system = new T();
             system.Init(this);
             system.Enable = true;
-            system.AddEvents();
             mWaitAddSystems.Add(system);
             mWaitRemoveSystems.Remove(system);
             return system;
@@ -560,12 +582,15 @@ public abstract class BaseWorld
             system.AddEvents();
             system.OnAddToWorld();
             OnAddSystem(system);
-            foreach(var entity in mAllEntity)
+            foreach(var entityData in mUpadteEntityTypeAndEntitiesMap)
             {
-                if(system.Filter(entity))
+                foreach (var entity in entityData.Value)
                 {
-                    system.AddSystemEntity(entity);
-                    system.OnAdd(entity);
+                    if (system.Filter(entity))
+                    {
+                        system.AddSystemEntity(entity);
+                        system.OnAdd(entity);
+                    }
                 }
             }
             return true;
@@ -633,8 +658,9 @@ public abstract class BaseWorld
             return entityClassTypeParent;
         }
         var entityClassTypeParentGo = new GameObject(entityClassType.Name);
-        entityClassTypeParentGo.transform.SetParent(mEntityRootGo.transform);
-        mEntityClassTypeParentMap.Add(entityClassType, entityClassTypeParentGo.transform);
+        entityClassTypeParent = entityClassTypeParentGo.transform;
+        entityClassTypeParent.SetParent(mEntityRootGo.transform);
+        mEntityClassTypeParentMap.Add(entityClassType, entityClassTypeParent);
         return entityClassTypeParent;
     }
     
@@ -655,12 +681,12 @@ public abstract class BaseWorld
     }
 
     /// <summary>
-    /// 执行添加指定Entity
+    /// 添加指定Entity
     /// </summary>
     /// <typeparam name="T"></typeparam>
     /// <param name="entity"></param>
     /// <returns></returns>
-    protected bool DoAddEntity<T>(T entity) where T : BaseEntity
+    protected bool AddEntity<T>(T entity) where T : BaseEntity
     {
         if (entity == null)
         {
@@ -676,6 +702,58 @@ public abstract class BaseWorld
         {
             entityList = new List<BaseEntity>();
             mEntityTypeAndEntitiesMap.Add(entityClassType, entityList);
+        }
+        entityList.Add(entity);
+        mWaitAddEntities.Add(entity);
+        mWaitRemoveEntities.Remove(entity);
+        return true;
+    }
+
+    /// <summary>
+    /// 移除指定Entity
+    /// </summary>
+    /// <param name="entity"></param>
+    /// <returns></returns>
+    protected bool RemoveEntity(BaseEntity entity)
+    {
+        if (entity == null)
+        {
+            Debug.LogError($"不允许移除空Entity！");
+            return false;
+        }
+        var entityUuid = entity.Uuid;
+        var targetEntity = GetEntityByUuid<BaseEntity>(entityUuid);
+        if(targetEntity != entity)
+        {
+            Debug.LogError($"指定Entity Uuid:{entityUuid}和已存在的目标Entity不一致，移除指定Entity失败！");
+            return false;
+        }
+        mEntityMap.Remove(entityUuid);
+        mAllEntity.Remove(entity);
+        mWaitRemoveEntities.Add(entity);
+        mWaitAddEntities.Remove(entity);
+        return true;
+    }
+
+    /// <summary>
+    /// 执行响应添加指定Entity
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
+    /// <param name="entity"></param>
+    /// <returns></returns>
+    protected bool DoOnAddEntity<T>(T entity) where T : BaseEntity
+    {
+        if (entity == null)
+        {
+            Debug.LogError($"不允许执行响应添加空Entity！");
+            return false;
+        }
+        var entityType = entity.ClassType;
+        List<BaseEntity> entityList;
+        if(!mUpadteEntityTypeAndEntitiesMap.TryGetValue(entityType, out entityList))
+        {
+            entityList = new List<BaseEntity>();
+            mUpadteEntityTypeAndEntitiesMap.Add(entityType, entityList);
         }
         entityList.Add(entity);
         foreach(var system in mAllSystems)
@@ -746,8 +824,7 @@ public abstract class BaseWorld
         var entityUuid = GetNextEntityUuid();
         entity.SetUuid(entityUuid);
         EntityUtilities.InitEntityComponents(entity, parameters);
-        mWaitAddEntities.Add(entity);
-        mWaitRemoveEntities.Remove(entity);
+        AddEntity<T>(entity);
         return entity;
     }
 
@@ -764,8 +841,7 @@ public abstract class BaseWorld
             Debug.LogError($"找不大Uuid:{uuid}的Entity，销毁指定Uuid的Entity失败！");
             return false;
         }
-        mWaitRemoveEntities.Add(entity);
-        mWaitAddEntities.Remove(entity);
+        RemoveEntity(entity);
         return true;
     }
 
@@ -797,36 +873,36 @@ public abstract class BaseWorld
     }
 
     /// <summary>
-    /// 执行Entity销毁
+    /// 执行响应Entity移除
     /// </summary>
     /// <param name="entity"></param>
     /// <returns></returns>
-    protected bool DoDestroyEntity(BaseEntity entity)
+    protected bool DoOnRemoveEntity(BaseEntity entity)
     {
-        var uuid = entity.Uuid;
-        mEntityMap.Remove(uuid);
-        var result = mAllEntity.Remove(entity);
-        if(result)
+        var entityType = entity.ClassType;
+        List<BaseEntity> entityList;
+        if (!mUpadteEntityTypeAndEntitiesMap.TryGetValue(entityType, out entityList))
         {
-            var entityClassType = entity.ClassType;
-            var entityList = GetEntityListByType(entityClassType);
-            entityList.Remove(entity);
-            foreach(var system in mAllSystems)
+            Debug.LogError($"找不到Entity类型:{entityType.Name}的更新Entity列表，响应移除Entity失败！");
+            return false;
+        }
+        var result = entityList.Remove(entity);
+        if(!result)
+        {
+            Debug.LogError($"指定Entity类型:{entityType.Name}的更新Entity列表里找不到目标Entity Uuid:{entity.Uuid}的Entity对象，响应移除Entity失败！");
+            return false;
+        }
+        foreach (var system in mAllSystems)
+        {
+            if(system.Filter(entity))
             {
-                if(system.Filter(entity))
-                {
-                    system.RemoveSystemEntity(entity);
-                    system.OnRemove(entity);
-                }
+                system.RemoveSystemEntity(entity);
+                system.OnRemove(entity);
             }
-            entity.OnDestroy();
-            ObjectPool.Singleton.Push(entity);
         }
-        else
-        {
-            Debug.LogError($"找不到Uuid:{uuid}的Entity，执行移除Entity失败！");
-        }
-        return result;
+        entity.OnDestroy();
+        ObjectPool.Singleton.Push(entity);
+        return true;
     }
 
     /// <summary>

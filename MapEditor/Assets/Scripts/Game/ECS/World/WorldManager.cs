@@ -57,13 +57,14 @@ public class WorldManager : SingletonTemplate<WorldManager>
     /// <summary>
     /// LogicUpdate
     /// </summary>
-    public void LogicUpdate()
+    /// <param name="logicFrameTime"></param>
+    public void LogicUpdate(float logicFrameTime)
     {
         UpdateAllUpdateWorldNames();
         foreach (var updateWorldName in mAllUpdateWorldNames)
         {
             var world = GetWorld<BaseWorld>(updateWorldName);
-            world?.LogicUpdate();
+            world?.LogicUpdate(logicFrameTime);
         }
     }
 

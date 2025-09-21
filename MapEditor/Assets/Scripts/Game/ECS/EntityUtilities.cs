@@ -166,6 +166,25 @@ public static class EntityUtilities
 
     #region Entity公共逻辑方法
     /// <summary>
+    /// 获取指定Entity的根GameObject名字
+    /// </summary>
+    /// <param name="entity"></param>
+    /// <returns></returns>
+    public static string GetEntityRootGameObjectName(BaseEntity entity)
+    {
+        if(entity == null)
+        {
+            Debug.LogError($"不允许获取空Entity的根GameObject名字！");
+            return string.Empty;
+        }
+        var classType = entity.ClassType;
+        var classTypeName = classType.Name;
+        var entityUuid = entity.Uuid;
+        var rootGameObjectName = $"{classTypeName}_{entityUuid}";
+        return rootGameObjectName;
+    }
+
+    /// <summary>
     /// 临时位置
     /// </summary>
     private static Vector3 TempPosition = Vector3.zero;
