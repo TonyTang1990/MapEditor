@@ -32,6 +32,51 @@ public abstract class BaseWorld
     }
 
     /// <summary>
+    /// 世界更新类型
+    /// </summary>
+    public WorldUpdateType WorldUpdateType
+    {
+        get;
+        private set;
+    }
+
+    /// <summary>
+    /// 当前逻辑帧数
+    /// </summary>
+    public int LogicFrame
+    {
+        get;
+        private set;
+    }
+
+    /// <summary>
+    /// 逻辑帧经历时长
+    /// </summary>
+    public float LogicFramePassedTime
+    {
+        get;
+        private set;
+    }
+
+    /// <summary>
+    /// 逻辑帧数
+    /// </summary>
+    public int LogicFrameRate
+    {
+        get;
+        private set;
+    }
+
+    /// <summary>
+    /// 单帧时长
+    /// </summary>
+    public float LogicFrameTime
+    {
+        get;
+        private set;
+    }
+
+    /// <summary>
     /// 世界根节点GameObject
     /// </summary>
     protected GameObject mWorldRootGo;
@@ -133,6 +178,11 @@ public abstract class BaseWorld
     #region World部分开始
     public BaseWorld()
     {
+        LogicFrame = 0;
+        LogicFramePassedTime = 0f;
+        LogicFrameRate = 0;
+        LogicFrameTime = 0f;
+
         mAllSystemTypeAndSystemMap = new Dictionary<Type, BaseSystem>();
         mAllSystems = new List<BaseSystem>();
         mWaitAddSystems = new List<BaseSystem>();
@@ -154,11 +204,16 @@ public abstract class BaseWorld
     /// <summary>
     /// 初始化
     /// </summary>
-    /// <param name="worldName"></param>
+    /// <param name="worldBasicData"></param>
     /// <param name="parameters"></param>
-    public virtual void Init(string worldName, params object[] parameters)
+    public virtual void Init(WorldBasicData worldBasicData, params object[] parameters)
     {
-        WorldName = worldName;
+        WorldName = worldBasicData.WorldName;
+        WorldUpdateType = worldBasicData.WorldUpdateType;
+        LogicFrame = 0;
+        LogicFramePassedTime = 0f;
+        LogicFrameRate = worldBasicData.LogicFrameRate;
+        LogicFrameTime = 1f / LogicFrameRate;
     }
 
     /// <summary>
@@ -189,6 +244,55 @@ public abstract class BaseWorld
     /// </summary>
     /// <param name="deltaTime"></param>
     public virtual void Update(float deltaTime)
+    {
+        LogicFramePassedTime += Time.deltaTime;
+        while(LogicFramePassedTime >= LogicFrameTime)
+        {
+            LogicFramePassedTime -= LogicFrameTime;
+            LogicUpdate(LogicFrameTime);
+        }
+
+        if(WorldUpdateType == WorldUpdateType.UPDATE)
+        {
+            WorldUpdate(deltaTime);
+        }
+    }
+
+    /// <summary>
+    /// LogicUpdate
+    /// </summary>
+    /// <param name="logicFrameTime"></param>
+    public virtual void LogicUpdate(float logicFrameTime)
+    {
+        if(WorldUpdateType == WorldUpdateType.LOGIC_UPDATE)
+        {
+            WorldUpdate(logicFrameTime);
+        }
+
+        SystemLogicUpdate(logicFrameTime);
+    }
+
+    /// <summary>
+    /// 处理系统的逻辑更新
+    /// </summary>
+    /// <param name="logicFrameTime"></param>
+    protected void SystemLogicUpdate(float logicFrameTime)
+    {
+        foreach (var system in mAllSystems)
+        {
+            if (system == null)
+            {
+                continue;
+            }
+            system.LogicUpdate(logicFrameTime);
+        }
+    }
+
+    /// <summary>
+    /// 世界更新
+    /// </summary>
+    /// <param name="deltaTime"></param>
+    protected void WorldUpdate(float deltaTime)
     {
         ManagerSystems();
         ManagerEntities();
@@ -281,31 +385,6 @@ public abstract class BaseWorld
                 }
             }
             system.PostProcess(deltaTime);
-        }
-    }
-
-    /// <summary>
-    /// LogicUpdate
-    /// </summary>
-    /// <param name="logicFrameTime"></param>
-    public virtual void LogicUpdate(float logicFrameTime)
-    {
-        ManagerSystemLogicUpdate(logicFrameTime);
-    }
-    
-    /// <summary>
-    /// 处理系统的逻辑更新
-    /// </summary>
-    /// <param name="logicFrameTime"></param>
-    protected void ManagerSystemLogicUpdate(float logicFrameTime)
-    {
-        foreach (var system in mAllSystems)
-        {
-            if (system == null)
-            {
-                continue;
-            }
-            system.LogicUpdate(logicFrameTime);
         }
     }
 

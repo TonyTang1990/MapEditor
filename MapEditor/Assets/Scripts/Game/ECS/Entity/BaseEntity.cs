@@ -100,6 +100,15 @@ public abstract class BaseEntity : IRecycle
         Uuid = uuid;
     }
 
+    /// <summary>
+    /// 初始化
+    /// </summary>
+    /// <param name="parameters"></param>
+    public virtual void Init(params object[] parameters)
+    {
+
+    }
+
     #region Component相关
     /// <summary>
     /// 添加指定组件

@@ -8,6 +8,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Numerics;
 using UnityEngine;
 
 /// <summary>
@@ -69,14 +70,9 @@ public class InputControlSystem : BaseSystem
         {
             return;
         }
-        var positionComponent = firstPlayerEntity.GetComponent<PositionComponent>();
-        if(positionComponent == null)
-        {
-            return;
-        }
         var playerMoveSpeed = MapGameManager.Singleton.PlayerMoveSpeed;
-        var playerOldPosition = positionComponent.Position;
-        EntityUtilities.SetPositionOnNav(firstPlayerEntity, playerOldPosition.x, playerOldPosition.y, playerOldPosition.z + playerMoveSpeed * deltaTime);
+        var offsetPos = new Vector3(0, 0, playerMoveSpeed * deltaTime);
+        EntityUtilities.MoveNavMeshAgentEntity(firstPlayerEntity, offsetPos);
     }
 
     /// <summary>
@@ -90,14 +86,9 @@ public class InputControlSystem : BaseSystem
         {
             return;
         }
-         var positionComponent = firstPlayerEntity.GetComponent<PositionComponent>();
-        if(positionComponent == null)
-        {
-            return;
-        }
         var playerMoveSpeed = MapGameManager.Singleton.PlayerMoveSpeed;
-        var playerOldPosition = positionComponent.Position;
-        EntityUtilities.SetPositionOnNav(firstPlayerEntity, playerOldPosition.x, playerOldPosition.y, playerOldPosition.z - playerMoveSpeed * deltaTime);
+        var offsetPos = new Vector3(0, 0, -playerMoveSpeed * deltaTime);
+        EntityUtilities.MoveNavMeshAgentEntity(firstPlayerEntity, offsetPos);
     }
 
     /// <summary>
@@ -111,14 +102,9 @@ public class InputControlSystem : BaseSystem
         {
             return;
         }
-        var positionComponent = firstPlayerEntity.GetComponent<PositionComponent>();
-        if(positionComponent == null)
-        {
-            return;
-        }
         var playerMoveSpeed = MapGameManager.Singleton.PlayerMoveSpeed;
-        var playerOldPosition = positionComponent.Position;
-        EntityUtilities.SetPositionOnNav(firstPlayerEntity, playerOldPosition.x - playerMoveSpeed * deltaTime, playerOldPosition.y, playerOldPosition.z);
+        var offsetPos = new Vector3(-playerMoveSpeed * deltaTime, 0, 0);
+        EntityUtilities.MoveNavMeshAgentEntity(firstPlayerEntity, offsetPos);
     }
 
     /// <summary>
@@ -132,13 +118,8 @@ public class InputControlSystem : BaseSystem
         {
             return;
         }
-        var positionComponent = firstPlayerEntity.GetComponent<PositionComponent>();
-        if(positionComponent == null)
-        {
-            return;
-        }
         var playerMoveSpeed = MapGameManager.Singleton.PlayerMoveSpeed;
-        var playerOldPosition = positionComponent.Position;
-        EntityUtilities.SetPositionOnNav(firstPlayerEntity, playerOldPosition.x + playerMoveSpeed * deltaTime, playerOldPosition.y, playerOldPosition.z);
+        var offsetPos = new Vector3(playerMoveSpeed * deltaTime, 0, 0);
+        EntityUtilities.MoveNavMeshAgentEntity(firstPlayerEntity, offsetPos);
     }
 }

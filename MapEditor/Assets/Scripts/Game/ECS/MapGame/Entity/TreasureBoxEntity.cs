@@ -10,6 +10,6 @@
 /// TreasureBoxEntity.cs
 /// 宝箱Entity
 /// </summary>
-public class TreasureBoxEntity : BaseEntity
+public class TreasureBoxEntity : BaseObjectEntity
 {
 }

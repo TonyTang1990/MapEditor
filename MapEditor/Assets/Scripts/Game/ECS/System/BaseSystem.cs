@@ -240,4 +240,14 @@ public abstract class BaseSystem
     {
 
     }
+
+    /// <summary>
+    /// 获取指定类型的世界
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
+    /// <returns></returns>
+    public T GetWorld<T>() where T : BaseWorld
+    {
+        return OwnerWorld as T;
+    }
 }

@@ -10,7 +10,7 @@
 /// MonsterEntity.cs
 /// 怪物Entity
 /// </summary>
-public class MonsterEntity : BaseEntity
+public class MonsterEntity : BaseObjectEntity
 {
 
 }

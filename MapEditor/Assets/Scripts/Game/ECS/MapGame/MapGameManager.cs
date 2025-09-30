@@ -7,6 +7,7 @@
 using Cinemachine;
 using MapEditor;
 using System;
+using System.Web.UI;
 using UnityEngine;
 using UnityEngine.UIElements;
 
@@ -311,40 +312,30 @@ public class MapGameManager : SingletonTemplate<MapGameManager>
     /// </summary>
     private void CreateWorld()
     {
-        WorldManager.Singleton.CreateWrold<MapGameWorld>(WorldNames.MapGameWorldName);
+        var worldBasicData = new WorldBasicData(WorldNames.MapGameWorldName);
+        WorldManager.Singleton.CreateWrold<MapGameWorld>(worldBasicData);
     }
 
-    #region 公共方法
+    /// <summary>
+    /// 获取空待NavMeshAgent的预制件路径
+    /// </summary>
+    /// <returns></returns>
+    public string GetEmptyNavPrefabPath()
+    {
+        return ECSManager.Singleton.GetCommonPrefabPath(MapGameConst.EmptyNavPrefabName);
+    }
+
     /// <summary>
     /// 根据路径加载Entity预制体
     /// </summary>
     /// <param name="entity"></param>
-    /// <param name="prefabPath"></param>
     /// <param name="parent"></param>
+    /// <param name="worldPos"></param>
+    /// <param name="eulerAngles"></param>
     /// <param name="loadCompleteCb"></param>
-    public void LoadEntityPrefabByPath(BaseEntity entity, string prefabPath, Transform parent, Action<BaseEntity> loadCompleteCb = null)
+    public void LoadObjectEntityEmptyNavPrefab(BaseObjectEntity entity, Transform parent, Vector3 worldPos, Vector3 eulerAngles, Action<BaseEntity> loadCompleteCb = null)
     {
-        PoolManager.Singleton.Pop(prefabPath, (instance) =>
-        {
-            var rootGameObjectName = EntityUtilities.GetEntityRootGameObjectName(entity);
-            instance.name = rootGameObjectName;
-            var gameObjectComponent = entity.GetComponent<GameObjectComponent>();
-            gameObjectComponent.Go = instance;
-            var instanceTransform = instance.transform;
-            if (parent != null)
-            {
-                instanceTransform.SetParent(parent);
-            }
-            var positionComponent = entity.GetComponent<PositionComponent>();
-            instanceTransform.position = positionComponent.Position;
-            var rotationComponent = entity.GetComponent<RotationComponent>();
-            instanceTransform.eulerAngles = rotationComponent.Rotation;
-            var animatorPlayComponent = entity.GetComponent<AnimatorPlayComponent>();
-            var animator = instanceTransform.GetComponent<Animator>();
-            animatorPlayComponent.Animator = animator;
-            EntityUtilities.PlayAnim(entity, animatorPlayComponent.PlayAnimName);
-            loadCompleteCb?.Invoke(entity);
-        });
+        var emptyNavPrefabPath = GetEmptyNavPrefabPath();
+        ECSManager.Singleton.LoadObjectEntityPrefabByPath(emptyNavPrefabPath, entity, parent, worldPos, eulerAngles, loadCompleteCb);
     }
-    #endregion
 }

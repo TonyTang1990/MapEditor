@@ -60,4 +60,19 @@ public static class ECSConst
     /// </summary>
     public static readonly Type MapGameEntityType = typeof(MapGameEntity);
     #endregion
+
+    /// <summary>
+    /// 通用Common预制件目录路径
+    /// </summary>
+    public const string CommonPrefabFolderPath = "Common/";
+
+    /// <summary>
+    /// 实体对象Object节点前缀名
+    /// </summary>
+    public const string ObjectNodePrefixName = "Object";
+
+    /// <summary>
+    /// 空GameObject预制件名
+    /// </summary>
+    public const string EmptyPrefabName = "EmptyGo";
 }

@@ -106,7 +106,6 @@ public class GameManager : SingletonTemplate<GameManager>
     private void LogicUpdate(float logicFrameTime)
     {
         LogicFrame++;
-        MapGameManager.Singleton.LogicUpdate(logicFrameTime);
     }
 
     /// <summary>

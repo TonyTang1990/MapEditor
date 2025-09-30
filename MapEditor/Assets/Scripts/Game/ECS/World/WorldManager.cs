@@ -101,20 +101,21 @@ public class WorldManager : SingletonTemplate<WorldManager>
     /// 创建指定类型和名字的世界
     /// </summary>
     /// <typeparam name="T"></typeparam>
-    /// <param name="worldName"></param>
+    /// <param name="worldBasicData"></param>
     /// <param name="parameters"></param>
     /// <returns></returns>
-    public T CreateWrold<T>(string worldName, params object[] parameters) where T : BaseWorld, new()
+    public T CreateWrold<T>(WorldBasicData worldBasicData, params object[] parameters) where T : BaseWorld, new()
     {
+        var worldName = worldBasicData.WorldName;
         var existWorld = GetWorld<T>(worldName);
         if(existWorld != null)
         {
             var worldType = typeof(T);
-            Debug.LogError($"已存在世界类型:{worldType.Name}和世界名:{worldName}的世界，创建世界失败！");
+            Debug.LogError($"已存在世界类型:{worldType.Name}和世界名:{worldBasicData}的世界，创建世界失败！");
             return null;
         }
         var newWorld = new T();
-        newWorld.Init(worldName, parameters);
+        newWorld.Init(worldBasicData, parameters);
         var result = AddWorld(newWorld);
         if(result)
         {

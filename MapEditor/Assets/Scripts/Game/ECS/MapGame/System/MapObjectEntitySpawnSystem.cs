@@ -191,21 +191,21 @@ public class MapObjectEntitySpawnSystem : BaseSystem
             var position = mapDataExport.Position;
             if(mapDataExport is MonsterMapDataExport)
             {
-                var monsterEntity = OwnerWorld.CreateEntity<MonsterEntity>(MapGameConst.MonsterPrefabPath);
+                var monsterEntity = GetWorld<MapGameWorld>.CreateMonsterEntity(MapGameConst.MonsterPrefabPath);
                 entity = monsterEntity;
                 EntityUtilities.SetPositionOnNav(monsterEntity, position.x, position.y, position.z);
                 Debug.Log($"生成在位置:x:{position.x}, y:{position.y}, z:{position.z}生成MonsterEntity！");
             }
             else if(mapDataExport is TreasureBoxMapDataExport)
             {
-                var treasureEntity = OwnerWorld.CreateEntity<TreasureBoxEntity>(MapGameConst.TreasureBoxPrefabPath);
+                var treasureEntity = GetWorld<MapGameWorld>.CreateTreasureBoxEntity(MapGameConst.TreasureBoxPrefabPath);
                 entity = treasureEntity;
                 EntityUtilities.SetPositionOnNav(treasureEntity, position.x, position.y, position.z);
                 Debug.Log($"生成在位置:x:{position.x}, y:{position.y}, z:{position.z}生成TreasureBoxEntity！");
             }
             else if(mapDataExport is TrapMapDataExport)
             {
-                var trapEntity = OwnerWorld.CreateEntity<TrapEntity>(MapGameConst.TrapPrefabPath);
+                var trapEntity = GetWorld<MapGameWorld>.CreateTrapEntity(MapGameConst.TrapPrefabPath);
                 entity = trapEntity;
                 EntityUtilities.SetPositionOnNav(trapEntity, position.x, position.y, position.z);
                 Debug.Log($"生成在位置:x:{position.x}, y:{position.y}, z:{position.z}生成TrapEntity！");

@@ -10,6 +10,6 @@
 /// TrapEntity.cs
 /// 陷阱Entity
 /// </summary>
-public class TrapEntity : BaseEntity
+public class TrapEntity : BaseObjectEntity
 {
 }

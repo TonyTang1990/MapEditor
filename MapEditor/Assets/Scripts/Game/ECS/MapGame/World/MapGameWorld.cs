@@ -8,6 +8,7 @@
 
 using Cinemachine;
 using MapEditor;
+using System.Numerics;
 using UnityEngine;
 
 /// <summary>
@@ -43,13 +44,93 @@ public class MapGameWorld : BaseWorld
     /// </summary>
     private void CreateAllSystem()
     {
+        CreateSystem<MapGameEntitySpawnSystem>();
         CreateSystem<InputControlSystem>();
         CreateSystem<PlayerSpawnSystem>();
         CreateSystem<MapObjectEntitySpawnSystem>();
-        CreateSystem<MapObjectGoSpawnSystem>();
-        CreateSystem<ActorSyncSystem>();
         CreateSystem<CameraFollowSystem>();
-        // MapGameEntitySpawnSystem一来摄像机的位置改变，所以必须放在CameraFollowSystem后
-        CreateSystem<MapGameEntitySpawnSystem>();
+    }
+
+    /// <summary>
+    /// 创建MapGameEntity
+    /// </summary>
+    /// <returns></returns>
+    public MapGameEntity CreateMapGameEntity()
+    {
+        var mapGameEntity = CreateEntity<MapGameEntity>();
+        MapGameEntityUtilities.InitEntityComponents(mapGameEntity);
+        mapGameEntity.Init();
+        return mapGameEntity;
+    }
+
+    /// <summary>
+    /// 创建CameraEntity
+    /// </summary>
+    /// <param name="bindCameraGo"></param>
+    /// <param name="isAutoDestroy"></param>
+    /// <returns></returns>
+    public CameraEntity CreateCameraEntity(GameObject bindCameraGo, bool isAutoDestroy = false)
+    {
+        var cameraEntity = CreateEntity<CameraEntity>();
+        MapGameEntityUtilities.InitEntityComponents(cameraEntity);
+        cameraEntity.Init(bindCameraGo, isAutoDestroy);
+        return cameraEntity;
+    }
+
+    /// <summary>
+    /// 创建PlayerEntity
+    /// </summary>
+    /// <returns></returns>
+    public PlayerEntity CreatePlayerEntity(string prefabPath, Vector3 worldPos)
+    {
+        var playerEntity = CreateEntity<PlayerEntity>();
+        MapGameEntityUtilities.InitEntityComponents(playerEntity);
+        playerEntity.Init(prefabPath);
+        var entityParent = GetEntityTypeParent(playerEntity);
+        MapGameManager.Singleton.LoadObjectEntityEmptyNavPrefab(playerEntity, entityParent, worldPos);
+        return playerEntity;
+    }
+
+    /// <summary>
+    /// 创建MonsterEntity
+    /// </summary>
+    /// <returns></returns>
+    public MonsterEntity CreateMonsterEntity(string prefabPath, Vector3 worldPos)
+    {
+        var monsterEntity = CreateEntity<MonsterEntity>();
+        MapGameEntityUtilities.InitEntityComponents(monsterEntity);
+        monsterEntity.Init(prefabPath);
+        var entityParent = GetEntityTypeParent(monsterEntity);
+        MapGameManager.Singleton.LoadObjectEntityEmptyNavPrefab(monsterEntity, entityParent, worldPos);
+        return monsterEntity;
+    }
+
+    /// <summary>
+    /// 创建TreasureBoxEntity
+    /// </summary>
+    /// <returns></returns>
+    public TreasureBoxEntity CreateTreasureBoxEntity(string prefabPath, Vector3 worldPos)
+    {
+        var treasureBoxEntity = CreateEntity<TreasureBoxEntity>();
+        MapGameEntityUtilities.InitEntityComponents(treasureBoxEntity);
+        treasureBoxEntity.Init(prefabPath);
+        var entityParent = GetEntityTypeParent(treasureBoxEntity);
+        ECSManager.Singleton.LoadObjectEntityPrefabByPath(treasureBoxEntity, entityParent, worldPos);
+        return treasureBoxEntity;
+    }
+
+
+    /// <summary>
+    /// 创建TrapEntity
+    /// </summary>
+    /// <returns></returns>
+    public TrapEntity CreateTrapEntity(string prefabPath, Vector3 worldPos)
+    {
+        var trapEntity = CreateEntity<TrapEntity>();
+        MapGameEntityUtilities.InitEntityComponents(trapEntity);
+        trapEntity.Init(prefabPath);
+        var entityParent = GetEntityTypeParent(trapEntity);
+        ECSManager.Singleton.LoadObjectEntityPrefabByPath(trapEntity, entityParent, worldPos);
+        return trapEntity;
     }
 }

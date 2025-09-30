@@ -9,7 +9,8 @@
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProductVersion>10.0.20506</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
-    <RootNamespace></RootNamespace>
+    <RootNamespace>
+    </RootNamespace>
     <ProjectGuid>{8FDB5A40-4C78-576C-FBF9-6CA5ED291819}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
@@ -58,12 +59,15 @@
     <Analyzer Include="G:\Software\VisualStudio\VS2022\Install\Common7\IDE\Extensions\Microsoft\Visual Studio Tools for Unity\Analyzers\Microsoft.Unity.Analyzers.dll" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Assets\Scripts\Game\ECS\ECSManager.cs" />
+    <Compile Include="Assets\Scripts\Game\ECS\Entity\BaseObjectEntity.cs" />
+    <Compile Include="Assets\Scripts\Game\ECS\MapGame\MapGameEntityUtilities.cs" />
+    <Compile Include="Assets\Scripts\Game\ECS\World\WorldBasicData.cs" />
+    <Compile Include="Assets\Scripts\Game\ECS\World\WorldUpdateType.cs" />
     <Compile Include="Assets\Scripts\Utilities\FolderUtilities.cs" />
-    <Compile Include="Assets\Scripts\Game\ECS\MapGame\System\MapObjectGoSpawnSystem.cs" />
     <Compile Include="Assets\Scripts\Map\MapData\MapDataConfig.cs" />
     <Compile Include="Assets\Scripts\Map\MapData\MonsterMapData.cs" />
     <Compile Include="Assets\GameLauncher.cs" />
-    <Compile Include="Assets\Scripts\Game\ECS\MapGame\Component\RotationComponent.cs" />
     <Compile Include="Assets\Scripts\Core\Collision\Collision2D\Circle2D.cs" />
     <Compile Include="Assets\Scripts\Map\MapObject\MapObjectType.cs" />
     <Compile Include="Assets\Scripts\Core\Collision\Collision3D\Collision3DUtilities.cs" />
@@ -90,7 +94,6 @@
     <Compile Include="Assets\Scripts\Game\ECS\MapGame\Entity\PlayerEntity.cs" />
     <Compile Include="Assets\Scripts\Utilities\CameraUtilities.cs" />
     <Compile Include="Assets\Scripts\Game\ECS\MapGame\Entity\MapGameEntity.cs" />
-    <Compile Include="Assets\Scripts\Game\ECS\MapGame\Component\AnimatorPlayComponent.cs" />
     <Compile Include="Assets\Scripts\Map\MapExport\MapExport.cs" />
     <Compile Include="Assets\Scripts\Utilities\UnityUtilities.cs" />
     <Compile Include="Assets\Scripts\Core\Collision\Collision2D\Sector2D.cs" />
@@ -102,7 +105,6 @@
     <Compile Include="Assets\Scripts\Map\MapExport\MapObjectExport.cs" />
     <Compile Include="Assets\Scripts\Game\ECS\Component\BaseComponent.cs" />
     <Compile Include="Assets\Scripts\Map\MapExport\TreasureBoxMapDataExport.cs" />
-    <Compile Include="Assets\Scripts\Game\ECS\MapGame\Component\GameObjectBindComponent.cs" />
     <Compile Include="Assets\Scripts\Core\Collision\Collision2D\Collision2DUtilities.cs" />
     <Compile Include="Assets\Scripts\Game\ECS\Entity\BaseEntity.cs" />
     <Compile Include="Assets\Scripts\Map\MapObject\ColliderDataMono.cs" />
@@ -110,7 +112,7 @@
     <Compile Include="Assets\Scripts\Game\ECS\EntityUtilities.cs" />
     <Compile Include="Assets\Scripts\Core\Singleton\SingletonMonoBehaviourTemplate.cs" />
     <Compile Include="Assets\Scripts\Core\Collision\MeshUtilities.cs" />
-    <Compile Include="Assets\Scripts\Game\MapGameManager.cs" />
+    <Compile Include="Assets\Scripts\Game\ECS\MapGame\MapGameManager.cs" />
     <Compile Include="Assets\Scripts\Core\Collision\Collision2D\VisibleDraw\OBB2DVisible.cs" />
     <Compile Include="Assets\Scripts\Map\MapData\MapData.cs" />
     <Compile Include="Assets\Scripts\Core\Collision\Collision2D\VisibleDraw\Circle2DVisible.cs" />
@@ -119,28 +121,23 @@
     <Compile Include="Assets\Scripts\Core\Pool\PoolManager.cs" />
     <Compile Include="Assets\Scripts\Core\Collision\Collision2D\OBB2D.cs" />
     <Compile Include="Assets\Scripts\Map\MapExport\ExportType.cs" />
-    <Compile Include="Assets\Scripts\Game\ECS\MapGame\Component\PositionComponent.cs" />
-    <Compile Include="Assets\Scripts\Game\ECS\MapGame\Component\ActorComponent.cs" />
-    <Compile Include="Assets\Scripts\Game\MapGameConst.cs" />
+    <Compile Include="Assets\Scripts\Game\ECS\MapGame\MapGameConst.cs" />
     <Compile Include="Assets\Scripts\Game\ECS\System\BaseSystem.cs" />
     <Compile Include="Assets\Scripts\Core\Collision\Collision2D\AABB2D.cs" />
     <Compile Include="Assets\Scripts\Map\MapFoldType.cs" />
     <Compile Include="Assets\Scripts\Core\Singleton\SingletonTemplate.cs" />
-    <Compile Include="Assets\Scripts\Game\ECS\MapGame\System\ActorSyncSystem.cs" />
     <Compile Include="Assets\Scripts\Core\Collision\Collision2D\VisibleDraw\AABB2DVisible.cs" />
     <Compile Include="Assets\Scripts\Game\GameManager.cs" />
     <Compile Include="Assets\Scripts\Game\ECS\ECSConst.cs" />
-    <Compile Include="Assets\Scripts\Game\ECS\MapGame\Component\GameObjectComponent.cs" />
     <Compile Include="Assets\Scripts\Game\ECS\ComponentUtilities.cs" />
     <Compile Include="Assets\Scripts\Map\MapExport\MonsterMapDataExport.cs" />
     <Compile Include="Assets\Scripts\Map\Map.cs" />
     <Compile Include="Assets\Scripts\Game\ECS\MapGame\System\PlayerSpawnSystem.cs" />
     <Compile Include="Assets\Scripts\Core\Collision\Collision2D\VisibleDraw\Capsule2DVisible.cs" />
-    <Compile Include="Assets\Scripts\Game\ECS\MapGame\Entity\BaseBindEntity.cs" />
+    <Compile Include="Assets\Scripts\Game\ECS\Entity\BaseBindEntity.cs" />
     <Compile Include="Assets\Scripts\Game\UI\MainUI.cs" />
     <Compile Include="Assets\Scripts\Map\MapExport\BaseMapDataExport.cs" />
     <Compile Include="Assets\Scripts\Game\ECS\MapGame\System\CameraFollowSystem.cs" />
-    <Compile Include="Assets\Scripts\Game\ECS\MapGame\Component\GameObjectSyncComponent.cs" />
     <Compile Include="Assets\Scripts\Game\ECS\MapGame\System\MapGameEntitySpawnSystem.cs" />
     <Compile Include="Assets\Scripts\Game\UI\BaseUI.cs" />
     <Compile Include="Assets\Scripts\Game\ECS\MapGame\System\InputControlSystem.cs" />

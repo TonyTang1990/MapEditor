@@ -10,6 +10,6 @@
 /// PlayerEntity.cs
 /// 玩家Entity
 /// </summary>
-public class PlayerEntity : BaseEntity
+public class PlayerEntity : BaseObjectEntity
 {
 }
