@@ -35,6 +35,11 @@ public static class MapGameConst
     public const string UIPrefabFolderPath = "UI";
 
     /// <summary>
+    /// 空待navMeshAgent的预制件名字
+    /// </summary>
+    public const string EmptyNavPrefabName = "EmptyNavGo";
+
+    /// <summary>
     /// 玩家预制件路径
     /// </summary>
     public const string PlayerPrefabPath = "MapObjects/Player/Player";

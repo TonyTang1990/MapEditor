@@ -118,11 +118,6 @@ public class MapObjectEntitySpawnSystem : BaseSystem
     public override void Process(BaseEntity entity, float deltaTime)
     {
         base.Process(entity, deltaTime);
-        var gameObjectSyncComponent = entity.GetComponent<GameObjectSyncComponent>();
-        if(gameObjectSyncComponent == null || !gameObjectSyncComponent.SyncPosition)
-        {
-            return;
-        }
         UpdateCameraDatas();
         CheckAllMapDataExportEntitySpawn();
         CheckAllSpawnEntityRemove();
@@ -191,23 +186,20 @@ public class MapObjectEntitySpawnSystem : BaseSystem
             var position = mapDataExport.Position;
             if(mapDataExport is MonsterMapDataExport)
             {
-                var monsterEntity = GetWorld<MapGameWorld>.CreateMonsterEntity(MapGameConst.MonsterPrefabPath);
+                var monsterEntity = GetWorld<MapGameWorld>().CreateMonsterEntity(MapGameConst.MonsterPrefabPath, position);
                 entity = monsterEntity;
-                EntityUtilities.SetPositionOnNav(monsterEntity, position.x, position.y, position.z);
                 Debug.Log($"生成在位置:x:{position.x}, y:{position.y}, z:{position.z}生成MonsterEntity！");
             }
             else if(mapDataExport is TreasureBoxMapDataExport)
             {
-                var treasureEntity = GetWorld<MapGameWorld>.CreateTreasureBoxEntity(MapGameConst.TreasureBoxPrefabPath);
+                var treasureEntity = GetWorld<MapGameWorld>().CreateTreasureBoxEntity(MapGameConst.TreasureBoxPrefabPath, position);
                 entity = treasureEntity;
-                EntityUtilities.SetPositionOnNav(treasureEntity, position.x, position.y, position.z);
                 Debug.Log($"生成在位置:x:{position.x}, y:{position.y}, z:{position.z}生成TreasureBoxEntity！");
             }
             else if(mapDataExport is TrapMapDataExport)
             {
-                var trapEntity = GetWorld<MapGameWorld>.CreateTrapEntity(MapGameConst.TrapPrefabPath);
+                var trapEntity = GetWorld<MapGameWorld>().CreateTrapEntity(MapGameConst.TrapPrefabPath, position);
                 entity = trapEntity;
-                EntityUtilities.SetPositionOnNav(trapEntity, position.x, position.y, position.z);
                 Debug.Log($"生成在位置:x:{position.x}, y:{position.y}, z:{position.z}生成TrapEntity！");
             }
             else
@@ -230,13 +222,12 @@ public class MapObjectEntitySpawnSystem : BaseSystem
         foreach(var spawnedMapDataEntity in mSpawnedMapDataEntityMap)
         {
             var entityUuid = spawnedMapDataEntity.Value;
-            var entity = OwnerWorld.GetEntityByUuid<BaseEntity>(entityUuid);
+            var entity = OwnerWorld.GetEntityByUuid<BaseObjectEntity>(entityUuid);
             if (entity == null)
             {
                 continue;
             }
-            var positionComponent = entity.GetComponent<PositionComponent>();
-            var entityPosition = positionComponent.Position;
+            var entityPosition = entity.GetWorldPos();
             mTempMapDataExportPos.x = entityPosition.x;
             mTempMapDataExportPos.y = entityPosition.z;
             if(!Collision2DUtilities.PointInAABB(mCameraRectArea, mTempMapDataExportPos))

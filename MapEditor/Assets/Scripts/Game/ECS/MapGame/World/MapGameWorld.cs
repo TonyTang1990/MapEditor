@@ -87,7 +87,7 @@ public class MapGameWorld : BaseWorld
         MapGameEntityUtilities.InitEntityComponents(playerEntity);
         playerEntity.Init(prefabPath);
         var entityParent = GetEntityTypeParent(playerEntity);
-        MapGameManager.Singleton.LoadObjectEntityEmptyNavPrefab(playerEntity, entityParent, worldPos);
+        MapGameManager.Singleton.LoadObjectEntityEmptyNavPrefab(playerEntity, entityParent, worldPos, Vector3.zero);
         return playerEntity;
     }
 
@@ -101,7 +101,7 @@ public class MapGameWorld : BaseWorld
         MapGameEntityUtilities.InitEntityComponents(monsterEntity);
         monsterEntity.Init(prefabPath);
         var entityParent = GetEntityTypeParent(monsterEntity);
-        MapGameManager.Singleton.LoadObjectEntityEmptyNavPrefab(monsterEntity, entityParent, worldPos);
+        MapGameManager.Singleton.LoadObjectEntityEmptyNavPrefab(monsterEntity, entityParent, worldPos, Vector3.zero);
         return monsterEntity;
     }
 
@@ -115,7 +115,7 @@ public class MapGameWorld : BaseWorld
         MapGameEntityUtilities.InitEntityComponents(treasureBoxEntity);
         treasureBoxEntity.Init(prefabPath);
         var entityParent = GetEntityTypeParent(treasureBoxEntity);
-        ECSManager.Singleton.LoadObjectEntityPrefabByPath(treasureBoxEntity, entityParent, worldPos);
+        ECSManager.Singleton.LoadObjectEntityEmptyPrefab(treasureBoxEntity, entityParent, worldPos, Vector3.zero);
         return treasureBoxEntity;
     }
 
@@ -130,7 +130,7 @@ public class MapGameWorld : BaseWorld
         MapGameEntityUtilities.InitEntityComponents(trapEntity);
         trapEntity.Init(prefabPath);
         var entityParent = GetEntityTypeParent(trapEntity);
-        ECSManager.Singleton.LoadObjectEntityPrefabByPath(trapEntity, entityParent, worldPos);
+        ECSManager.Singleton.LoadObjectEntityEmptyPrefab(trapEntity, entityParent, worldPos, Vector3.zero);
         return trapEntity;
     }
 }

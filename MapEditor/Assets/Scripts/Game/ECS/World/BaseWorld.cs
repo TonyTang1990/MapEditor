@@ -772,7 +772,8 @@ public abstract class BaseWorld
             Debug.LogError($"不允许添加空Entity！");
             return false;
         }
-        var entityUuid = entity.Uuid;
+        var entityUuid = GetNextEntityUuid();
+        entity.SetUuid(entityUuid);
         mEntityMap.Add(entityUuid, entity);
         mAllEntity.Add(entity);
         var entityClassType = entity.ClassType;
@@ -900,9 +901,6 @@ public abstract class BaseWorld
     public T CreateEntity<T>(params object[] parameters) where T : BaseEntity, new()
     {
         T entity = ObjectPool.Singleton.Pop<T>();
-        var entityUuid = GetNextEntityUuid();
-        entity.SetUuid(entityUuid);
-        EntityUtilities.InitEntityComponents(entity, parameters);
         AddEntity<T>(entity);
         return entity;
     }

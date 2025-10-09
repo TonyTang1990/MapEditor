@@ -7,10 +7,6 @@
 using System;
 using System.IO;
 using UnityEngine;
-using Unity.AI.Navigation;
-using System.Threading.Tasks;
-using Unity.AI.Navigation.Editor;
-using UnityEngine.AI;
 using System.Collections.Generic;
 #if UNITY_EDITOR
 using UnityEditor;

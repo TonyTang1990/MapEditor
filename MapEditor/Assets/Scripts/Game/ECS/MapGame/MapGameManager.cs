@@ -7,9 +7,7 @@
 using Cinemachine;
 using MapEditor;
 using System;
-using System.Web.UI;
 using UnityEngine;
-using UnityEngine.UIElements;
 
 /// <summary>
 /// MapGameManager.cs

@@ -7,15 +7,9 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Threading.Tasks;
-using Unity.AI.Navigation;
-using Unity.AI.Navigation.Editor;
 using UnityEditor;
-using UnityEditor.SceneManagement;
 using UnityEngine;
-using UnityEngine.AI;
-using static System.Runtime.CompilerServices.RuntimeHelpers;
 
 namespace MapEditor
 {

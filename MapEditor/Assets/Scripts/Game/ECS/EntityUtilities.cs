@@ -7,9 +7,8 @@
 *
 */
 
-using System.Diagnostics;
-using System.Numerics;
 using UnityEngine;
+using UnityEngine.AI;
 
 /// <summary>
 /// EntityUtilities.cs

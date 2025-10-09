@@ -8,8 +8,7 @@
 
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
-using System.Runtime.Serialization;
+using UnityEngine;
 
 /// <summary>
 /// MapGameEntityUtilities.cs
@@ -78,7 +77,7 @@ public static class MapGameEntityUtilities
     /// <param name="entityType"></param>
     private static void InitActorEntityCommonComponents(BaseEntity entity, EntityType entityType)
     {
-        var entityTypeComponent = ComponentUtilities.CreateEntityTypeComponent(entityType);
+        var entityTypeComponent = CreateEntityTypeComponent(entityType);
         entity.AddComponents(entityTypeComponent);
     }
 
@@ -91,7 +90,7 @@ public static class MapGameEntityUtilities
     /// <param name="IsAutoDestroyBindGo"></param>
     private static void InitBindEntityCommonComponents(BaseEntity entity, EntityType entityType)
     {
-        var entityTypeComponent = ComponentUtilities.CreateEntityTypeComponent(entityType);
+        var entityTypeComponent = CreateEntityTypeComponent(entityType);
         entity.AddComponents(entityTypeComponent);
     }
 
@@ -112,8 +111,7 @@ public static class MapGameEntityUtilities
     /// <param name="parameters"></param>
     private static void InitMonsterEntityComponents(MonsterEntity entity, params object[] parameters)
     {
-        var prefabPath = parameters[0] as string;
-        InitActorEntityCommonComponents(entity, EntityType.Monster, prefabPath);
+        InitActorEntityCommonComponents(entity, EntityType.Monster);
     }
 
     /// <summary>
@@ -153,7 +151,7 @@ public static class MapGameEntityUtilities
     /// <param name="parameters"></param>
     private static void InitMapGameEntityComponents(MapGameEntity entity, params object[] parameters)
     {
-        var entityTypeComponent = ComponentUtilities.CreateEntityTypeComponent(EntityType.MapGame);
+        var entityTypeComponent = CreateEntityTypeComponent(EntityType.MapGame);
         entity.AddComponents(entityTypeComponent);
     }
 }

@@ -42,7 +42,7 @@ public class CameraFollowSystem : BaseSystem
     public override void OnAddToWorld()
     {
         base.OnAddToWorld();
-        var cameraEntity = OwnerWorld.CreateEntity<CameraEntity>(MapGameManager.Singleton.GameVirtualCamera.gameObject, false);
+        var cameraEntity = GetWorld<MapGameWorld>().CreateCameraEntity(MapGameManager.Singleton.GameVirtualCamera.gameObject, false);
         mCameraEntityUuid = cameraEntity.Uuid;
     }
 
@@ -72,10 +72,9 @@ public class CameraFollowSystem : BaseSystem
         {
             return;
         }
-        var positionComponent = firstPlayerEntity.GetComponent<PositionComponent>();
-        var playerPos = positionComponent.Position;
+        var playerPos = firstPlayerEntity.GetWorldPos();
         var playerCameraPosOffset = MapGameManager.Singleton.PlayerCameraPosOffset;
         var newCameraPos = playerPos + playerCameraPosOffset;
-        EntityUtilities.SetPosition(cameraEntity, newCameraPos.x, newCameraPos.y, newCameraPos.z);
+        EntityUtilities.SetBindEntityWorldPos(cameraEntity, newCameraPos.x, newCameraPos.y, newCameraPos.z);
     }
 }

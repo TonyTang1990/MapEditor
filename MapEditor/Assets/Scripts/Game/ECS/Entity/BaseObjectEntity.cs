@@ -10,8 +10,6 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Diagnostics;
-using System.Numerics;
 using UnityEngine;
 
 /// <summary>
@@ -150,7 +148,7 @@ public abstract class BaseObjectEntity : BaseEntity
         {
             return RootGameObject.transform.position;
         }
-        Debug.LogErorr($"Class Type:{ClassType}，Entity Uuid:{Uuid}的根实体对象不存在，获取世界坐标失败！");
+        Debug.LogError($"Class Type:{ClassType}，Entity Uuid:{Uuid}的根实体对象不存在，获取世界坐标失败！");
         return Vector3.zero;
     }
 
