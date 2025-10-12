@@ -6,9 +6,6 @@
 * @ Description:
 */
 
-using Cinemachine;
-using MapEditor;
-using System.Numerics;
 using UnityEngine;
 
 /// <summary>
@@ -81,13 +78,13 @@ public class MapGameWorld : BaseWorld
     /// 创建PlayerEntity
     /// </summary>
     /// <returns></returns>
-    public PlayerEntity CreatePlayerEntity(string prefabPath, Vector3 worldPos)
+    public PlayerEntity CreatePlayerEntity(string prefabPath, Vector3 worldPos, Vector3 worldRotation)
     {
         var playerEntity = CreateEntity<PlayerEntity>();
         MapGameEntityUtilities.InitEntityComponents(playerEntity);
         playerEntity.Init(prefabPath);
         var entityParent = GetEntityTypeParent(playerEntity);
-        MapGameManager.Singleton.LoadObjectEntityEmptyNavPrefab(playerEntity, entityParent, worldPos, Vector3.zero);
+        MapGameManager.Singleton.LoadObjectEntityEmptyNavPrefab(playerEntity, entityParent, worldPos, worldRotation);
         return playerEntity;
     }
 

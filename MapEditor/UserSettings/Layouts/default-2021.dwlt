@@ -19,7 +19,7 @@ MonoBehaviour:
     width: 1920
     height: 997
   m_ShowMode: 4
-  m_Title: Scene
+  m_Title: Game
   m_RootView: {fileID: 11}
   m_MinSize: {x: 875, y: 300}
   m_MaxSize: {x: 10000, y: 10000}
@@ -74,7 +74,7 @@ MonoBehaviour:
   m_MinSize: {x: 100, y: 200}
   m_MaxSize: {x: 8096, y: 16192}
   vertical: 1
-  controlID: 121
+  controlID: 75
 --- !u!114 &4
 MonoBehaviour:
   m_ObjectHideFlags: 52
@@ -99,7 +99,7 @@ MonoBehaviour:
   m_MinSize: {x: 100, y: 200}
   m_MaxSize: {x: 8096, y: 16192}
   vertical: 1
-  controlID: 17
+  controlID: 81
 --- !u!114 &5
 MonoBehaviour:
   m_ObjectHideFlags: 52
@@ -150,7 +150,7 @@ MonoBehaviour:
   m_MinSize: {x: 100, y: 200}
   m_MaxSize: {x: 8096, y: 16192}
   vertical: 1
-  controlID: 84
+  controlID: 41
 --- !u!114 &7
 MonoBehaviour:
   m_ObjectHideFlags: 52
@@ -228,7 +228,7 @@ MonoBehaviour:
   m_MinSize: {x: 300, y: 200}
   m_MaxSize: {x: 24288, y: 16192}
   vertical: 0
-  controlID: 16
+  controlID: 74
 --- !u!114 &10
 MonoBehaviour:
   m_ObjectHideFlags: 52
@@ -336,7 +336,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 1
   m_Script: {fileID: 12006, guid: 0000000000000000e000000000000000, type: 0}
-  m_Name: SceneView
+  m_Name: ConsoleWindow
   m_EditorClassIdentifier: 
   m_Children: []
   m_Position:
@@ -345,14 +345,14 @@ MonoBehaviour:
     y: 0
     width: 656
     height: 279
-  m_MinSize: {x: 201, y: 221}
+  m_MinSize: {x: 101, y: 121}
   m_MaxSize: {x: 4001, y: 4021}
-  m_ActualView: {fileID: 19}
+  m_ActualView: {fileID: 21}
   m_Panes:
   - {fileID: 19}
   - {fileID: 21}
-  m_Selected: 0
-  m_LastSelected: 1
+  m_Selected: 1
+  m_LastSelected: 0
 --- !u!114 &15
 MonoBehaviour:
   m_ObjectHideFlags: 52
@@ -422,22 +422,22 @@ MonoBehaviour:
     m_SkipHidden: 0
     m_SearchArea: 1
     m_Folders:
-    - Assets/Scripts/Game/ECS/MapGame/Component
+    - Assets/Scripts/Game/ECS/World
     m_Globs: []
     m_OriginalText: 
   m_ViewMode: 1
   m_StartGridSize: 16
   m_LastFolders:
-  - Assets/Scripts/Game/ECS/MapGame/Component
+  - Assets/Scripts/Game/ECS/World
   m_LastFoldersGridSize: 16
   m_LastProjectPath: G:\Projects\GitHubProjects\MapEditor\MapEditor
   m_LockTracker:
     m_IsLocked: 0
   m_FolderTreeState:
-    scrollPos: {x: 0, y: 202}
-    m_SelectedIDs: 445d0000
-    m_LastClickedID: 23876
-    m_ExpandedIDs: 00000000be5c0000c05c0000c25c0000c45c0000c65c0000c85c0000ca5c0000145d0000465d0000485d000000ca9a3bffffff7f
+    scrollPos: {x: 0, y: 95}
+    m_SelectedIDs: 585d0000
+    m_LastClickedID: 23896
+    m_ExpandedIDs: 00000000c45c0000c65c0000c85c0000ca5c0000cc5c0000ce5c0000d05c0000165d0000485d00004a5d000000ca9a3bffffff7f
     m_RenameOverlay:
       m_UserAcceptedRename: 0
       m_Name: 
@@ -465,7 +465,7 @@ MonoBehaviour:
     scrollPos: {x: 0, y: 0}
     m_SelectedIDs: 
     m_LastClickedID: 0
-    m_ExpandedIDs: 00000000be5c0000c05c0000c25c0000c45c0000c65c0000c85c0000ca5c0000
+    m_ExpandedIDs: 00000000c45c0000c65c0000c85c0000ca5c0000cc5c0000ce5c0000d05c0000
     m_RenameOverlay:
       m_UserAcceptedRename: 0
       m_Name: 
@@ -492,24 +492,24 @@ MonoBehaviour:
   m_ListAreaState:
     m_SelectedInstanceIDs: 
     m_LastClickedInstanceID: 0
-    m_HadKeyboardFocusLastEvent: 0
+    m_HadKeyboardFocusLastEvent: 1
     m_ExpandedInstanceIDs: 5a270000eab9feffb4270000742900002a5affff2c270000402700003e260000022600009c260000bc2600002a2f00008226000076310000f8250000b426000094260000302e0000de280000842e0000f62600003c55f7ffe0c7f6ff32290000f0250000222f00004e260000922500006a2600001a16feffac270000000000001827000016270000
     m_RenameOverlay:
       m_UserAcceptedRename: 0
-      m_Name: 
-      m_OriginalName: 
+      m_Name: ECSConst
+      m_OriginalName: ECSConst
       m_EditFieldRect:
         serializedVersion: 2
         x: 0
         y: 0
         width: 0
         height: 0
-      m_UserData: 0
+      m_UserData: 6616
       m_IsWaitingForDelay: 0
       m_IsRenaming: 0
-      m_OriginalEventType: 11
+      m_OriginalEventType: 0
       m_IsRenamingFilename: 1
-      m_ClientGUIView: {fileID: 7}
+      m_ClientGUIView: {fileID: 5}
     m_CreateAssetUtility:
       m_EndAction: {fileID: 0}
       m_InstanceID: 0
@@ -595,7 +595,7 @@ MonoBehaviour:
       scrollPos: {x: 0, y: 0}
       m_SelectedIDs: 
       m_LastClickedID: 0
-      m_ExpandedIDs: 04fbffff
+      m_ExpandedIDs: 26c4ffff34c4ffff4cc4ffff9cc4ffffa0c4ffffa4c4ffff4ae9ffff96e9ffff9ae9ffff9ee9ffffa2e9ffff6aecffffbaecffffbeecffffc2ecffff5ef7ffffd6f7ffffdaf7ffff02f8ffff12f8ffff16f8ffff1ef8ffff18fbfffff4ffffff
       m_RenameOverlay:
         m_UserAcceptedRename: 0
         m_Name: 
@@ -844,9 +844,9 @@ MonoBehaviour:
   m_PlayAudio: 0
   m_AudioPlay: 0
   m_Position:
-    m_Target: {x: -5.814073, y: 14.235588, z: 15.074559}
+    m_Target: {x: -7.474525, y: 29.555363, z: 11.786421}
     speed: 2
-    m_Value: {x: -5.814073, y: 14.235588, z: 15.074559}
+    m_Value: {x: -7.474525, y: 29.555363, z: 11.786421}
   m_RenderMode: 0
   m_CameraMode:
     drawMode: 0
@@ -893,13 +893,13 @@ MonoBehaviour:
     m_GridAxis: 1
     m_gridOpacity: 0.5
   m_Rotation:
-    m_Target: {x: 0.42477125, y: 0.5275434, z: -0.34849888, w: 0.6479561}
+    m_Target: {x: 0.44468316, y: 0.5085252, z: -0.35155323, w: 0.64815205}
     speed: 2
-    m_Value: {x: 0.4247646, y: 0.5275352, z: -0.34849343, w: 0.64794594}
+    m_Value: {x: 0.4446761, y: 0.50851715, z: -0.35154766, w: 0.6481418}
   m_Size:
-    m_Target: 23.465746
+    m_Target: 1.2247449
     speed: 2
-    m_Value: 22.45526
+    m_Value: 1.2247449
   m_Ortho:
     m_Target: 0
     speed: 2

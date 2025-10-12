@@ -73,7 +73,7 @@ public abstract class BaseBindEntity : BaseEntity
         {
             return BindGameObject.transform.position;
         }
-        Debug.LogErorr($"Class Type:{ClassType}，Entity Uuid:{Uuid}的绑定实体对象不存在，获取世界坐标失败！");
+        Debug.LogError($"Class Type:{ClassType}，Entity Uuid:{Uuid}的绑定实体对象不存在，获取世界坐标失败！");
         return Vector3.zero;
     }
 
