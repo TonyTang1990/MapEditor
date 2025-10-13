@@ -1,9 +1,7 @@
-﻿/**
- * @ Author: TONYTANG
- * @ Create Time: 2025-10-13 10:55:00
- * @ Modified by: TONYTANG
- * @ Modified time: 2025-10-13 10:55:00
- * @ Description:
+﻿/*
+ * Description:             BaseEntityView.cs
+ * Author:                  TONYTANG
+ * Create Date:             2025/10/13
  */
 
 using System;
@@ -30,6 +28,22 @@ public abstract class BaseEntityView<T> : MonoBehaviour where T : BaseEntity
     /// </summary>
     [Header("Entity Uuid")]
     public int Uuid;
+
+    /// <summary>
+    /// EntityView类型信息
+    /// </summary>
+    public Type ClassType
+    {
+        get
+        {
+            if (mClassType == null)
+            {
+                mClassType = GetType();
+            }
+            return mClassType;
+        }
+    }
+    protected Type mClassType;
 
     /// <summary>
     /// 初始化

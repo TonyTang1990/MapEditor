@@ -44,7 +44,7 @@ public class MapGameEntitySpawnSystem : BaseSystem
     public override void OnRemoveFromWorld()
     {
         base.OnRemoveFromWorld();
-        OwnerWorld.DestroyEntityByUuid(mMapGameEntityUuid);
+        OwnerWorld.DestroyEntityByUuid<MapGameEntity>(mMapGameEntityUuid);
         mMapGameEntityUuid = 0;
     }
 }

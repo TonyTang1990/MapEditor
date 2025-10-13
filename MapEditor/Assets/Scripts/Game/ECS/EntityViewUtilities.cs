@@ -17,5 +17,23 @@ using System.Text;
 /// </summary>
 public static class EntityViewUtilities
 {
-
+    /// <summary>
+    /// 获取指定Entity的EntityView GameObject名字
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
+    /// <param name="entity"></param>
+    /// <returns></returns>
+    public static string GetEntityViewGoName<T>(T entity) where T : BaseEntity
+    {
+        if (entity == null)
+        {
+            return string.Empty;
+        }
+        // 根GameObject名规则 = 类型名 + "_" + Entity Uuid
+        var entityUuid = entity.Uuid;
+        var entityType = entity.GetType();
+        var entityTypeName = entityType.Name;
+        var entityViewGoName = $"{entityTypeName}_{entityUuid}";
+        return entityViewGoName;
+    }
 }

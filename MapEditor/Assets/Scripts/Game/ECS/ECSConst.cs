@@ -66,6 +66,21 @@ public static class ECSConst
     /// PlayerEntityView类型信息
     /// </summary>
     public static readonly Type PlayerEntityViewType = typeof(PlayerEntityView);
+
+    /// <summary>
+    /// MonsterEntityView类型信息
+    /// </summary>
+    public static readonly Type MonsterEntityViewType = typeof(MonsterEntityView);
+
+    /// <summary>
+    /// TreasureBoxEntityView类型信息
+    /// </summary>
+    public static readonly Type TreasureBoxEntityViewType = typeof(TreasureBoxEntityView);
+
+    /// <summary>
+    /// TrapEntityView类型信息
+    /// </summary>
+    public static readonly Type TrapEntityViewType = typeof(TrapEntityView);
     #endregion
 
     /// <summary>

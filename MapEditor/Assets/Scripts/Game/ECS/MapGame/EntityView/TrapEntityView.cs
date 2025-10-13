@@ -1,23 +1,24 @@
 ﻿/*
- * Description:             PlayerEntityView.cs
+ * Description:             TrapEntityView.cs
  * Author:                  TONYTANG
  * Create Date:             2025/10/13
  */
 
-using System;
+using System.Collections;
 using System.Collections.Generic;
-using System.Text;
+using UnityEngine;
 
 /// <summary>
-/// PlayerEntityView.cs
-/// PlayerEntity的可视化View
+/// TrapEntityView.cs
 /// </summary>
-public class PlayerEntityView : BaseEntityView<PlayerEntity>
+public class TrapEntityView : BaseEntityView<TrapEntity>
 {
     /// <summary>
     /// 同步数据
     /// </summary>
+    /// <exception cref="System.NotImplementedException"></exception>
     public override void SyncData()
     {
+
     }
 }

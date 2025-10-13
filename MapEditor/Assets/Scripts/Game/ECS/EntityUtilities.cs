@@ -36,11 +36,9 @@ public static class EntityUtilities
         }
         var classType = entity.ClassType;
         var classTypeName = classType.Name;
-        var entityTypeComponent = entity.GetComponent<EntityTypeComponent>();
-        var entityType = entityTypeComponent.EntityType;
         var entityUuid = entity.Uuid;
-        // 根GameObject名规则 = 类型名 + "_" + EntityType + "_" + Entity Uuid
-        var rootGameObjectName = $"{classTypeName}_{entityType}_{entityUuid}";
+        // 根GameObject名规则 = 类型名 + "_" + Entity Uuid
+        var rootGameObjectName = $"{classTypeName}_{entityUuid}";
         return rootGameObjectName;
     }
 
@@ -58,11 +56,9 @@ public static class EntityUtilities
         }
         var classType = entity.ClassType;
         var classTypeName = classType.Name;
-        var entityTypeComponent = entity.GetComponent<EntityTypeComponent>();
-        var entityType = entityTypeComponent.EntityType;
         var entityUuid = entity.Uuid;
-        // 提示GameObject名规则 = 实体Object前缀名 + "_" + 类型名 + "_" + EntityType + "_" + Entity Uuid
-        var objectGameObjectName = $"{ECSConst.ObjectNodePrefixName}_{classTypeName}_{entityType}_{entityUuid}";
+        // 提示GameObject名规则 = 实体Object前缀名 + "_" + 类型名 + "_" + Entity Uuid
+        var objectGameObjectName = $"{ECSConst.ObjectNodePrefixName}_{classTypeName}_{entityUuid}";
         return objectGameObjectName;
     }
 
@@ -83,8 +79,8 @@ public static class EntityUtilities
         TempPosition.x = worldPosX;
         TempPosition.y = worldPosY;
         TempPosition.z = worldPosZ;
-        UnityEngine.AI.NavMeshHit navMeshHit;
-        UnityEngine.AI.NavMesh.SamplePosition(TempPosition, out navMeshHit, MapGameConst.ActorNavMeshHitDistance, UnityEngine.AI.NavMesh.AllAreas);
+        NavMeshHit navMeshHit;
+        NavMesh.SamplePosition(TempPosition, out navMeshHit, MapGameConst.ActorNavMeshHitDistance, UnityEngine.AI.NavMesh.AllAreas);
         if(!navMeshHit.hit)
         {
             return;

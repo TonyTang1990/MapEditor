@@ -1,10 +1,10 @@
-/**
- * @ Author: TONYTANG
- * @ Create Time: 2025-02-17 16:38:20
- * @ Modified by: TONYTANG
- * @ Modified time: 2025-03-17 15:55:20
- * @ Description:
+/*
+ * Description:             TreasureBoxEntity.cs
+ * Author:                  TONYTANG
+ * Create Date:             2025/10/13
  */
+
+using System;
 
 /// <summary>
 /// TreasureBoxEntity.cs
@@ -12,4 +12,12 @@
 /// </summary>
 public class TreasureBoxEntity : BaseObjectEntity
 {
+    /// <summary>
+    /// 获取EntityView类型信息
+    /// </summary>
+    /// <returns></returns>
+    public override Type GetEntityViewType()
+    {
+        return ECSConst.TreasureBoxEntityViewType;
+    }
 }

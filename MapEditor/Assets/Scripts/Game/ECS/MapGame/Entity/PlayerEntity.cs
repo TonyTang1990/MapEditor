@@ -1,9 +1,7 @@
-/**
- * @ Author: TONYTANG
- * @ Create Time: 2025-02-17 16:38:05
- * @ Modified by: TONYTANG
- * @ Modified time: 2025-03-17 15:55:15
- * @ Description:
+/*
+ * Description:             PlayerEntity.cs
+ * Author:                  TONYTANG
+ * Create Date:             2025/10/13
  */
 
 using System;

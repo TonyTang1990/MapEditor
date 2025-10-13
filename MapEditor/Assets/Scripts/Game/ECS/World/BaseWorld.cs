@@ -9,7 +9,6 @@
 using MapEditor;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using UnityEngine;
 
 // Note:
@@ -190,6 +189,16 @@ public abstract class BaseWorld
     /// Entity Uuid和EntityView Map
     /// </summary>
     protected Dictionary<int, MonoBehaviour> mEntityViewMap;
+
+    /// <summary>
+    /// EntityView根节点
+    /// </summary>
+    protected Transform mEntityViewRoot;
+
+    /// <summary>
+    /// EntityView类型信息父节点Map
+    /// </summary>
+    protected Dictionary<Type, Transform> mEntityViewClassTypeParentMap;
     #endregion
 
     #region World部分开始
@@ -219,6 +228,7 @@ public abstract class BaseWorld
 
         EntityViewSwitch = true;
         mEntityViewMap = new Dictionary<int, MonoBehaviour>();
+        mEntityViewClassTypeParentMap = new Dictionary<Type, Transform>();
     }
 
     /// <summary>
@@ -243,6 +253,7 @@ public abstract class BaseWorld
     {
         CreateWorldRoot();
         CreateEntityRoot();
+        CreateEntityViewRoot();
     }
 
     /// <summary>
@@ -255,6 +266,8 @@ public abstract class BaseWorld
         ManagerSystems();
         ManagerEntities();
         DestroyEntityClassTypeParent();
+        DestroyEntityViewClassTypeParent();
+        DestroyEntityViewRoot();
         DestroyEntityRoot();
         DestroyWorldRoot();
     }
@@ -931,9 +944,9 @@ public abstract class BaseWorld
     /// </summary>
     /// <param name="uuid"></param>
     /// <returns></returns>
-    public bool DestroyEntityByUuid(int uuid)
+    public bool DestroyEntityByUuid<T>(int uuid) where T : BaseEntity
     {
-        var entity = GetEntityByUuid<BaseEntity>(uuid);
+        var entity = GetEntityByUuid<T>(uuid);
         if (entity == null)
         {
             Debug.LogError($"找不大Uuid:{uuid}的Entity，销毁指定Uuid的Entity失败！");
@@ -942,7 +955,7 @@ public abstract class BaseWorld
         var result = RemoveEntity(entity);
         if(result)
         {
-            DestroyEntityView(entity);
+            DestroyEntityView<T>(entity);
         }
         return result;
     }
@@ -952,7 +965,7 @@ public abstract class BaseWorld
     /// </summary>
     /// <param name="entity"></param>
     /// <returns></returns>
-    public bool DestroyEntity(BaseEntity entity)
+    public bool DestroyEntity<T>(T entity) where T : BaseEntity
     {
         if (entity == null)
         {
@@ -960,7 +973,7 @@ public abstract class BaseWorld
             return false;
         }
         var entityUuid = entity.Uuid;
-        var getEntity = GetEntityByUuid<BaseEntity>(entityUuid);
+        var getEntity = GetEntityByUuid<T>(entityUuid);
         if (getEntity == null)
         {
             Debug.LogError($"找不到Uuid:{entityUuid}的Entity，销毁指定Entity失败！");
@@ -971,7 +984,7 @@ public abstract class BaseWorld
             Debug.LogError($"Uuid:{entityUuid}的Entity与传入的Entity不一致，销毁指定Entity失败！");
             return false;
         }
-        return DestroyEntityByUuid(entityUuid);
+        return DestroyEntityByUuid<T>(entityUuid);
     }
 
     /// <summary>
@@ -1015,13 +1028,90 @@ public abstract class BaseWorld
         for(int index = mAllEntity.Count - 1; index >=0; index--)
         {
             var entity = mAllEntity[index];
-            var entityUuid = entity.Uuid;
-            DestroyEntityByUuid(entityUuid);
+            DestroyEntity(entity);
         }
     }
     #endregion
 
     #region EntityView相关
+    /// <summary>
+    /// 创建EntityView根GameObject
+    /// </summary>
+    protected void CreateEntityViewRoot()
+    {
+        mEntityViewRoot = new GameObject("EntityViewRoot").transform;
+        var entityViewRootTransform = mEntityViewRoot.transform;
+        entityViewRootTransform.position = Vector3.zero;
+        entityViewRootTransform.rotation = Quaternion.identity;
+        entityViewRootTransform.SetParent(mWorldRootGo.transform);
+
+        mEntityViewClassTypeParentMap = new Dictionary<Type, Transform>();
+    }
+
+    /// <summary>
+    /// 获取指定EntityView的EntityView类型实体挂载父节点
+    /// </summary>
+    /// <param name="entityViewClassType"></param>
+    /// <returns></returns>
+    public Transform GetEntityViewTypeParent(Type entityViewClassType)
+    {
+        Transform entityViewTypeParent = null;
+        if (mEntityViewClassTypeParentMap.TryGetValue(entityViewClassType, out entityViewTypeParent))
+        {
+            return entityViewTypeParent;
+        }
+        entityViewTypeParent = CreateEntityViewClassTypeParent(entityViewClassType);
+        return entityViewTypeParent;
+    }
+
+    /// <summary>
+    /// 创建指定EntityView类型信息的挂在父节点
+    /// </summary>
+    /// <param name="entityViewClassType"></param>
+    /// <returns></returns>
+    protected Transform CreateEntityViewClassTypeParent(Type entityViewClassType)
+    {
+        Transform entityViewClassTypeParent = null;
+        if (mEntityViewClassTypeParentMap.TryGetValue(entityViewClassType, out entityViewClassTypeParent))
+        {
+            Debug.LogError($"已存在EntityView类型:{entityViewClassType.Name}的挂载父节点，请勿重复创建挂在父节点！");
+            return entityViewClassTypeParent;
+        }
+        var entityViewClassTypeParentGo = new GameObject(entityViewClassType.Name);
+        entityViewClassTypeParent = entityViewClassTypeParentGo.transform;
+        entityViewClassTypeParent.SetParent(mEntityViewRoot);
+        mEntityViewClassTypeParentMap.Add(entityViewClassType, entityViewClassTypeParent);
+        return entityViewClassTypeParent;
+    }
+
+    /// <summary>
+    /// 销毁EntityView类型信息挂在父节点
+    /// </summary>
+    protected void DestroyEntityViewClassTypeParent()
+    {
+        foreach (var entityViewClassTypeParent in mEntityViewClassTypeParentMap)
+        {
+            if (entityViewClassTypeParent.Value != null)
+            {
+                var entityClassTypeParentGo = entityViewClassTypeParent.Value.gameObject;
+                GameObject.Destroy(entityClassTypeParentGo);
+            }
+        }
+        mEntityViewClassTypeParentMap.Clear();
+    }
+
+    /// <summary>
+    /// 销毁EntityView根节点
+    /// </summary>
+    protected void DestroyEntityViewRoot()
+    {
+        if (mEntityViewRoot != null)
+        {
+            GameObject.Destroy(mEntityViewRoot.gameObject);
+            mEntityViewRoot = null;
+        }
+    }
+
     /// <summary>
     /// 添加指定EntityView
     /// </summary>
@@ -1033,7 +1123,7 @@ public abstract class BaseWorld
         var entityUuid = entityView.Uuid;
         if(mEntityViewMap.ContainsKey(entityUuid))
         {
-            Debug.LogError($"不允许重复添加Entity Uuid:{entityUuid}的EntityView，添加EntityView失败！");)
+            Debug.LogError($"不允许重复添加Entity Uuid:{entityUuid}的EntityView，添加EntityView失败！");
             return false;
         }
         mEntityViewMap.Add(entityUuid, entityView);
@@ -1069,7 +1159,7 @@ public abstract class BaseWorld
         MonoBehaviour entityView;
         if(!mEntityViewMap.TryGetValue(entityUuid, out entityView))
         {
-            Debug.LogError($"找不到Entity Uuid:{entityUuid}的EntityView，获取EntityView失败！");)
+            Debug.LogError($"找不到Entity Uuid:{entityUuid}的EntityView，获取EntityView失败！");
             return null;
         }
         return entityView as BaseEntityView<T>;
@@ -1100,25 +1190,6 @@ public abstract class BaseWorld
     }
 
     /// <summary>
-    /// 获取指定Entity的EntityView GameObject名字
-    /// </summary>
-    /// <typeparam name="T"></typeparam>
-    /// <param name="entity"></param>
-    /// <returns></returns>
-    private string GetEntityViewGoName<T>(T entity) where T : BaseEntity
-    {
-        if(entity == null)
-        {
-            return string.Empty;
-        }
-        var entityUuid = entity.Uuid;
-        var entityType = entity.GetType();
-        var entityTypeName = entityType.Name;
-        var entityViewGoName = $"{entityTypeName}_{entityUuid}_View";
-        return entityViewGoName;
-    }
-
-    /// <summary>
     /// 创建指定Entity的可视化EntityView
     /// </summary>
     /// <typeparam name="T"></typeparam>
@@ -1140,12 +1211,15 @@ public abstract class BaseWorld
         {
             return null;
         }
-        var entityViewGoName = GetEntityViewGoName(entity);
-        // TODO:用池
-        var entityViewGo = new GameObject(entityViewGoName);
+        var entityViewGoName = EntityViewUtilities.GetEntityViewGoName(entity);
+        var entityViewGo = PoolManager.Singleton.PopEmptyGo();
+        entityViewGo.name = entityViewGoName;
+        var entityViewTypeParent = GetEntityViewTypeParent(entityViewType);
+        entityViewGo.transform.SetParent(entityViewTypeParent);
         var entityViewInstance = entityViewGo.AddComponent(entityViewType) as BaseEntityView<T>;
         entityViewInstance.Init(entity);
         AddEntityView(entityViewInstance);
+        SyncEntityViewData(entity);
         return entityViewInstance;
     }
 
@@ -1172,8 +1246,8 @@ public abstract class BaseWorld
         var result = RemoveEntityView(entityView);
         if(result)
         {
-            // TODO:用池
-            GameObject.Destroy(entityView.gameObject);
+            GameObject.Destroy(entityView);
+            PoolManager.Singleton.PushEmptyGo(entityView.gameObject);
         }
         return result;
     }

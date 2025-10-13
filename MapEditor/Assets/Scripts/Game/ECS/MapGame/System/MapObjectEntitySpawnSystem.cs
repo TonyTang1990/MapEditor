@@ -234,7 +234,7 @@ public class MapObjectEntitySpawnSystem : BaseSystem
             {
                 mTempRemoveSpawnedMapDataExportList.Add(spawnedMapDataEntity.Key);
                 Debug.Log($"移除在位置:x:{entityPosition.x}, y:{entityPosition.y}, z:{entityPosition.z}的Entity Uuid:{entityUuid}的Entity！");
-                OwnerWorld.DestroyEntityByUuid(entityUuid);
+                OwnerWorld.DestroyEntity(entity);
             }
         }
         foreach(var removeSpawnMapDataExport in mTempRemoveSpawnedMapDataExportList)

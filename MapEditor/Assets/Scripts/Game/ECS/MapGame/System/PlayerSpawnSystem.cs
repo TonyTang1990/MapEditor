@@ -48,7 +48,7 @@ public class PlayerSpawnSystem : BaseSystem
     public override void OnRemoveFromWorld()
     {
         base.OnRemoveFromWorld();
-        OwnerWorld.DestroyEntityByUuid(mPlayerEntityUuid);
+        OwnerWorld.DestroyEntityByUuid<PlayerEntity>(mPlayerEntityUuid);
         mPlayerEntityUuid = 0;
     }
 }
