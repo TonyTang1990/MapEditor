@@ -6,10 +6,20 @@
  * @ Description:
  */
 
+using System;
+
 /// <summary>
 /// PlayerEntity.cs
 /// 玩家Entity
 /// </summary>
 public class PlayerEntity : BaseObjectEntity
 {
+    /// <summary>
+    /// 获取EntityView类型信息
+    /// </summary>
+    /// <returns></returns>
+    public override Type GetEntityViewType()
+    {
+        return ECSConst.PlayerEntityViewType;
+    }
 }

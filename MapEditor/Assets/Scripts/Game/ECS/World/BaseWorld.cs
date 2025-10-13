@@ -9,6 +9,7 @@
 using MapEditor;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using UnityEngine;
 
 // Note:
@@ -175,6 +176,22 @@ public abstract class BaseWorld
     protected List<BaseEntity> mTempWaitRemoveEntities;
     #endregion
 
+    #region EntityView相关
+    /// <summary>
+    /// EntityView开关
+    /// </summary>
+    public bool EntityViewSwitch
+    {
+        get;
+        set;
+    }
+
+    /// <summary>
+    /// Entity Uuid和EntityView Map
+    /// </summary>
+    protected Dictionary<int, MonoBehaviour> mEntityViewMap;
+    #endregion
+
     #region World部分开始
     public BaseWorld()
     {
@@ -199,6 +216,9 @@ public abstract class BaseWorld
         mTempWaitAddEntities = new List<BaseEntity>();
         mWaitRemoveEntities = new List<BaseEntity>();
         mTempWaitRemoveEntities = new List<BaseEntity>();
+
+        EntityViewSwitch = true;
+        mEntityViewMap = new Dictionary<int, MonoBehaviour>();
     }
 
     /// <summary>
@@ -901,7 +921,8 @@ public abstract class BaseWorld
     public T CreateEntity<T>(params object[] parameters) where T : BaseEntity, new()
     {
         T entity = ObjectPool.Singleton.Pop<T>();
-        AddEntity<T>(entity);
+        AddEntity(entity);
+        CreateEntityView(entity);
         return entity;
     }
 
@@ -918,8 +939,12 @@ public abstract class BaseWorld
             Debug.LogError($"找不大Uuid:{uuid}的Entity，销毁指定Uuid的Entity失败！");
             return false;
         }
-        RemoveEntity(entity);
-        return true;
+        var result = RemoveEntity(entity);
+        if(result)
+        {
+            DestroyEntityView(entity);
+        }
+        return result;
     }
 
     /// <summary>
@@ -993,6 +1018,164 @@ public abstract class BaseWorld
             var entityUuid = entity.Uuid;
             DestroyEntityByUuid(entityUuid);
         }
+    }
+    #endregion
+
+    #region EntityView相关
+    /// <summary>
+    /// 添加指定EntityView
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
+    /// <param name="entityView"></param>
+    /// <returns></returns>
+    public bool AddEntityView<T>(BaseEntityView<T> entityView) where T : BaseEntity
+    {
+        var entityUuid = entityView.Uuid;
+        if(mEntityViewMap.ContainsKey(entityUuid))
+        {
+            Debug.LogError($"不允许重复添加Entity Uuid:{entityUuid}的EntityView，添加EntityView失败！");)
+            return false;
+        }
+        mEntityViewMap.Add(entityUuid, entityView);
+        return true;
+    }
+
+    /// <summary>
+    /// 移除指定
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
+    /// <param name="entityView"></param>
+    /// <returns></returns>
+    public bool RemoveEntityView<T>(BaseEntityView<T> entityView) where T : BaseEntity
+    {
+        var entityUuid = entityView.Uuid;
+        if(!mEntityViewMap.ContainsKey(entityUuid))
+        {
+            Debug.LogError($"找不到Entity Uuid:{entityUuid}的EntityView，移除EntityView失败！");
+            return false;
+        }
+        mEntityViewMap.Remove(entityUuid);
+        return true;
+    }
+
+    /// <summary>
+    /// 获取指定Entity Uuid的可视化EntityView
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
+    /// <param name="entityUuid"></param>
+    /// <returns></returns>
+    public BaseEntityView<T> GetEntityView<T>(int entityUuid) where T : BaseEntity
+    {
+        MonoBehaviour entityView;
+        if(!mEntityViewMap.TryGetValue(entityUuid, out entityView))
+        {
+            Debug.LogError($"找不到Entity Uuid:{entityUuid}的EntityView，获取EntityView失败！");)
+            return null;
+        }
+        return entityView as BaseEntityView<T>;
+    }
+
+    /// <summary>
+    /// 同步指定Entity的EntityView数据
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
+    /// <param name="entity"></param>
+    /// <returns></returns>
+    public bool SyncEntityViewData<T>(T entity) where T : BaseEntity
+    {
+        if(entity == null)
+        {
+            Debug.LogError($"不允许同步空Entity的EntityView数据，同步Entity数据失败！");
+            return false;
+        }
+        var entityUuid = entity.Uuid;
+        var entityView = GetEntityView<T>(entityUuid);
+        if(entityView == null)
+        {
+            Debug.LogError($"找不到Entity Uuid:{entityUuid}的EntityView，同步Entity的EntityView数据失败！");
+            return false;
+        }
+        entityView.SyncData();
+        return true;
+    }
+
+    /// <summary>
+    /// 获取指定Entity的EntityView GameObject名字
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
+    /// <param name="entity"></param>
+    /// <returns></returns>
+    private string GetEntityViewGoName<T>(T entity) where T : BaseEntity
+    {
+        if(entity == null)
+        {
+            return string.Empty;
+        }
+        var entityUuid = entity.Uuid;
+        var entityType = entity.GetType();
+        var entityTypeName = entityType.Name;
+        var entityViewGoName = $"{entityTypeName}_{entityUuid}_View";
+        return entityViewGoName;
+    }
+
+    /// <summary>
+    /// 创建指定Entity的可视化EntityView
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
+    /// <param name="entity"></param>
+    /// <returns></returns>
+    public BaseEntityView<T> CreateEntityView<T>(T entity) where T : BaseEntity
+    {
+        if(!EntityViewSwitch)
+        {
+            return null;
+        }
+        if(entity == null)
+        {
+            Debug.LogError($"不允许创建空Entity的EntityView，创建EntityView失败！");
+            return null;
+        }
+        var entityViewType = entity.GetEntityViewType();
+        if(entityViewType == null)
+        {
+            return null;
+        }
+        var entityViewGoName = GetEntityViewGoName(entity);
+        // TODO:用池
+        var entityViewGo = new GameObject(entityViewGoName);
+        var entityViewInstance = entityViewGo.AddComponent(entityViewType) as BaseEntityView<T>;
+        entityViewInstance.Init(entity);
+        AddEntityView(entityViewInstance);
+        return entityViewInstance;
+    }
+
+    /// <summary>
+    /// 销毁指定Entity的EntityView
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
+    /// <param name="entity"></param>
+    /// <returns></returns>
+    public bool DestroyEntityView<T>(T entity) where T : BaseEntity
+    {
+        if (entity == null)
+        {
+            Debug.LogError($"不允许销毁空Entity的EntityView，销毁EntityView失败！");
+            return false;
+        }
+        var entityUuid = entity.Uuid;
+        var entityView = GetEntityView<T>(entityUuid);
+        if(entityView == null)
+        {
+            Debug.LogError($"找不到Entity Uuid:{entityUuid}的EntityView，销毁EntityView失败！");
+            return false;
+        }
+        var result = RemoveEntityView(entityView);
+        if(result)
+        {
+            // TODO:用池
+            GameObject.Destroy(entityView.gameObject);
+        }
+        return result;
     }
     #endregion
 }

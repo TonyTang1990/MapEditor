@@ -61,6 +61,13 @@ public static class ECSConst
     public static readonly Type MapGameEntityType = typeof(MapGameEntity);
     #endregion
 
+    #region EntityView类型信息
+    /// <summary>
+    /// PlayerEntityView类型信息
+    /// </summary>
+    public static readonly Type PlayerEntityViewType = typeof(PlayerEntityView);
+    #endregion
+
     /// <summary>
     /// 通用Common预制件目录路径
     /// </summary>

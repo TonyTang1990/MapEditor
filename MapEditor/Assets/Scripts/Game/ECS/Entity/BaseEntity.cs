@@ -365,4 +365,15 @@ public abstract class BaseEntity : IRecycle
         return componentList.Contains(component);
     }
     #endregion
+
+    #region EntityView可视化相关
+    /// <summary>
+    /// 获取Entity可视化EntityView类型信息
+    /// </summary>
+    /// <returns></returns>
+    public virtual Type GetEntityViewType()
+    {
+        return null;
+    }
+    #endregion
 }
