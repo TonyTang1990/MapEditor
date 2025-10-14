@@ -955,9 +955,19 @@ public abstract class BaseWorld
         var result = RemoveEntity(entity);
         if(result)
         {
-            DestroyEntityView<T>(entity);
+            DestroyEntityView(entity);
         }
         return result;
+    }
+
+    /// <summary>
+    /// 销毁指定Uuid的Entity
+    /// </summary>
+    /// <param name="uuid"></param>
+    /// <returns></returns>
+    public bool DestroyEntityByUuid(int uuid)
+    {
+        return DestroyEntityByUuid<BaseEntity>(uuid);
     }
 
     /// <summary>
@@ -1246,12 +1256,13 @@ public abstract class BaseWorld
         }
         */
         var entityView = RemoveEntityView(entityUuid);
-        if(entityView != null)
+        var result = entityView != null;
+        if(result)
         {
             GameObject.Destroy(entityView);
             PoolManager.Singleton.PushEmptyGo(entityView.gameObject);
         }
-        return entityView;
+        return result;
     }
     #endregion
 }

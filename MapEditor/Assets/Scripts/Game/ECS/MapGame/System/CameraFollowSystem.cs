@@ -52,7 +52,7 @@ public class CameraFollowSystem : BaseSystem
     public override void OnRemoveFromWorld()
     {
         base.OnRemoveFromWorld();
-        OwnerWorld.DestroyEntityByUuid<CameraEntity>(mCameraEntityUuid);
+        OwnerWorld.DestroyEntityByUuid(mCameraEntityUuid);
     }
 
     /// <summary>
