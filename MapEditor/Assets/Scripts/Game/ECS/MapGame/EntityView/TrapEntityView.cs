@@ -11,7 +11,7 @@ using UnityEngine;
 /// <summary>
 /// TrapEntityView.cs
 /// </summary>
-public class TrapEntityView : BaseEntityView<TrapEntity>
+public class TrapEntityView : BaseEntityGenericView<TrapEntity>
 {
     /// <summary>
     /// 同步数据

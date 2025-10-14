@@ -12,7 +12,7 @@ using System.Text;
 /// PlayerEntityView.cs
 /// PlayerEntity的可视化View
 /// </summary>
-public class PlayerEntityView : BaseEntityView<PlayerEntity>
+public class PlayerEntityView : BaseEntityGenericView<PlayerEntity>
 {
     /// <summary>
     /// 同步数据

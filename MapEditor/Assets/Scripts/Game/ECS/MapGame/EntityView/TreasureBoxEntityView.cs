@@ -11,7 +11,7 @@ using UnityEngine;
 /// <summary>
 /// TreasureBoxEntityView.cs
 /// </summary>
-public class TreasureBoxEntityView : BaseEntityView<TreasureBoxEntity>
+public class TreasureBoxEntityView : BaseEntityGenericView<TreasureBoxEntity>
 {
     /// <summary>
     /// 同步数据

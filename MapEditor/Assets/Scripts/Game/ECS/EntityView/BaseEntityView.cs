@@ -12,17 +12,8 @@ using UnityEngine;
 /// BaseEntityView.cs
 /// Entity可视化显示基类抽象
 /// </summary>
-public abstract class BaseEntityView<T> : MonoBehaviour where T : BaseEntity
+public abstract class BaseEntityView : MonoBehaviour
 {
-    /// <summary>
-    /// 所属Entity
-    /// </summary>
-    public T OwnerEntity
-    {
-        get;
-        private set;
-    }
-
     /// <summary>
     /// Entity Uuid
     /// </summary>
@@ -46,13 +37,12 @@ public abstract class BaseEntityView<T> : MonoBehaviour where T : BaseEntity
     protected Type mClassType;
 
     /// <summary>
-    /// 初始化
+    /// 设置Entity Uuid
     /// </summary>
-    /// <param name="entity"></param>
-    public void Init(T entity)
+    /// <param name="entityUuid"></param>
+    protected void SetEntityUuid(int entityUuid)
     {
-        OwnerEntity = entity;
-        Uuid = OwnerEntity.Uuid;
+        Uuid = entityUuid;
     }
 
     /// <summary>

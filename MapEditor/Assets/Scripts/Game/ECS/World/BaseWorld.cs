@@ -9,6 +9,7 @@
 using MapEditor;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using UnityEngine;
 
 // Note:
@@ -188,7 +189,7 @@ public abstract class BaseWorld
     /// <summary>
     /// Entity Uuid和EntityView Map
     /// </summary>
-    protected Dictionary<int, MonoBehaviour> mEntityViewMap;
+    protected Dictionary<int, BaseEntityView> mEntityViewMap;
 
     /// <summary>
     /// EntityView根节点
@@ -227,7 +228,7 @@ public abstract class BaseWorld
         mTempWaitRemoveEntities = new List<BaseEntity>();
 
         EntityViewSwitch = true;
-        mEntityViewMap = new Dictionary<int, MonoBehaviour>();
+        mEntityViewMap = new Dictionary<int, BaseEntityView>();
         mEntityViewClassTypeParentMap = new Dictionary<Type, Transform>();
     }
 
@@ -1128,7 +1129,7 @@ public abstract class BaseWorld
     /// <typeparam name="T"></typeparam>
     /// <param name="entityView"></param>
     /// <returns></returns>
-    public bool AddEntityView<T>(BaseEntityView<T> entityView) where T : BaseEntity
+    public bool AddEntityView<T>(BaseEntityGenericView<T> entityView) where T : BaseEntity
     {
         var entityUuid = entityView.Uuid;
         if(mEntityViewMap.ContainsKey(entityUuid))
@@ -1141,20 +1142,31 @@ public abstract class BaseWorld
     }
 
     /// <summary>
-    /// 移除指定Entity Uuid的EntityView
+    /// 移除指定EntityView
     /// </summary>
-    /// <param name="entityUuid"></param>
+    /// <param name="entityView"></param>
     /// <returns></returns>
-    public MonoBehaviour RemoveEntityView(int entityUuid)
+    public bool RemoveEntityView(BaseEntityView entityView)
     {
-        MonoBehaviour entityView;
-        if(!mEntityViewMap.TryGetValue(entityUuid, out entityView))
+        if(entityView == null)
+        {
+            Debug.LogError($"不允许移除空EntityView，移除EntityView失败！");
+            return false;
+        }
+        var entityUuid = entityView.Uuid;
+        BaseEntityView saveEntityView;
+        if (!mEntityViewMap.TryGetValue(entityUuid, out saveEntityView))
         {
             Debug.LogError($"找不到Entity Uuid:{entityUuid}的EntityView，移除EntityView失败！");
-            return entityView;
+            return false;
         }
-        mEntityViewMap.Remove(entityUuid);
-        return entityView;
+        if(saveEntityView != entityView)
+        {
+            Debug.LogError($"存储的Entity Uuid:{entityUuid}绑定EntityView和目标EntityView不一致，移除EntityView失败！");
+            return false;
+        }
+        var result = mEntityViewMap.Remove(entityUuid);
+        return result;
     }
 
     /// <summary>
@@ -1163,15 +1175,31 @@ public abstract class BaseWorld
     /// <typeparam name="T"></typeparam>
     /// <param name="entityUuid"></param>
     /// <returns></returns>
-    public BaseEntityView<T> GetEntityView<T>(int entityUuid) where T : BaseEntity
+    public BaseEntityGenericView<T> GetEntityGenericView<T>(int entityUuid) where T : BaseEntity
     {
-        MonoBehaviour entityView;
+        BaseEntityView entityView;
         if(!mEntityViewMap.TryGetValue(entityUuid, out entityView))
         {
             Debug.LogError($"找不到Entity Uuid:{entityUuid}的EntityView，获取EntityView失败！");
             return null;
         }
-        return entityView as BaseEntityView<T>;
+        return entityView as BaseEntityGenericView<T>;
+    }
+
+    /// <summary>
+    /// 获取指定Entity Uuid的EntityView
+    /// </summary>
+    /// <param name="entityUuid"></param>
+    /// <returns></returns>
+    public BaseEntityView GetEntityView(int entityUuid)
+    {
+        BaseEntityView entityView;
+        if (!mEntityViewMap.TryGetValue(entityUuid, out entityView))
+        {
+            Debug.LogError($"找不到Entity Uuid:{entityUuid}的EntityView，获取EntityView失败！");
+            return null;
+        }
+        return entityView;
     }
 
     /// <summary>
@@ -1188,7 +1216,7 @@ public abstract class BaseWorld
             return false;
         }
         var entityUuid = entity.Uuid;
-        var entityView = GetEntityView<T>(entityUuid);
+        var entityView = GetEntityView(entityUuid);
         if(entityView == null)
         {
             Debug.LogError($"找不到Entity Uuid:{entityUuid}的EntityView，同步Entity的EntityView数据失败！");
@@ -1204,7 +1232,7 @@ public abstract class BaseWorld
     /// <typeparam name="T"></typeparam>
     /// <param name="entity"></param>
     /// <returns></returns>
-    public BaseEntityView<T> CreateEntityView<T>(T entity) where T : BaseEntity
+    public BaseEntityGenericView<T> CreateEntityView<T>(T entity) where T : BaseEntity
     {
         if(!EntityViewSwitch)
         {
@@ -1225,8 +1253,8 @@ public abstract class BaseWorld
         entityViewGo.name = entityViewGoName;
         var entityViewTypeParent = GetEntityViewTypeParent(entityViewType);
         entityViewGo.transform.SetParent(entityViewTypeParent);
-        var entityViewInstance = entityViewGo.AddComponent(entityViewType) as BaseEntityView<T>;
-        entityViewInstance.Init(entity);
+        var entityViewInstance = entityViewGo.AddComponent(entityViewType) as BaseEntityGenericView<T>;
+        entityViewInstance.SetOwnerEntity(entity);
         AddEntityView(entityViewInstance);
         SyncEntityViewData(entity);
         return entityViewInstance;
@@ -1246,17 +1274,13 @@ public abstract class BaseWorld
             return false;
         }
         var entityUuid = entity.Uuid;
-        // 泛型类型对不上会导致GetEntityView失败，所以这里不获取了
-        /*
-        var entityView = GetEntityView<T>(entityUuid);
+        var entityView = GetEntityView(entityUuid);
         if(entityView == null)
         {
             Debug.LogError($"找不到Entity Uuid:{entityUuid}的EntityView，销毁EntityView失败！");
             return false;
         }
-        */
-        var entityView = RemoveEntityView(entityUuid);
-        var result = entityView != null;
+        var result = RemoveEntityView(entityView);
         if(result)
         {
             GameObject.Destroy(entityView);

@@ -12,7 +12,7 @@ using UnityEngine;
 /// MonsterEntityView.cs
 /// MonsterEntity可视化View
 /// </summary>
-public class MonsterEntityView : BaseEntityView<MonsterEntity>
+public class MonsterEntityView : BaseEntityGenericView<MonsterEntity>
 {
     /// <summary>
     /// 同步数据
