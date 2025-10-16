@@ -1,15 +1,11 @@
-﻿/**
-* @ Author: TONYTANG
-* @ Create Time: 2025-02-17 16:39:04
- * @ Modified by: TONYTANG
- * @ Modified time: 2025-03-19 18:34:26
-* @ Description:
-*/
+﻿/*
+ * Description:             BaseWorld.cs
+ * Author:                  TONYTANG
+ * Create Date:             2025/10/13
+ */
 
-using MapEditor;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using UnityEngine;
 
 // Note:
