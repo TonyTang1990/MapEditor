@@ -314,7 +314,19 @@ public abstract class BaseWorld
             {
                 continue;
             }
-            system.LogicUpdate(logicFrameTime);
+            system.PreLogicUpdate(logicFrameTime);
+
+            foreach (var entityData in mUpadteEntityTypeAndEntitiesMap)
+            {
+                foreach (var entity in entityData.Value)
+                {
+                    if (system.Filter(entity))
+                    {
+                        system.LogicUpdate(entity, logicFrameTime);
+                    }
+                }
+            }
+            system.PostLogicUpdate(logicFrameTime);
         }
     }
 
@@ -426,7 +438,23 @@ public abstract class BaseWorld
     {
         foreach (var system in mAllSystems)
         {
-            system?.FixedUpdate(fixedDeltaTime);
+            if (system == null)
+            {
+                continue;
+            }
+            system.PreFixedUpdate(fixedDeltaTime);
+
+            foreach (var entityData in mUpadteEntityTypeAndEntitiesMap)
+            {
+                foreach (var entity in entityData.Value)
+                {
+                    if (system.Filter(entity))
+                    {
+                        system.FixedUpdate(entity, fixedDeltaTime);
+                    }
+                }
+            }
+            system.PostFixedUpdate(fixedDeltaTime);
         }
     }
 
@@ -438,11 +466,23 @@ public abstract class BaseWorld
     {
         foreach (var system in mAllSystems)
         {
-            if(system == null)
+            if (system == null)
             {
                 continue;
             }
-            system.LateUpdate(deltaTime);
+            system.PreLateUpdate(deltaTime);
+
+            foreach (var entityData in mUpadteEntityTypeAndEntitiesMap)
+            {
+                foreach (var entity in entityData.Value)
+                {
+                    if (system.Filter(entity))
+                    {
+                        system.LateUpdate(entity, deltaTime);
+                    }
+                }
+            }
+            system.PostLateUpdate(deltaTime);
         }
     }
 

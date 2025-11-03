@@ -41,11 +41,12 @@ public class MapGameWorld : BaseWorld
     /// </summary>
     private void CreateAllSystem()
     {
-        CreateSystem<MapGameEntitySpawnSystem>();
         CreateSystem<InputControlSystem>();
         CreateSystem<PlayerSpawnSystem>();
         CreateSystem<MapObjectEntitySpawnSystem>();
         CreateSystem<CameraFollowSystem>();
+        // MapGameEntitySpawnSystem一来摄像机的位置改变，所以必须放在CameraFollowSystem后
+        CreateSystem<MapGameEntitySpawnSystem>();
     }
 
     /// <summary>

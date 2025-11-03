@@ -215,10 +215,38 @@ public abstract class BaseSystem
     }
 
     /// <summary>
-    /// Logic Update
+    /// PreLogicUpdate
     /// </summary>
     /// <param name="logicFrameTime"></param>
-    public virtual void LogicUpdate(float logicFrameTime)
+    public virtual void PreLogicUpdate(float logicFrameTime)
+    {
+
+    }
+
+    /// <summary>
+    /// Logic Update
+    /// </summary>
+    /// <param name="entity"></param>
+    /// <param name="logicFrameTime"></param>
+    public virtual void LogicUpdate(BaseEntity entity, float logicFrameTime)
+    {
+
+    }
+
+    /// <summary>
+    /// PostLogicUpdate
+    /// </summary>
+    /// <param name="logicFrameTime"></param>
+    public virtual void PostLogicUpdate(float logicFrameTime)
+    {
+
+    }
+
+    /// <summary>
+    /// PreFixedUpdate
+    /// </summary>
+    /// <param name="fixedDeltaTime"></param>
+    public virtual void PreFixedUpdate(float fixedDeltaTime)
     {
 
     }
@@ -226,8 +254,27 @@ public abstract class BaseSystem
     /// <summary>
     /// FixedUpdate
     /// </summary>
+    /// <param name="entity"></param>
     /// <param name="fixedDeltaTime"></param>
-    public virtual void FixedUpdate(float fixedDeltaTime)
+    public virtual void FixedUpdate(BaseEntity entity, float fixedDeltaTime)
+    {
+
+    }
+
+    /// <summary>
+    /// PostFixedUpdate
+    /// </summary>
+    /// <param name="fixedDeltaTime"></param>
+    public virtual void PostFixedUpdate(float fixedDeltaTime)
+    {
+
+    }
+
+    /// <summary>
+    /// PreLateUpdate
+    /// </summary>
+    /// <param name="deltaTime"></param>
+    public virtual void PreLateUpdate(float deltaTime)
     {
 
     }
@@ -236,7 +283,16 @@ public abstract class BaseSystem
     /// LateUpdate
     /// </summary>
     /// <param name="deltaTime"></param>
-    public virtual void LateUpdate(float deltaTime)
+    public virtual void LateUpdate(BaseEntity entity, float deltaTime)
+    {
+
+    }
+
+    /// <summary>
+    /// PostLateUpdate
+    /// </summary>
+    /// <param name="deltaTime"></param>
+    public virtual void PostLateUpdate(float deltaTime)
     {
 
     }
