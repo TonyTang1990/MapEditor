@@ -172,6 +172,7 @@ public class MapGameManager : SingletonTemplate<MapGameManager>
     {
         WorldManager.Singleton.RemoveWorld(WorldNames.MapGameWorldName);
         World = null;
+        CloseMainUI();
     }
 
     /// <summary>
