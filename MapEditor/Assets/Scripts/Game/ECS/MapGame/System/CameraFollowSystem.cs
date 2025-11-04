@@ -58,17 +58,18 @@ public class CameraFollowSystem : BaseSystem
     /// <summary>
     /// LateUpdate
     /// </summary>
+    /// <param name="entity"></param>
     /// <param name="deltaTime"></param>
-    public override void LateUpdate(float deltaTime)
+    public override void LateUpdate(BaseEntity entity, float deltaTime)
     {
-        base.LateUpdate(deltaTime);
-        var firstPlayerEntity = OwnerWorld.GetFirstEntityByType<PlayerEntity>(EntityType.Player);
-        if(firstPlayerEntity == null)
+        base.LateUpdate(entity, deltaTime);
+        var cameraEntity = entity as CameraEntity;
+        if(cameraEntity == null)
         {
             return;
         }
-        var cameraEntity = OwnerWorld.GetEntityByUuid<CameraEntity>(mCameraEntityUuid);
-        if(cameraEntity == null)
+        var firstPlayerEntity = OwnerWorld.GetFirstEntityByType<PlayerEntity>(EntityType.Player);
+        if (firstPlayerEntity == null)
         {
             return;
         }
